@@ -1,9 +1,9 @@
 import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
+    AxiosError,
+    AxiosInstance,
+    AxiosRequestConfig,
+    AxiosResponse,
+    InternalAxiosRequestConfig,
 } from "axios";
 import * as SecureStore from "expo-secure-store";
 import { useAuthStore } from "../store/auth";
@@ -229,21 +229,41 @@ export const getToken = async (): Promise<string | null> => {
 
 // Error handler utility
 export const handleApiError = (error: AxiosError): ApiError => {
+  console.log("handleApiError: Processing error:", error);
+  
   if (error.response) {
     // Server responded with error status
+    console.log("handleApiError: Server error response:", {
+      status: error.response.status,
+      statusText: error.response.statusText,
+      data: error.response.data
+    });
+    
+    let errorMessage = "An error occurred";
+    
+    // Try to extract message from various response formats
+    if (typeof error.response.data === 'object' && error.response.data !== null) {
+      const data = error.response.data as any;
+      errorMessage = data.message || data.error || data.error_message || 
+                    (typeof data.errors === 'object' ? JSON.stringify(data.errors) : null) ||
+                    "Server error: " + error.response.status;
+    }
+    
     return {
-      message: (error.response.data as any)?.message || "An error occurred",
+      message: errorMessage,
       status: error.response.status,
       data: error.response.data,
     };
   } else if (error.request) {
     // Request was made but no response received
+    console.log("handleApiError: No response received:", error.request);
     return {
       message: "Network error. Please check your connection.",
       status: 0,
     };
   } else {
     // Something else happened
+    console.log("handleApiError: Other error:", error.message);
     return {
       message: error.message || "An unexpected error occurred",
     };

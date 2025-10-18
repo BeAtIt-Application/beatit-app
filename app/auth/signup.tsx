@@ -95,17 +95,31 @@ export default function SignupScreen() {
 
     setIsLoading(true);
     try {
-      await signup({
+      console.log("Signup: Sending credentials...", {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+      });
+      
+      const response = await signup({
         first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
       });
-      router.replace("/(tabs)");
+      
+      console.log("Signup: Response received:", response);
+      
+      // Navigate to interests selection screen
+      router.push({
+        pathname: "/auth/select-interests" as any,
+        params: { email: formData.email },
+      });
     } catch (error) {
+      console.error("Signup Error:", error);
       Alert.alert(
         "Signup Failed",
-        error instanceof Error ? error.message : "An error occurred"
+        error instanceof Error ? error.message : "An unexpected error occurred"
       );
     } finally {
       setIsLoading(false);

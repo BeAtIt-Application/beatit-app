@@ -20,7 +20,10 @@ export { UserApi, userApi } from "./userApi";
 export type {
     LoginCredentials,
     LoginResponse,
+    SaveInterestsRequest,
+    SaveInterestsResponse,
     SignupCredentials,
+    SignupResponse,
     User
 } from "./authApi";
 export type { ApiError, RefreshTokenResponse } from "./client";

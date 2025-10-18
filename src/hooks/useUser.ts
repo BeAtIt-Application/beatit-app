@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { LoginCredentials, SignupCredentials, User } from "../api/authApi";
+import type { LoginCredentials, SignupCredentials, SignupResponse, User } from "../api/authApi";
 import { authApiWrapper } from "../api/authApiSwitch";
 import { useAuthStore } from "../store/auth";
 
@@ -28,20 +28,33 @@ export const useUser = () => {
     [login]
   );
 
-  // Signup function that calls API and saves token securely
+  // Signup function that calls API (no auto-login in new flow)
   const handleSignup = useCallback(
-    async (credentials: SignupCredentials): Promise<void> => {
+    async (credentials: SignupCredentials): Promise<SignupResponse> => {
       try {
+        console.log("useUser: Calling authApiWrapper.signup with:", credentials.email);
         const data = await authApiWrapper.signup(credentials);
-
-        // Save token and user data securely using the auth store
-        await login(data.user, data.token);
+        
+        // New flow: user must complete interests selection and email verification
+        // before they can login, so we don't auto-login here
+        console.log("useUser: Signup successful, response:", data);
+        
+        if (!data || !data.user) {
+          console.error("useUser: Invalid response format:", data);
+          throw new Error("Invalid response from server");
+        }
+        
+        return data;
       } catch (error) {
-        console.error("Signup error:", error);
+        console.error("useUser: Signup error details:", error);
+        if (error instanceof Error) {
+          console.error("useUser: Error message:", error.message);
+          console.error("useUser: Error stack:", error.stack);
+        }
         throw error;
       }
     },
-    [login]
+    []
   );
 
   // Logout function that clears token and resets state
@@ -177,6 +190,7 @@ export type {
   LoginCredentials,
   LoginResponse,
   SignupCredentials,
+  SignupResponse,
   User
 } from "../api/authApi";
 

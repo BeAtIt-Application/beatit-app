@@ -2,8 +2,13 @@
 import type {
   LoginCredentials,
   LoginResponse,
+  SaveInterestsRequest,
+  SaveInterestsResponse,
   SignupCredentials,
+  SignupResponse,
   User,
+  VerifyEmailByCodeRequest,
+  VerifyEmailByCodeResponse,
 } from "./authApi";
 import { authApi } from "./authApi";
 import { mockAuthApi } from "./mockAuth";
@@ -23,8 +28,138 @@ export const authApiWrapper = {
     return await authApiSwitch.login(credentials);
   },
 
-  async signup(credentials: SignupCredentials): Promise<LoginResponse> {
-    return await authApiSwitch.signup(credentials);
+  async signup(credentials: SignupCredentials): Promise<SignupResponse> {
+    try {
+      console.log("authApiSwitch: Calling signup with:", credentials.email);
+      
+      // Call the actual signup function
+      const response = await authApiSwitch.signup(credentials);
+      console.log("authApiSwitch: Raw signup response:", response);
+      
+      // If we get a LoginResponse with token (from mock), convert it to SignupResponse
+      if (response && 'token' in response) {
+        console.log("authApiSwitch: Converting LoginResponse to SignupResponse");
+        return {
+          message: "Account created successfully. Please select your interests.",
+          user: response.user,
+          interests_selection_required: true
+        };
+      }
+      
+      // Otherwise, return the SignupResponse directly
+      // Check if we have a valid response with the expected format
+      if (!response) {
+        console.error("authApiSwitch: Empty response");
+        throw new Error("Empty response from server");
+      }
+      
+      // For SignupResponse, we need user and interests_selection_required
+      if (!response.user) {
+        console.error("authApiSwitch: Missing user in response:", response);
+        // Try to adapt the response format if possible
+        if (typeof response === 'object') {
+          // Create a fallback user object if user is missing
+          const fallbackUser = { 
+            id: 0, 
+            email: credentials.email, 
+            first_name: credentials.first_name, 
+            last_name: credentials.last_name, 
+            role: 1, 
+            is_disabled: false, 
+            permissions_array: [] 
+          };
+          
+          return {
+            message: response.message || "Account created successfully",
+            user: (response as any).data || fallbackUser,
+            interests_selection_required: true
+          };
+        }
+        throw new Error("Invalid response format: missing user data");
+      }
+      
+      console.log("authApiSwitch: Returning SignupResponse directly");
+      return response;
+    } catch (error) {
+      console.error("authApiSwitch: Signup error:", error);
+      if (error instanceof Error) {
+        console.error("authApiSwitch: Error message:", error.message);
+        console.error("authApiSwitch: Error stack:", error.stack);
+      }
+      throw error;
+    }
+  },
+
+  async saveInterests(data: SaveInterestsRequest): Promise<SaveInterestsResponse> {
+    // If using real API, call it directly
+    if (!USE_MOCK_API) {
+      return await authApi.saveInterests(data);
+    }
+    
+    // Mock implementation for when mockAuth.ts is used
+    console.log("Mock: Saving interests for", data.email);
+    console.log("Music genres:", data.music_genre_ids);
+    console.log("Venue types:", data.venue_type_ids);
+    
+    // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    return {
+      message: "Interests saved successfully. Registration complete.",
+      // No email verification required in the simplified flow
+    };
+  },
+
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    // If using real API, call it directly
+    if (!USE_MOCK_API) {
+      return await authApi.resendVerificationEmail(email);
+    }
+    
+    // Mock implementation for when mockAuth.ts is used
+    console.log("Mock: Sending verification email to", email);
+    
+    // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return {
+      message: "Verification email sent successfully",
+    };
+  },
+
+  async verifyEmailByCode(data: VerifyEmailByCodeRequest): Promise<VerifyEmailByCodeResponse> {
+    // If using real API, call it directly
+    if (!USE_MOCK_API) {
+      return await authApi.verifyEmailByCode(data);
+    }
+    
+    // Mock implementation for when mockAuth.ts is used
+    console.log("Mock: Verifying email with code for", data.email);
+    console.log("Code:", data.code);
+    
+    // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // For testing, accept code "123456" as valid
+    const isValid = data.code === "123456";
+    
+    if (!isValid) {
+      throw new Error("Invalid verification code");
+    }
+    
+    return {
+      message: "Email verified successfully! You can now log in.",
+      user: {
+        id: 1,
+        email: data.email,
+        first_name: "Test",
+        last_name: "User",
+        email_verified_at: new Date().toISOString(),
+        role: 5,
+        is_disabled: false,
+        permissions_array: ["write_public", "read_events_public", "read_venues_public"]
+      }
+    };
   },
 
   async logout(): Promise<void> {

@@ -11,30 +11,39 @@ import type {
 // Mock users database
 const mockUsers: Array<User & { password: string }> = [
   {
-    id: "1",
+    id: 1,
     email: "demo@beatit.com",
-    name: "Demo User",
+    first_name: "Demo",
+    last_name: "User",
     password: "password123",
-    role: "user",
+    role: 1,
+    is_disabled: false,
+    permissions_array: [],
   },
   {
-    id: "2",
+    id: 2,
     email: "premium@beatit.com",
-    name: "Premium User",
+    first_name: "Premium",
+    last_name: "User",
     password: "premium123",
-    role: "premium",
+    role: 2,
+    is_disabled: false,
+    permissions_array: [],
   },
   {
-    id: "3",
+    id: 3,
     email: "admin@beatit.com",
-    name: "Admin User",
+    first_name: "Admin",
+    last_name: "User",
     password: "admin123",
-    role: "admin",
+    role: 3,
+    is_disabled: false,
+    permissions_array: ["admin"],
   },
 ];
 
 // Mock JWT token generator (just for demo)
-const generateMockToken = (userId: string): string => {
+const generateMockToken = (userId: number): string => {
   return `mock-jwt-token-${userId}-${Date.now()}`;
 };
 
@@ -83,11 +92,14 @@ export class MockAuthApi {
 
     // Create new user
     const newUser: User & { password: string } = {
-      id: (mockUsers.length + 1).toString(),
+      id: (mockUsers.length + 1),
       email: credentials.email,
-      name: credentials.name,
+      first_name: credentials.first_name,
+      last_name: credentials.last_name,
       password: credentials.password,
-      role: "user", // Default role
+      role: 1, // Default role
+      is_disabled: false,
+      permissions_array: []
     };
 
     mockUsers.push(newUser);
@@ -133,7 +145,7 @@ export class MockAuthApi {
     await simulateApiDelay(400);
 
     // For demo, just generate a new token
-    const newToken = generateMockToken("1");
+    const newToken = generateMockToken(1);
 
     return {
       token: newToken,

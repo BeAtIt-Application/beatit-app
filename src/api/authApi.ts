@@ -30,6 +30,9 @@ export interface User {
   role: number;
   is_disabled: boolean;
   permissions_array: string[];
+  email_verified_at?: string;
+  preferred_music_genres?: any[];
+  preferred_venue_types?: any[];
 }
 
 export interface LoginCredentials {
@@ -47,6 +50,33 @@ export interface SignupCredentials {
 export interface LoginResponse {
   user: User;
   token: string;
+}
+
+export interface SignupResponse {
+  message: string;
+  user: User;
+  interests_selection_required: boolean;
+}
+
+export interface SaveInterestsRequest {
+  email: string;
+  music_genre_ids: number[];
+  venue_type_ids: number[];
+}
+
+export interface SaveInterestsResponse {
+  message: string;
+  email_verification_required?: boolean;
+}
+
+export interface VerifyEmailByCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface VerifyEmailByCodeResponse {
+  message: string;
+  user: User; // API returns the user object instead of a verified flag
 }
 
 // Auth API service
@@ -94,23 +124,111 @@ export class AuthApi {
   /**
    * Register new user
    */
-  static async signup(credentials: SignupCredentials): Promise<LoginResponse> {
+  static async signup(credentials: SignupCredentials): Promise<SignupResponse> {
     try {
+      console.log("AuthApi.signup: Calling API with:", credentials.email);
+      console.log("AuthApi.signup: Endpoint:", getAuthEndpoint("signup"));
+      console.log("AuthApi.signup: Full URL:", `${process.env.EXPO_PUBLIC_API_URL}${getAuthEndpoint("signup")}`);
+      
       const response = await api.post(getAuthEndpoint("signup"), credentials);
-
-      // Extract token from Authorization header
-      const token =
-        response.headers.authorization || response.headers.Authorization;
-
-      if (!token) {
-        throw new Error("No authentication token received");
+      
+      console.log("AuthApi.signup: Response status:", response.status);
+      console.log("AuthApi.signup: Response headers:", response.headers);
+      console.log("AuthApi.signup: Response data:", response.data);
+      
+      // Handle different response formats
+      const data = response.data;
+      
+      // If we have a standard format with user and message, return it
+      if (data && typeof data === 'object' && data.user) {
+        return {
+          message: data.message || "Account created successfully",
+          user: data.user,
+          interests_selection_required: data.interests_selection_required !== false
+        };
       }
-
+      
+      // If we have a different format, try to adapt it
+      if (data && typeof data === 'object') {
+        // Try to extract user data from various formats
+        const user = data.user || data.data || {
+          id: 0,
+          email: credentials.email,
+          first_name: credentials.first_name,
+          last_name: credentials.last_name,
+          role: 1,
+          is_disabled: false,
+          permissions_array: []
+        };
+        
+        return {
+          message: data.message || "Account created successfully",
+          user,
+          interests_selection_required: true
+        };
+      }
+      
+      // If all else fails, create a minimal valid response
       return {
-        user: response.data,
-        token: token,
+        message: "Account created successfully",
+        user: {
+          id: 0,
+          email: credentials.email,
+          first_name: credentials.first_name,
+          last_name: credentials.last_name,
+          role: 1,
+          is_disabled: false,
+          permissions_array: []
+        },
+        interests_selection_required: true
       };
     } catch (error) {
+      console.error("AuthApi.signup: Error occurred:", error);
+      
+      const apiError = handleApiError(error as any);
+      console.error("AuthApi.signup: API error:", apiError);
+      
+      throw new Error(apiError.message);
+    }
+  }
+
+  /**
+   * Save user interests (music genres and venue types)
+   */
+  static async saveInterests(data: SaveInterestsRequest): Promise<SaveInterestsResponse> {
+    try {
+      const response = await api.post(getAuthEndpoint("saveInterests"), data);
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
+
+  /**
+   * Resend email verification
+   */
+  static async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    try {
+      const response = await api.post(getAuthEndpoint("resendVerificationEmail"), { email });
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
+
+  /**
+   * Verify email with code
+   */
+  static async verifyEmailByCode(data: VerifyEmailByCodeRequest): Promise<VerifyEmailByCodeResponse> {
+    try {
+      console.log("AuthApi.verifyEmailByCode: Calling API with:", data.email);
+      const response = await api.post(getAuthEndpoint("verifyEmailByCode"), data);
+      console.log("AuthApi.verifyEmailByCode: Response data:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("AuthApi.verifyEmailByCode: Error occurred:", error);
       const apiError = handleApiError(error as any);
       throw new Error(apiError.message);
     }
@@ -160,6 +278,9 @@ export class AuthApi {
 export const authApi = {
   login: AuthApi.login,
   signup: AuthApi.signup,
+  saveInterests: AuthApi.saveInterests,
+  resendVerificationEmail: AuthApi.resendVerificationEmail,
+  verifyEmailByCode: AuthApi.verifyEmailByCode,
   logout: AuthApi.logout,
   getCurrentUser: AuthApi.getCurrentUser,
   refreshToken: AuthApi.refreshToken,

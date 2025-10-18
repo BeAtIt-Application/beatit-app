@@ -6,8 +6,11 @@ export const API_CONFIG = {
     auth: {
       login: "/auth/login",
       signup: "/auth/sign-up",
+      saveInterests: "/auth/public/save-interests",
+      resendVerificationEmail: "/auth/send-verification-code",
+      verifyEmailByCode: "/auth/verify-email-by-code",
       logout: "/auth/logout",
-      me: "/auth/me",
+      me: "/me/profile",
       refresh: "/auth/refresh",
     },
     user: {
