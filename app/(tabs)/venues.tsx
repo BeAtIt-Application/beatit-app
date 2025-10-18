@@ -3,11 +3,11 @@ import { VenueCard } from "@/components/VenueCard";
 import { CityFilter } from "@/components/filters/CityFilter";
 import { VenueTypeFilter } from "@/components/filters/VenueTypeFilter";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Animated,
-  Text,
-  View
+    ScrollView,
+    Text,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -15,9 +15,6 @@ export default function VenuesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [venues, setVenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  // Scroll animation value
-  const scrollY = useRef(new Animated.Value(0)).current;
   
   // Modal visibility states
   const [venueTypeModalVisible, setVenueTypeModalVisible] = useState(false);
@@ -116,19 +113,11 @@ export default function VenuesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[linear-gradient(180deg,#6932D4_0%,#3F6AE9_100%)]">
-      {/* Content with scroll tracking - header is now INSIDE */}
-      <Animated.ScrollView 
+      <ScrollView 
         className="flex-1" 
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
-        stickyHeaderIndices={[0]}
         contentContainerStyle={{ paddingBottom: 90 }}
       >
-        {/* Sticky PageHeader component */}
         <PageHeader
           title="Venues"
           colors={['#2FCC67', '#5C1593'] as const}
@@ -139,7 +128,6 @@ export default function VenuesScreen() {
           onSearchChange={handleSearchChange}
           onFilterChange={handleFilterChange}
           selectedFilters={selectedFilters}
-          scrollY={scrollY}
         />
 
         {/* Venues List */}
@@ -165,7 +153,7 @@ export default function VenuesScreen() {
             </View>
           )}
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
 
       {/* Filter Modals */}
       <VenueTypeFilter

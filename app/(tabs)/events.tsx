@@ -4,8 +4,8 @@ import { CityFilter } from "@/components/filters/CityFilter";
 import { DateFilter } from "@/components/filters/DateFilter";
 import { GenreFilter } from "@/components/filters/GenreFilter";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface DateRange {
@@ -18,9 +18,6 @@ export default function EventsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  // Scroll animation value
-  const scrollY = useRef(new Animated.Value(0)).current;
 
   // Modal visibility states
   const [genreModalVisible, setGenreModalVisible] = useState(false);
@@ -126,19 +123,11 @@ export default function EventsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[linear-gradient(180deg,#6932D4_0%,#3F6AE9_100%)]bg-white">
-      {/* Content with scroll tracking - header is now INSIDE */}
-      <Animated.ScrollView 
+      <ScrollView 
         className="flex-1" 
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
-        stickyHeaderIndices={[0]}
         contentContainerStyle={{ paddingBottom: 90 }}
       >
-        {/* Sticky PageHeader component */}
         <PageHeader
           title="Events"
           colors={['#761CBC', '#5271FF'] as const}
@@ -149,7 +138,6 @@ export default function EventsScreen() {
           onSearchChange={handleSearchChange}
           onFilterChange={handleFilterChange}
           selectedFilters={selectedFilters}
-          scrollY={scrollY}
         />
 
         {/* Events List */}
@@ -173,7 +161,7 @@ export default function EventsScreen() {
             </View>
           )}
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
 
       {/* Filter Modals */}
       <GenreFilter

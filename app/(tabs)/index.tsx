@@ -5,14 +5,11 @@ import { EventsHorizontalList } from "@/components/EventsHorizontalList";
 import { PageHeader } from "@/components/PageHeader";
 import { VenuesHorizontalList } from "@/components/VenuesHorizontalList";
 import { router } from "expo-router";
-import React, { useRef, useState } from "react";
-import { Animated, View } from "react-native";
+import React, { useState } from "react";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Discover");
-  
-  // Scroll animation value
-  const scrollY = useRef(new Animated.Value(0)).current;
 
   const tabs = ["Discover", "Events", "Venues", "Artists"];
 
@@ -154,25 +151,16 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[linear-gradient(180deg,#6932D4_0%,#3F6AE9_100%)]">
-      {/* Content with scroll tracking - header is now INSIDE */}
-      <Animated.ScrollView
+      <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
-        stickyHeaderIndices={[0]}
         contentContainerStyle={{ paddingBottom: 90 }}
       >
-        {/* Sticky PageHeader component */}
         <PageHeader
           title="Home Feed"
           colors={['#5271FF', '#22954B'] as const}
           showLogo={true}
           showNotification={true}
-          scrollY={scrollY}
         />
 
         {/* Content */}
@@ -223,7 +211,7 @@ export default function HomeScreen() {
           onItemPress={handleCategoryPress}
           columns={2}
         />
-      </Animated.ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 }
