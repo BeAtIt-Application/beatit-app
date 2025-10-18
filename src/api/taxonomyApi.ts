@@ -41,3 +41,4 @@ export const taxonomyApi = {
   getVenueTypes: TaxonomyApi.getVenueTypes,
 };
 
+
