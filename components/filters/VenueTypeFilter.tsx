@@ -1,4 +1,5 @@
 import { FilterModal } from "@/components/FilterModal";
+import { useVenueTypes } from "@/src/hooks/useTaxonomies";
 import React, { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -9,25 +10,13 @@ interface VenueTypeFilterProps {
   selectedVenueType?: string | null;
 }
 
-const VENUE_TYPE_OPTIONS = [
-  { id: "club", label: "Club", icon: "🎵" },
-  { id: "bar", label: "Bar", icon: "🍺" },
-  { id: "concert-hall", label: "Concert Hall", icon: "🎭" },
-  { id: "outdoor", label: "Outdoor Venue", icon: "🌳" },
-  { id: "restaurant", label: "Restaurant", icon: "🍽️" },
-  { id: "cafe", label: "Café", icon: "☕" },
-  { id: "theater", label: "Theater", icon: "🎬" },
-  { id: "arena", label: "Arena", icon: "🏟️" },
-  { id: "festival-ground", label: "Festival Ground", icon: "🎪" },
-  { id: "lounge", label: "Lounge", icon: "🛋️" },
-];
-
 export function VenueTypeFilter({ 
   visible, 
   onClose, 
   onSelect, 
   selectedVenueType 
 }: VenueTypeFilterProps) {
+  const { venueTypes, isLoading } = useVenueTypes();
   const [tempSelected, setTempSelected] = useState<string | null>(selectedVenueType || null);
 
   useEffect(() => {
@@ -62,41 +51,56 @@ export function VenueTypeFilter({
           Choose the type of venue you're looking for
         </Text>
         
+        {/* Loading State */}
+        {isLoading && (
+          <View className="py-12 items-center">
+            <Text className="text-gray-400 text-base">Loading venue types...</Text>
+          </View>
+        )}
+
         {/* Venue Type Grid */}
-        <View className="gap-3">
-          {VENUE_TYPE_OPTIONS.map((venueType) => {
-            const isSelected = tempSelected === venueType.id;
-            return (
-              <TouchableOpacity
-                key={venueType.id}
-                onPress={() => handleSelect(venueType.id)}
-                className={`p-4 rounded-xl border-2 ${
-                  isSelected 
-                    ? 'bg-[#761CBC]/10 border-[#761CBC]' 
-                    : 'bg-white border-gray-200'
-                }`}
-              >
-                <View className="flex-row justify-between items-center">
-                  <View className="flex-row items-center">
-                    <Text className="text-2xl mr-3">{venueType.icon}</Text>
-                    <Text 
-                      className={`text-base ${
-                        isSelected ? 'text-[#761CBC] font-semibold' : 'text-gray-800'
-                      }`}
-                    >
-                      {venueType.label}
-                    </Text>
-                  </View>
-                  {isSelected && (
-                    <View className="w-6 h-6 bg-[#761CBC] rounded-full items-center justify-center">
-                      <Text className="text-white text-xs">✓</Text>
+        {!isLoading && venueTypes && venueTypes.length > 0 && (
+          <View className="gap-3">
+            {venueTypes.map((venueType) => {
+              const isSelected = tempSelected === venueType.id.toString();
+              return (
+                <TouchableOpacity
+                  key={venueType.id}
+                  onPress={() => handleSelect(venueType.id.toString())}
+                  className={`p-4 rounded-xl border-2 ${
+                    isSelected 
+                      ? 'bg-[#761CBC]/10 border-[#761CBC]' 
+                      : 'bg-white border-gray-200'
+                  }`}
+                >
+                  <View className="flex-row justify-between items-center">
+                    <View className="flex-row items-center">
+                      <Text 
+                        className={`text-base ${
+                          isSelected ? 'text-[#761CBC] font-semibold' : 'text-gray-800'
+                        }`}
+                      >
+                        {venueType.name}
+                      </Text>
                     </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                    {isSelected && (
+                      <View className="w-6 h-6 bg-[#761CBC] rounded-full items-center justify-center">
+                        <Text className="text-white text-xs">✓</Text>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && (!venueTypes || venueTypes.length === 0) && (
+          <View className="py-12 items-center">
+            <Text className="text-gray-400 text-base">No venue types available</Text>
+          </View>
+        )}
       </View>
     </FilterModal>
   );
