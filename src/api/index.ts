@@ -2,7 +2,6 @@
 export { AuthApi, authApi } from "./authApi";
 export {
     api,
-    clearTokens,
     getToken,
     handleApiError,
     setTokens

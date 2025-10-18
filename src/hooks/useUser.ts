@@ -92,8 +92,10 @@ export const useUser = () => {
       }
     } catch (error) {
       console.error("Error hydrating auth state:", error);
-      // If hydration fails, clear auth state
-      await logout();
+      // Only clear auth state if it's an authentication error
+      if (error instanceof Error && (error.message.includes("401") || error.message.includes("unauthorized"))) {
+        await logout();
+      }
     }
   }, [token, initializeAuth, logout]);
 
@@ -179,9 +181,11 @@ export const initializeAppAuth = async (): Promise<void> => {
     }
   } catch (error) {
     console.error("Error initializing app auth:", error);
-    // If initialization fails, clear auth state
-    const state = useAuthStore.getState();
-    await state.logout();
+    // Only clear auth state if it's an authentication error
+    if (error instanceof Error && (error.message.includes("401") || error.message.includes("unauthorized"))) {
+      const state = useAuthStore.getState();
+      await state.logout();
+    }
   }
 };
 

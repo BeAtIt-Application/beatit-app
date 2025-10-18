@@ -2,22 +2,22 @@ import { authApi } from "@/src/api";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VerifyEmailByCodeScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
   const [code, setCode] = useState("");
-  const [cooldown, setCooldown] = useState(0);
+  const [cooldown, setCooldown] = useState(0); // Start with 60 second cooldown
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -109,10 +109,26 @@ export default function VerifyEmailByCodeScreen() {
       setCooldown(60);
       Alert.alert("Success", "Verification code sent successfully");
     } catch (error) {
-      Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to resend code"
-      );
+      let errorMessage = "Failed to resend code";
+      
+      if (error instanceof Error) {
+        // Handle specific "code already sent" error
+        if (error.message.includes("verification code has already been sent")) {
+          // Extract expiration time from error message if available
+          const match = error.message.match(/(\d+)\s*minutes?/);
+          const expirationMinutes = match ? parseInt(match[1]) : 15;
+          const expirationSeconds = expirationMinutes * 60;
+          
+          // Set cooldown to match server expiration time
+          setCooldown(expirationSeconds);
+          
+          errorMessage = `A verification code was already sent. Please check your email or wait ${expirationMinutes} minutes before requesting a new one.`;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      Alert.alert("Cannot Resend Code", errorMessage);
     } finally {
       setIsResending(false);
     }
@@ -179,7 +195,13 @@ export default function VerifyEmailByCodeScreen() {
                   {isResending
                     ? "Sending..."
                     : cooldown > 0
-                    ? `Resend code in ${cooldown}s`
+                    ? (() => {
+                        const minutes = Math.floor(cooldown / 60);
+                        const seconds = cooldown % 60;
+                        return minutes > 0 
+                          ? `Resend code in ${minutes}m ${seconds}s`
+                          : `Resend code in ${cooldown}s`;
+                      })()
                     : "Resend verification code"}
                 </Text>
               </TouchableOpacity>

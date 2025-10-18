@@ -1,9 +1,9 @@
 import axios, {
-    AxiosError,
-    AxiosInstance,
-    AxiosRequestConfig,
-    AxiosResponse,
-    InternalAxiosRequestConfig,
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
 } from "axios";
 import * as SecureStore from "expo-secure-store";
 import { useAuthStore } from "../store/auth";
@@ -206,17 +206,7 @@ export const setTokens = async (
   }
 };
 
-export const clearTokens = async (): Promise<void> => {
-  try {
-    await Promise.all([
-      SecureStore.deleteItemAsync(TOKEN_KEY),
-      SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
-    ]);
-  } catch (error) {
-    console.error("Error clearing tokens:", error);
-    throw error;
-  }
-};
+// Removed clearTokens - use authStore.logout() instead
 
 export const getToken = async (): Promise<string | null> => {
   try {
@@ -247,6 +237,11 @@ export const handleApiError = (error: AxiosError): ApiError => {
       errorMessage = data.message || data.error || data.error_message || 
                     (typeof data.errors === 'object' ? JSON.stringify(data.errors) : null) ||
                     "Server error: " + error.response.status;
+      
+      // For verification code errors, include expiration time in the message
+      if (data.message && data.message.includes("verification code has already been sent") && data.code_expires_in_minutes) {
+        errorMessage = `${data.message} The code expires in ${data.code_expires_in_minutes} minutes.`;
+      }
     }
     
     return {
@@ -272,3 +267,4 @@ export const handleApiError = (error: AxiosError): ApiError => {
 
 // Export types
 export type { ApiError, RefreshTokenResponse };
+

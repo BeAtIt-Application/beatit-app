@@ -108,29 +108,4 @@ export const getAuthToken = async (): Promise<string | null> => {
   }
 };
 
-export const clearAuthData = async (): Promise<void> => {
-  try {
-    await Promise.all([
-      SecureStore.deleteItemAsync(TOKEN_KEY),
-      SecureStore.deleteItemAsync(USER_KEY),
-    ]);
-
-    // Also clear the store state
-    useAuthStore.setState({ user: null, token: null, isLoading: false });
-  } catch (error) {
-    console.error("Error clearing auth data:", error);
-    throw error;
-  }
-};
-
-// Force logout function that clears everything
-export const forceLogout = async (): Promise<void> => {
-  try {
-    const store = useAuthStore.getState();
-    await store.logout();
-  } catch (error) {
-    console.error("Error during force logout:", error);
-    // Even if logout fails, clear the state
-    useAuthStore.setState({ user: null, token: null, isLoading: false });
-  }
-};
+// Removed clearAuthData and forceLogout - use store.logout() instead
