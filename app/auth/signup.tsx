@@ -7,6 +7,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -117,9 +118,14 @@ export default function SignupScreen() {
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View className="flex-1 px-5 pt-8 mb-4 flex flex-col justify-between h-full bg-white">
-          {/* Main Content */}
-          <View className="flex-1">
+        <ScrollView 
+          className="flex-1"
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <View className="flex-1 px-5 pt-8 mb-4 flex flex-col justify-between h-full bg-white">
+            {/* Main Content */}
+            <View className="flex-1">
             <Text className="text-[23px] text-[#151B23] font-poppins-bold mb-2">
               Welcome to{" "}
               <Text className="text-brand-blue text-[23px] font-poppins">
@@ -141,6 +147,7 @@ export default function SignupScreen() {
                   onChangeText={(value) => handleInputChange("first_name", value)}
                   autoCapitalize="words"
                   autoCorrect={false}
+                  autoFocus={false}
                 />
               </View>
 
@@ -153,6 +160,7 @@ export default function SignupScreen() {
                   onChangeText={(value) => handleInputChange("last_name", value)}
                   autoCapitalize="words"
                   autoCorrect={false}
+                  autoFocus={false}
                 />
               </View>
 
@@ -166,6 +174,7 @@ export default function SignupScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoFocus={false}
                 />
               </View>
 
@@ -179,6 +188,7 @@ export default function SignupScreen() {
                   secureTextEntry
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoFocus={false}
                 />
               </View>
 
@@ -194,6 +204,7 @@ export default function SignupScreen() {
                   secureTextEntry
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoFocus={false}
                 />
               </View>
 
@@ -236,6 +247,7 @@ export default function SignupScreen() {
             </Link>
           </View>
         </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
