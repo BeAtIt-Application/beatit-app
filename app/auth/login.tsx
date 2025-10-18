@@ -83,7 +83,7 @@ export default function LoginScreen() {
             </Text>
 
             {/* Form */}
-            <View className="mb-8 mt-[72px]">
+            <View className="mb-8 mt-[26px]">
               <View className="mb-5">
                 <TextInput
                   className="border border-gray-200 rounded-xl px-4 py-4 text-base  text-gray-800"

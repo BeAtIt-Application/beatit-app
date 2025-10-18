@@ -15,7 +15,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface SignupData {
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -23,7 +24,8 @@ interface SignupData {
 
 export default function SignupScreen() {
   const [formData, setFormData] = useState<SignupData>({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -59,8 +61,11 @@ export default function SignupScreen() {
   }, []);
 
   const validateForm = (): string | null => {
-    if (!formData.name.trim()) {
-      return "Please enter your name";
+    if (!formData.first_name.trim()) {
+      return "Please enter your first name";
+    }
+    if (!formData.last_name.trim()) {
+      return "Please enter your last name";
     }
     if (!formData.email.trim()) {
       return "Please enter your email";
@@ -90,8 +95,8 @@ export default function SignupScreen() {
     setIsLoading(true);
     try {
       await signup({
-        first_name: formData.name,
-        last_name: "",
+        first_name: formData.first_name,
+        last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
       });
@@ -126,14 +131,26 @@ export default function SignupScreen() {
             </Text>
 
             {/* Form */}
-            <View className="mb-8 mt-[72px]">
+            <View className="mb-8 mt-[26px]">
               <View className="mb-5">
                 <TextInput
                   className="border border-gray-200 rounded-xl px-4 py-4 text-base text-gray-800"
-                  placeholder="Name"
+                  placeholder="First Name"
                   placeholderTextColor="#999"
-                  value={formData.name}
-                  onChangeText={(value) => handleInputChange("name", value)}
+                  value={formData.first_name}
+                  onChangeText={(value) => handleInputChange("first_name", value)}
+                  autoCapitalize="words"
+                  autoCorrect={false}
+                />
+              </View>
+
+              <View className="mb-5">
+                <TextInput
+                  className="border border-gray-200 rounded-xl px-4 py-4 text-base text-gray-800"
+                  placeholder="Last Name"
+                  placeholderTextColor="#999"
+                  value={formData.last_name}
+                  onChangeText={(value) => handleInputChange("last_name", value)}
                   autoCapitalize="words"
                   autoCorrect={false}
                 />

@@ -177,5 +177,6 @@ export type {
   LoginCredentials,
   LoginResponse,
   SignupCredentials,
-  User,
+  User
 } from "../api/authApi";
+
