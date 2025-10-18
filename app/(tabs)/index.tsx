@@ -2,6 +2,7 @@ import { CategoryGrid, CategoryItem } from "@/components/CategoryGrid";
 import { CompactEventsHorizontalList } from "@/components/CompactEventsHorizontalList";
 import { CompactVenuesHorizontalList } from "@/components/CompactVenuesHorizontalList";
 import { EventsHorizontalList } from "@/components/EventsHorizontalList";
+import { HorizontalSavedSlider, SliderCard } from "@/components/HorizontalSavedSlider";
 import { PageHeader } from "@/components/PageHeader";
 import { VenuesHorizontalList } from "@/components/VenuesHorizontalList";
 import { router } from "expo-router";
@@ -149,6 +150,34 @@ export default function HomeScreen() {
     // router.push(`/events?genre=${item.value}`);
   };
 
+  // Slider cards data
+  const sliderCards: SliderCard[] = [
+    {
+      id: 1,
+      title: "Venues",
+      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+      onPress: () => console.log('Featured Event pressed'),
+    },
+    {
+      id: 2,
+      title: "Events",
+      image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=300&fit=crop",
+      onPress: () => console.log('New Venue pressed'),
+    },
+    {
+      id: 3,
+      title: "Organizations",
+      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
+      onPress: () => console.log('Artist Spotlight pressed'),
+    },
+    {
+      id: 4,
+      title: "Artists",
+      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+      onPress: () => console.log('Weekend Special pressed'),
+    },
+  ];
+
   return (
     <SafeAreaView className="flex-1 bg-[linear-gradient(180deg,#6932D4_0%,#3F6AE9_100%)]">
       <ScrollView
@@ -161,6 +190,14 @@ export default function HomeScreen() {
           colors={['#5271FF', '#22954B'] as const}
           showLogo={true}
           showNotification={true}
+        />
+
+        {/* Horizontal Slider */}
+        <HorizontalSavedSlider
+          cards={sliderCards}
+          cardWidth={220}
+          cardHeight={200}
+          blurRadius={10}
         />
 
         {/* Content */}
