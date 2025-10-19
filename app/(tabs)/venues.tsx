@@ -212,7 +212,7 @@ export default function VenuesScreen() {
                   name: venue.name,
                   venueType: venue.type,
                   city: venue.city,
-                  image: venue.image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+                  image: venue.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
                   venueTypes: [venue.type].filter(Boolean) as string[],
                   stars: 0, // No rating field in API response
                 }}

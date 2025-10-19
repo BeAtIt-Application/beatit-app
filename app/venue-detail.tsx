@@ -36,7 +36,7 @@ export default function VenueDetailScreen() {
       title: "Live Music Night",
       date: "Fri 15 Dec, 20:00",
       location: venue.name,
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop",
+      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       tag: "Live Music",
     },
     {
@@ -44,7 +44,7 @@ export default function VenueDetailScreen() {
       title: "DJ Set Weekend",
       date: "Sat 16 Dec, 22:00",
       location: venue.name,
-      image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=200&h=200&fit=crop",
+      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       tag: "DJ Set",
     },
     {
@@ -52,7 +52,7 @@ export default function VenueDetailScreen() {
       title: "Acoustic Session",
       date: "Sun 17 Dec, 19:00",
       location: venue.name,
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
+      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       tag: "Acoustic",
     },
   ];

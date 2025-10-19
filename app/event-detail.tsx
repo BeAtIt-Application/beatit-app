@@ -1,5 +1,6 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useEvent, useToggleEventStatus } from "@/src/hooks/useEvents";
+import { useMusicGenres } from "@/src/hooks/useTaxonomies";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -11,6 +12,16 @@ export default function EventDetailScreen() {
   
   const { event, loading, error } = useEvent(eventId);
   const { toggleStatus, loading: toggleLoading } = useToggleEventStatus();
+  const { genres } = useMusicGenres();
+
+  // Function to get genre names from genre IDs
+  const getGenreNames = (genreIds: number[] | undefined) => {
+    if (!genreIds || !genres || genres.length === 0) return [];
+    
+    return genreIds
+      .map(id => genres.find(genre => genre.id === id)?.name)
+      .filter(Boolean) as string[];
+  };
 
   const handleToggleStatus = async (status: 'interested' | 'going') => {
     if (!eventId) return;
@@ -42,18 +53,60 @@ export default function EventDetailScreen() {
     );
   }
 
+  // Get banner image from event images
+  const getBannerImage = () => {
+    if (!event.images) {
+      return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    }
+    
+    // Handle new API structure where images is an object with banner, card, thumbnail
+    if (typeof event.images === 'object' && !Array.isArray(event.images)) {
+      return event.images.banner?.url || event.images.card?.url || event.images.thumbnail?.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    }
+    
+    // Handle old API structure where images is an array
+    if (Array.isArray(event.images) && event.images.length > 0) {
+      const firstImage = event.images[0];
+      return firstImage.banner?.url || firstImage.card?.url || firstImage.thumbnail?.url || firstImage.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    }
+    
+    return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+  };
+
+  const bannerImageUrl = getBannerImage();
+
+  // Format date and time
+  const formatEventDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }),
+      time: date.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      })
+    };
+  };
+
+  const startDateTime = formatEventDateTime(event.event_start);
+  const endDateTime = formatEventDateTime(event.event_end);
+
   const artists = [
     {
       id: 1,
       name: "Saso Parketo",
       image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
     },
     {
       id: 2,
       name: "I brat mu",
       image:
-        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=200&h=200&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
     },
   ];
 
@@ -63,7 +116,7 @@ export default function EventDetailScreen() {
       <View className="relative">
         <Image
           source={{
-            uri: event.image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+            uri: bannerImageUrl,
           }}
           style={{ width: "100%", height: 300 }}
           contentFit="cover"
@@ -78,11 +131,19 @@ export default function EventDetailScreen() {
         </TouchableOpacity>
 
         {/* Event Info Card Overlay */}
-        <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6">
+        <View className="flex justify-center items-center">
+        <View className="absolute bottom-[-60px] bg-white rounded-3xl p-6 mt-24 w-[90%]">
           <Text className="text-3xl font-bold text-brand-purple mb-2">
             {event.name}
           </Text>
-          <Text className="text-lg text-gray-800 mb-2">{event.music_genres?.[0] || 'Event'}</Text>
+          <Text className="text-lg text-gray-800 mb-2">
+            {(() => {
+              const genreNames = getGenreNames((event as any).genreIds);
+              return genreNames.length > 0 
+                ? genreNames.join(' • ') 
+                : 'Event';
+            })()}
+          </Text>
           <View className="flex-row items-center">
             <IconSymbol name="location" size={16} color="#666" />
             <View className="flex-row items-center ml-1">
@@ -97,10 +158,11 @@ export default function EventDetailScreen() {
             </View>
           </View>
         </View>
+        </View>
       </View>
 
       {/* Content */}
-      <View className="px-5 pt-6">
+      <View className="px-5 pt-6 mt-16">
         {/* Description Section */}
         <View className="mb-6">
           <Text className="text-xl font-bold text-brand-purple mb-3">
@@ -118,7 +180,7 @@ export default function EventDetailScreen() {
           </Text>
           <TouchableOpacity>
             <Text className="text-brand-purple text-lg underline">
-              Kamarite, Bitola
+              {event.address || `${event.city}, ${event.country?.toUpperCase()}`}
             </Text>
           </TouchableOpacity>
         </View>
@@ -126,15 +188,18 @@ export default function EventDetailScreen() {
         {/* Date and Time Section */}
         <View className="mb-6">
           <Text className="text-xl font-bold text-brand-purple mb-3">
-            Description
+            Date & Time
           </Text>
-          <View className="flex-row justify-between">
-            <View>
-              <Text className="text-gray-600 mb-1">Event date: {new Date(event.event_start).toLocaleDateString()}</Text>
-              <Text className="text-gray-600">Event time: {new Date(event.event_start).toLocaleTimeString()}</Text>
+          <View className="bg-gray-50 rounded-xl p-4">
+            <View className="mb-3">
+              <Text className="text-gray-700 font-medium mb-1">Start</Text>
+              <Text className="text-gray-600">{startDateTime.date}</Text>
+              <Text className="text-gray-600">{startDateTime.time}</Text>
             </View>
-            <View className="items-end">
-              <Text className="text-gray-600 mb-1">Location: {event.city}</Text>
+            <View>
+              <Text className="text-gray-700 font-medium mb-1">End</Text>
+              <Text className="text-gray-600">{endDateTime.date}</Text>
+              <Text className="text-gray-600">{endDateTime.time}</Text>
             </View>
           </View>
         </View>

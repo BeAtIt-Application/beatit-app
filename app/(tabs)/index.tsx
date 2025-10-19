@@ -21,7 +21,7 @@ export default function HomeScreen() {
       date: "Thur 26 May, 09:00 am",
       location: "Kamarite, Bitola",
       image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       tags: ["Rock", "Metal"],
     },
     {
@@ -30,7 +30,7 @@ export default function HomeScreen() {
       date: "Fri 27 May, 08:00 pm",
       location: "Skopje Center",
       image:
-        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=300&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       tags: ["Rock", "Metal"],
 
     },
@@ -43,7 +43,7 @@ export default function HomeScreen() {
       date: "Available Now",
       location: "Adresa, Bitola",
       image:
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+      "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
       stars: 4.5
     },
@@ -53,7 +53,7 @@ export default function HomeScreen() {
       date: "Thu 26 May",
       location: "Kamarite, Bitola",
       image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
 
         stars: 4.5
@@ -64,7 +64,7 @@ export default function HomeScreen() {
       date: "Fri 27 May",
       location: "City Center, Skopje",
       image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
 
       stars: 4.5
@@ -78,7 +78,7 @@ export default function HomeScreen() {
       date: "Available Now",
       location: "Adresa, Bitola",
       image:
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+      "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
       stars: 4.5
     },
@@ -88,7 +88,7 @@ export default function HomeScreen() {
       date: "Thu 26 May",
       location: "Kamarite, Bitola",
       image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
 
         stars: 4.5
@@ -99,7 +99,7 @@ export default function HomeScreen() {
       date: "Fri 27 May",
       location: "City Center, Skopje",
       image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
 
       stars: 4.5
@@ -114,7 +114,7 @@ export default function HomeScreen() {
       date: "Thur 26 May, 10pm",
       location: "Bitola",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       tag: "Neshto",
     },
     {
@@ -123,7 +123,7 @@ export default function HomeScreen() {
       date: "Sat 28 May, 11pm",
       location: "Skopje",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       tag: "Rock",
     },
   ];
@@ -155,13 +155,13 @@ export default function HomeScreen() {
     {
       id: 1,
       title: "Venues",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       onPress: () => console.log('Featured Event pressed'),
     },
     {
       id: 2,
       title: "Events",
-      image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=300&fit=crop",
+      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       onPress: () => console.log('New Venue pressed'),
     },
     {
@@ -173,7 +173,7 @@ export default function HomeScreen() {
     {
       id: 4,
       title: "Artists",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       onPress: () => console.log('Weekend Special pressed'),
     },
   ];

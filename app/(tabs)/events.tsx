@@ -285,7 +285,7 @@ export default function EventsScreen() {
                   location: event.venue_name ? `${event.venue_name}, ${event.city}` : event.city,
                   venueName: event.venue_name,
                   city: event.city,
-                  image: event.image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+                  image: event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
                   tags: event.music_genres || [event.city],
                 }}
                 onPress={() => router.push(`/event-detail?id=${event.id}`)}

@@ -16,10 +16,12 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
 
   // Get a random banner image from the gallery
   const getBannerImage = () => {
-    if (!venue.images || venue.images.length === 0) return null;
+    if (!venue.images || venue.images.length === 0) {
+      return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    }
     const randomIndex = Math.floor(Math.random() * venue.images.length);
     const image = venue.images[randomIndex];
-    return image.banner?.url || image.card?.url || image.thumbnail?.url;
+    return image.banner?.url || image.card?.url || image.thumbnail?.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
   };
 
   const bannerImageUrl = getBannerImage();
@@ -142,13 +144,11 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
         {/* Hero Section with Banner and Logo */}
         <View className="relative">
           {/* Banner Image Background */}
-          {bannerImageUrl && (
-            <Image
-              source={{ uri: bannerImageUrl }}
-              className="w-full h-64"
-              resizeMode="cover"
-            />
-          )}
+          <Image
+            source={{ uri: bannerImageUrl }}
+            className="w-full h-64"
+            resizeMode="cover"
+          />
           
           {/* Gradient Overlay */}
           <View className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
