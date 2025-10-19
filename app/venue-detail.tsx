@@ -1,17 +1,42 @@
 import { CompactEventsHorizontalList } from "@/components/CompactEventsHorizontalList";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useVenue } from "@/src/hooks/useVenues";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function VenueDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const venueId = id ? parseInt(id) : null;
+  
+  const { venue, loading, error } = useVenue(venueId);
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-lg">Loading venue details...</Text>
+      </View>
+    );
+  }
+
+  if (error || !venue) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-lg text-red-500">{error || 'Venue not found'}</Text>
+        <TouchableOpacity onPress={() => router.back()} className="mt-4">
+          <Text className="text-blue-500">Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   const upcomingEvents = [
     {
       id: 1,
       title: "Live Music Night",
       date: "Fri 15 Dec, 20:00",
-      location: "This Venue",
+      location: venue.name,
       image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop",
       tag: "Live Music",
     },
@@ -19,7 +44,7 @@ export default function VenueDetailScreen() {
       id: 2,
       title: "DJ Set Weekend",
       date: "Sat 16 Dec, 22:00",
-      location: "This Venue",
+      location: venue.name,
       image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=200&h=200&fit=crop",
       tag: "DJ Set",
     },
@@ -27,7 +52,7 @@ export default function VenueDetailScreen() {
       id: 3,
       title: "Acoustic Session",
       date: "Sun 17 Dec, 19:00",
-      location: "This Venue",
+      location: venue.name,
       image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
       tag: "Acoustic",
     },
@@ -39,7 +64,7 @@ export default function VenueDetailScreen() {
       <View className="relative">
         <Image
           source={{
-            uri: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=300&fit=crop",
+            uri: venue.images?.[0] || venue.logo?.[0] || "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=300&fit=crop",
           }}
           style={{ width: "100%", height: 300 }}
           contentFit="cover"
@@ -56,12 +81,12 @@ export default function VenueDetailScreen() {
         {/* Venue Info Card Overlay */}
         <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6">
           <Text className="text-3xl font-bold text-[#22954B] mb-2">
-            Venue Name
+            {venue.name}
           </Text>
-          <Text className="text-lg text-gray-800 mb-2">Venue Type</Text>
+          <Text className="text-lg text-gray-800 mb-2">{venue.type || 'Venue'}</Text>
           <View className="flex-row items-center">
             <IconSymbol name="location" size={16} color="#666" />
-            <Text className="text-gray-500 ml-1">Adresa, Bitola</Text>
+            <Text className="text-gray-500 ml-1">{venue.address || venue.name}, {venue.city}</Text>
           </View>
         </View>
       </View>
@@ -71,13 +96,10 @@ export default function VenueDetailScreen() {
         {/* Description Section */}
         <View className="mb-6 px-5">
           <Text className="text-xl font-bold text-[#22954B] mb-3">
-            About Venue Name
+            About {venue.name}
           </Text>
           <Text className="text-gray-600 leading-6">
-            This is a premium venue located in the heart of the city. With state-of-the-art 
-            sound systems and lighting, it provides the perfect atmosphere for live music 
-            events, DJ sets, and private parties. The venue can accommodate up to 500 guests 
-            and features a spacious dance floor, VIP areas, and a full-service bar.
+            {venue.bio || 'No description available for this venue.'}
           </Text>
         </View>
 
@@ -88,7 +110,7 @@ export default function VenueDetailScreen() {
           </Text>
           <TouchableOpacity>
             <Text className="text-[#22954B] text-lg underline">
-              (MAP?) Kamarite, Bitola
+              (MAP?) {venue.address}, {venue.city}
             </Text>
           </TouchableOpacity>
         </View>

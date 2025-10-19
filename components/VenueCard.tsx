@@ -8,7 +8,7 @@ interface VenueCardProps {
     id: number;
     name: string;
     venueType?: string;
-    location: string;
+    city: string;
     image: string;
     stars?: number;
     venueTypes?: string[];
@@ -55,7 +55,7 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
             style={{ width: "100%", height: 200, borderTopRightRadius: 16, borderTopLeftRadius: 16 }}
             contentFit="cover"
           />
-          <TouchableOpacity className="absolute top-2.5 right-2.5 bg-white/90 p-2 rounded-full">
+          <TouchableOpacity className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full">
             <IconSymbol name="heart" size={16} color="#FF6B6B" />
           </TouchableOpacity>
         </View>
@@ -65,9 +65,6 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
           <Text className="text-base font-bold text-[#1A1A2E] mb-2 leading-5 text-lg">
             {venue.name}
           </Text>
-          {venue.venueType && (
-            <Text className="text-md text-gray-600 mb-1">{venue.venueType}</Text>
-          )}
           {venue.stars !== undefined && (
             <View className="flex-row items-center gap-1 mb-1">
               {renderStars(venue.stars)}
@@ -78,7 +75,7 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
           )}
           <View className="flex-row items-center mb-3">
             <IconSymbol name="location" size={14} color="#666" />
-            <Text className="text-md text-gray-600 ml-1">{venue.location}</Text>
+            <Text className="text-md text-gray-600 ml-1">{venue.city}</Text>
           </View>
           {venue.venueTypes && (
             <View className="flex-row gap-2">

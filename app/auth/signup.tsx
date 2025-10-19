@@ -95,11 +95,6 @@ export default function SignupScreen() {
 
     setIsLoading(true);
     try {
-      console.log("Signup: Sending credentials...", {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-      });
       
       const response = await signup({
         first_name: formData.first_name,
@@ -107,8 +102,6 @@ export default function SignupScreen() {
         email: formData.email,
         password: formData.password,
       });
-      
-      console.log("Signup: Response received:", response);
       
       // Navigate to interests selection screen
       router.push({
@@ -252,7 +245,7 @@ export default function SignupScreen() {
             </TouchableOpacity>
 
             <Link href="/auth/login" asChild>
-              <TouchableOpacity className="mt-5 bg-[#F6F6F6] px-3 py-2 w-fit rounded-full flex mx-auto">
+              <TouchableOpacity className="mt-4 mb-2 bg-[#F6F6F6] px-3 py-2 w-fit rounded-full flex mx-auto">
                 <Text className="text-[#324C6B] text-center">
                   Already have an account?{" "}
                   <Text className="text-[#151B23]">Login</Text>

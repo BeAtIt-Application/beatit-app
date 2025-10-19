@@ -119,7 +119,6 @@ export class MockAuthApi {
   static async logout(): Promise<void> {
     await simulateApiDelay(300);
     // In a real app, this would invalidate the token on the server
-    console.log("Mock logout successful");
   }
 
   /**

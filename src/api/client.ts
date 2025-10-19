@@ -29,8 +29,6 @@ const createApiClient = (): AxiosInstance => {
   const baseURL =
     process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api";
 
-  console.log("🚀 ~ createApiClient ~ baseURL:", baseURL);
-
   const api = axios.create({
     baseURL,
     timeout: 10000,
@@ -251,14 +249,12 @@ export const handleApiError = (error: AxiosError): ApiError => {
     };
   } else if (error.request) {
     // Request was made but no response received
-    console.log("handleApiError: No response received:", error.request);
     return {
       message: "Network error. Please check your connection.",
       status: 0,
     };
   } else {
     // Something else happened
-    console.log("handleApiError: Other error:", error.message);
     return {
       message: error.message || "An unexpected error occurred",
     };

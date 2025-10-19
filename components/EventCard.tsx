@@ -9,6 +9,8 @@ interface EventCardProps {
     title: string;
     date: string;
     location: string;
+    venueName?: string;
+    city?: string;
     image: string;
     tags: string[];
   };
@@ -31,7 +33,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
             <Text className="text-white text-sm font-semibold text-center">12</Text>
             <Text className="text-white text-sm font-semibold">May</Text>
           </View>
-          <TouchableOpacity className="absolute top-2.5 right-2.5 bg-white/90 p-2 rounded-full">
+          <TouchableOpacity className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full">
             <IconSymbol name="heart" size={16} color="#FF6B6B" />
           </TouchableOpacity>
         </View>
@@ -44,7 +46,16 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
           <Text className="text-md text-gray-600 mb-1">{event.date}</Text>
           <View className="flex-row items-center mb-3">
             <IconSymbol name="location" size={14} color="#666" />
-            <Text className="text-md text-gray-600 ml-1">{event.location}</Text>
+            <View className="flex-row items-center ml-1">
+              {event.venueName ? (
+                <>
+                  <Text className="text-md text-[#2FCC67] font-medium">{event.venueName}</Text>
+                  <Text className="text-md text-gray-600">, {event.city}</Text>
+                </>
+              ) : (
+                <Text className="text-md text-gray-600">{event.location}</Text>
+              )}
+            </View>
           </View>
           <View className="flex-row gap-2">
             {event.tags.map((tag, index) => (

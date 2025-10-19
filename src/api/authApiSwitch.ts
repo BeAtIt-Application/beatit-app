@@ -30,15 +30,11 @@ export const authApiWrapper = {
 
   async signup(credentials: SignupCredentials): Promise<SignupResponse> {
     try {
-      console.log("authApiSwitch: Calling signup with:", credentials.email);
-      
       // Call the actual signup function
       const response = await authApiSwitch.signup(credentials);
-      console.log("authApiSwitch: Raw signup response:", response);
       
       // If we get a LoginResponse with token (from mock), convert it to SignupResponse
       if (response && 'token' in response) {
-        console.log("authApiSwitch: Converting LoginResponse to SignupResponse");
         return {
           message: "Account created successfully. Please select your interests.",
           user: response.user,
@@ -49,13 +45,11 @@ export const authApiWrapper = {
       // Otherwise, return the SignupResponse directly
       // Check if we have a valid response with the expected format
       if (!response) {
-        console.error("authApiSwitch: Empty response");
         throw new Error("Empty response from server");
       }
       
       // For SignupResponse, we need user and interests_selection_required
       if (!response.user) {
-        console.error("authApiSwitch: Missing user in response:", response);
         // Try to adapt the response format if possible
         if (typeof response === 'object') {
           // Create a fallback user object if user is missing
@@ -78,7 +72,6 @@ export const authApiWrapper = {
         throw new Error("Invalid response format: missing user data");
       }
       
-      console.log("authApiSwitch: Returning SignupResponse directly");
       return response;
     } catch (error) {
       console.error("authApiSwitch: Signup error:", error);
@@ -96,11 +89,6 @@ export const authApiWrapper = {
       return await authApi.saveInterests(data);
     }
     
-    // Mock implementation for when mockAuth.ts is used
-    console.log("Mock: Saving interests for", data.email);
-    console.log("Music genres:", data.music_genre_ids);
-    console.log("Venue types:", data.venue_type_ids);
-    
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 800));
     
@@ -116,9 +104,6 @@ export const authApiWrapper = {
       return await authApi.resendVerificationEmail(email);
     }
     
-    // Mock implementation for when mockAuth.ts is used
-    console.log("Mock: Sending verification email to", email);
-    
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -132,10 +117,6 @@ export const authApiWrapper = {
     if (!USE_MOCK_API) {
       return await authApi.verifyEmailByCode(data);
     }
-    
-    // Mock implementation for when mockAuth.ts is used
-    console.log("Mock: Verifying email with code for", data.email);
-    console.log("Code:", data.code);
     
     // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 800));

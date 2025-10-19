@@ -6,8 +6,8 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 interface Venue {
   id: number;
   name: string;
-  venueType?: string;
-  location: string;
+  type?: string;
+  city: string;
   image: string;
   stars?: number;
   venueTypes?: string[];

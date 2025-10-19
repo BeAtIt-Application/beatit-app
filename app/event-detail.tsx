@@ -1,12 +1,46 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useEvent, useToggleEventStatus } from "@/src/hooks/useEvents";
 import { Image } from "expo-image";
-import { router } from "expo-router";
-import React, { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function EventDetailScreen() {
-  const [goingPercentage, setGoingPercentage] = useState(60);
-  const [interestedPercentage, setInterestedPercentage] = useState(40);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const eventId = id ? parseInt(id) : null;
+  
+  const { event, loading, error } = useEvent(eventId);
+  const { toggleStatus, loading: toggleLoading } = useToggleEventStatus();
+
+  const handleToggleStatus = async (status: 'interested' | 'going') => {
+    if (!eventId) return;
+    
+    try {
+      await toggleStatus(eventId, status);
+      // The event data will be refetched automatically by the hook
+    } catch (error) {
+      console.error('Failed to toggle event status:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-lg">Loading event details...</Text>
+      </View>
+    );
+  }
+
+  if (error || !event) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-lg text-red-500">{error || 'Event not found'}</Text>
+        <TouchableOpacity onPress={() => router.back()} className="mt-4">
+          <Text className="text-blue-500">Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const artists = [
     {
@@ -29,7 +63,7 @@ export default function EventDetailScreen() {
       <View className="relative">
         <Image
           source={{
-            uri: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+            uri: event.image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
           }}
           style={{ width: "100%", height: 300 }}
           contentFit="cover"
@@ -46,12 +80,21 @@ export default function EventDetailScreen() {
         {/* Event Info Card Overlay */}
         <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6">
           <Text className="text-3xl font-bold text-brand-purple mb-2">
-            Title
+            {event.name}
           </Text>
-          <Text className="text-lg text-gray-800 mb-2">Name</Text>
+          <Text className="text-lg text-gray-800 mb-2">{event.music_genres?.[0] || 'Event'}</Text>
           <View className="flex-row items-center">
             <IconSymbol name="location" size={16} color="#666" />
-            <Text className="text-gray-500 ml-1">Adresa, Bitola</Text>
+            <View className="flex-row items-center ml-1">
+              {event.venue_name ? (
+                <>
+                  <Text className="text-gray-500 font-medium text-[#1A1A2E]">{event.venue_name}</Text>
+                  <Text className="text-gray-500">, {event.city}</Text>
+                </>
+              ) : (
+                <Text className="text-gray-500">{event.city}</Text>
+              )}
+            </View>
           </View>
         </View>
       </View>
@@ -64,11 +107,7 @@ export default function EventDetailScreen() {
             Description
           </Text>
           <Text className="text-gray-600 leading-6">
-            Integer id augue iaculis, iaculis orci ut, blandit quam. Donec in
-            elit auctor, finibus quam in, phar. Proin id ligula dictum, covalis
-            enim ut, facilisis massa. Mauris a nisi ut sapien blandit imperdi.
-            Interdum et malesuada fames ac ante ipsum primis in faucibs. Sed
-            posuere egestas nunc ut tempus. Fu ipsum dolor sit amet.
+            {event.description || 'No description available for this event.'}
           </Text>
         </View>
 
@@ -91,12 +130,11 @@ export default function EventDetailScreen() {
           </Text>
           <View className="flex-row justify-between">
             <View>
-              <Text className="text-gray-600 mb-1">Start date: 23.09.2025</Text>
-              <Text className="text-gray-600">Start time: 09:00</Text>
+              <Text className="text-gray-600 mb-1">Event date: {new Date(event.event_start).toLocaleDateString()}</Text>
+              <Text className="text-gray-600">Event time: {new Date(event.event_start).toLocaleTimeString()}</Text>
             </View>
             <View className="items-end">
-              <Text className="text-gray-600 mb-1">End date: 10.10.2025</Text>
-              <Text className="text-gray-600">End time: 23:00</Text>
+              <Text className="text-gray-600 mb-1">Location: {event.city}</Text>
             </View>
           </View>
         </View>
@@ -104,25 +142,29 @@ export default function EventDetailScreen() {
         {/* Action Buttons */}
         <View className="flex-row gap-4 mb-8">
           <TouchableOpacity
-            onPress={() => {
-              setGoingPercentage(goingPercentage + 1);
-              setInterestedPercentage(interestedPercentage - 1);
-            }}
-            className="flex-1 bg-brand-purple py-4 rounded-xl"
+            onPress={() => handleToggleStatus('going')}
+            disabled={toggleLoading}
+            className={`flex-1 py-4 rounded-xl ${
+              event.user_status === 'going' ? 'bg-brand-purple' : 'bg-gray-200'
+            }`}
           >
-            <Text className="text-white text-center font-bold text-lg">
-              GOING {goingPercentage}%
+            <Text className={`text-center font-bold text-lg ${
+              event.user_status === 'going' ? 'text-white' : 'text-gray-800'
+            }`}>
+              {toggleLoading ? 'Loading...' : `GOING ${event.going_count || 0}`}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => {
-              setInterestedPercentage(interestedPercentage + 1);
-              setGoingPercentage(goingPercentage - 1);
-            }}
-            className="flex-1 bg-gray-200 py-4 rounded-xl"
+            onPress={() => handleToggleStatus('interested')}
+            disabled={toggleLoading}
+            className={`flex-1 py-4 rounded-xl ${
+              event.user_status === 'interested' ? 'bg-brand-purple' : 'bg-gray-200'
+            }`}
           >
-            <Text className="text-gray-800 text-center font-bold text-lg">
-              INTERESTED {interestedPercentage}%
+            <Text className={`text-center font-bold text-lg ${
+              event.user_status === 'interested' ? 'text-white' : 'text-gray-800'
+            }`}>
+              {toggleLoading ? 'Loading...' : `INTERESTED ${event.interested_count || 0}`}
             </Text>
           </TouchableOpacity>
         </View>

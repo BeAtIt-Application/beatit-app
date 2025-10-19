@@ -32,15 +32,12 @@ export const useUser = () => {
   const handleSignup = useCallback(
     async (credentials: SignupCredentials): Promise<SignupResponse> => {
       try {
-        console.log("useUser: Calling authApiWrapper.signup with:", credentials.email);
         const data = await authApiWrapper.signup(credentials);
         
         // New flow: user must complete interests selection and email verification
         // before they can login, so we don't auto-login here
-        console.log("useUser: Signup successful, response:", data);
         
         if (!data || !data.user) {
-          console.error("useUser: Invalid response format:", data);
           throw new Error("Invalid response from server");
         }
         

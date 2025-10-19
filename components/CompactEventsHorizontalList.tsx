@@ -47,7 +47,7 @@ export function CompactEventsHorizontalList({
             <CompactEventCard
               key={event.id}
               event={event}
-              onPress={() => router.push("/event-detail")}
+              onPress={() => router.push(`/event-detail?id=${event.id}`)}
             />
           ))}
         </View>

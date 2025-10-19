@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { CityFilter } from "@/components/filters/CityFilter";
 import { DateFilter } from "@/components/filters/DateFilter";
 import { GenreFilter } from "@/components/filters/GenreFilter";
+import { useEvents } from "@/src/hooks/useEvents";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -16,9 +17,7 @@ interface DateRange {
 
 export default function EventsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
+  
   // Modal visibility states
   const [genreModalVisible, setGenreModalVisible] = useState(false);
   const [dateModalVisible, setDateModalVisible] = useState(false);
@@ -31,70 +30,37 @@ export default function EventsScreen() {
   
   const filters = ["Genre", "Date", "City"];
 
-  // Mock events data - will be replaced by API data
-  const mockEvents = [
-    {
-      id: 1,
-      title: "Neshto interesno ke ima vo Kamarite",
-      date: "Thur 26 May, 09:00 am",
-      location: "Kamarite, Bitola",
-      image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-      tags: ["Bitola", "Kamarite"],
-    },
-    {
-      id: 2,
-      title: "Summer Music Festival",
-      date: "Fri 27 May, 08:00 pm",
-      location: "Skopje Center",
-      image:
-        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=300&fit=crop",
-      tags: ["Skopje", "Festival"],
-    },
-    {
-      id: 3,
-      title: "Electronic Night",
-      date: "Sat 28 May, 11:00 pm",
-      location: "Club Arena, Bitola",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
-      tags: ["Electronic", "Club"],
-    },
-  ];
+  // Use the events hook
+  const { events, loading, error, total, fetchEvents, refreshEvents } = useEvents();
 
   // Fetch events with filters
-  const fetchEvents = async () => {
-    setLoading(true);
+  const loadEvents = async () => {
     try {
-      const params = new URLSearchParams();
+      const filters = {
+        search: searchQuery || undefined,
+        genre: selectedGenres.length > 0 ? selectedGenres.join(',') : undefined,
+        date_from: selectedDateRange?.from,
+        date_to: selectedDateRange?.to,
+        city: selectedCity || undefined,
+        page: 1,
+        limit: 20,
+      };
       
-      if (searchQuery) params.append('search', searchQuery);
-      if (selectedGenres.length > 0) params.append('genres', selectedGenres.join(','));
-      if (selectedDateRange) {
-        params.append('dateFrom', selectedDateRange.from);
-        params.append('dateTo', selectedDateRange.to);
-      }
-      if (selectedCity) params.append('city', selectedCity);
-      
-      // TODO: Replace with actual API endpoint when backend is ready
-      // const data = await apiGet(`/events?${params.toString()}`);
-      // setEvents(data);
-      
-      // For now, use mock data
-      console.log('Fetching events with params:', params.toString());
-      setEvents(mockEvents);
+      const result = await fetchEvents(filters);
     } catch (error) {
       console.error('Failed to fetch events:', error);
-      setEvents(mockEvents); // Fallback to mock data
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Refetch when filters change
+  // Initial load and refetch when filters change
   useEffect(() => {
-    fetchEvents();
+    loadEvents();
   }, [searchQuery, selectedGenres, selectedDateRange, selectedCity]);
+
+  // Initial load on component mount
+  useEffect(() => {
+    loadEvents();
+  }, []);
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
@@ -143,18 +109,38 @@ export default function EventsScreen() {
         {/* Events List */}
         <View className="mb-8 mt-4 px-5">
           <Text className="text-xl font-bold text-black mb-4">
-            {loading ? "Loading..." : `Total ${events.length}`}
+            {loading ? "Loading..." : `Total ${total || events.length}`}
           </Text>
+          {error && (
+            <View className="py-4 items-center">
+              <Text className="text-red-500 text-base">{error}</Text>
+            </View>
+          )}
           <View className="gap-4">
             {events.map((event) => (
               <EventCard
                 key={event.id}
-                event={event}
-                onPress={() => router.push("/event-detail")}
+                event={{
+                  id: event.id,
+                  title: event.name,
+                  date: new Date(event.event_start).toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    day: 'numeric', 
+                    month: 'short', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  }),
+                  location: event.venue_name ? `${event.venue_name}, ${event.city}` : event.city,
+                  venueName: event.venue_name,
+                  city: event.city,
+                  image: event.image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+                  tags: event.music_genres || [event.city],
+                }}
+                onPress={() => router.push(`/event-detail?id=${event.id}`)}
               />
             ))}
           </View>
-          {events.length === 0 && !loading && (
+          {events.length === 0 && !loading && !error && (
             <View className="py-12 items-center">
               <Text className="text-gray-400 text-base">No events found</Text>
               <Text className="text-gray-400 text-sm mt-2">Try adjusting your filters</Text>

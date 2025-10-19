@@ -86,22 +86,7 @@ export class AuthApi {
    */
   static async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      console.log("🚀 ~ AuthApi ~ login ~ credentials:", credentials);
-      console.log("🚀 ~ AuthApi ~ login ~ endpoint:", getAuthEndpoint("login"));
-      console.log(
-        "🚀 ~ AuthApi ~ login ~ baseURL:",
-        process.env.EXPO_PUBLIC_API_URL
-      );
-      console.log(
-        "🚀 ~ AuthApi ~ login ~ full URL:",
-        `${process.env.EXPO_PUBLIC_API_URL}${getAuthEndpoint("login")}`
-      );
-
       const response = await api.post(getAuthEndpoint("login"), credentials);
-      console.log("🚀 ~ AuthApi ~ login ~ response status:", response.status);
-      console.log("🚀 ~ AuthApi ~ login ~ response headers:", response.headers);
-      console.log("🚀 ~ AuthApi ~ login ~ response data:", response.data);
-
       // Extract token from Authorization header
       const token =
         response.headers.authorization || response.headers.Authorization;
@@ -116,7 +101,6 @@ export class AuthApi {
       };
     } catch (error) {
       const apiError = handleApiError(error as any);
-      console.log("🚀 ~ AuthApi ~ login ~ apiError:", apiError);
       throw new Error(apiError.message);
     }
   }
@@ -126,16 +110,7 @@ export class AuthApi {
    */
   static async signup(credentials: SignupCredentials): Promise<SignupResponse> {
     try {
-      console.log("AuthApi.signup: Calling API with:", credentials.email);
-      console.log("AuthApi.signup: Endpoint:", getAuthEndpoint("signup"));
-      console.log("AuthApi.signup: Full URL:", `${process.env.EXPO_PUBLIC_API_URL}${getAuthEndpoint("signup")}`);
-      
       const response = await api.post(getAuthEndpoint("signup"), credentials);
-      
-      console.log("AuthApi.signup: Response status:", response.status);
-      console.log("AuthApi.signup: Response headers:", response.headers);
-      console.log("AuthApi.signup: Response data:", response.data);
-      
       // Handle different response formats
       const data = response.data;
       
@@ -223,12 +198,9 @@ export class AuthApi {
    */
   static async verifyEmailByCode(data: VerifyEmailByCodeRequest): Promise<VerifyEmailByCodeResponse> {
     try {
-      console.log("AuthApi.verifyEmailByCode: Calling API with:", data.email);
       const response = await api.post(getAuthEndpoint("verifyEmailByCode"), data);
-      console.log("AuthApi.verifyEmailByCode: Response data:", response.data);
       return response.data;
     } catch (error) {
-      console.error("AuthApi.verifyEmailByCode: Error occurred:", error);
       const apiError = handleApiError(error as any);
       throw new Error(apiError.message);
     }

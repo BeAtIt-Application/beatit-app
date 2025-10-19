@@ -5,22 +5,52 @@ import { getVenueEndpoint } from "./config";
 export interface Venue {
   id: number;
   name: string;
-  description?: string;
+  city: string;
+  image?: string;
+  lat?: number;
+  lng?: number;
+  meters?: number;
+  type?: string;
+  working_hours_today?: any[];
+  bio?: string;
   address?: string;
-  city?: string;
   country?: string;
-  phone?: string;
+  phone_number?: string;
   email?: string;
-  website?: string;
-  capacity?: number;
-  image_url?: string;
+  images?: string[];
+  logo?: string[];
+  venue_type_id?: number;
   is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
+  is_boosted?: boolean;
+  slug?: string;
+  user_id?: number;
+  collaborator_id?: number;
+  working_hours?: WorkingHour[];
+}
+
+export interface WorkingHour {
+  day_of_week: string;
+  opens_at: any;
+  closes_at: any;
+  is_closed: boolean;
+}
+
+export interface VenueFilterParams {
+  search?: string;
+  city?: string;
+  venue_type?: string;
+  page?: number;
+  limit?: number;
+  lat?: number;
+  lng?: number;
+  radius?: number;
 }
 
 export interface VenueResponse {
-  data: Venue[];
+  data?: Venue[];
+  total?: number;
+  page?: number;
+  limit?: number;
   message?: string;
   status?: string;
 }
@@ -28,20 +58,57 @@ export interface VenueResponse {
 // Venue API service
 export class VenueApi {
   /**
-   * Get all public venues
+   * Get filtered public venues
    */
-  static async getPublicVenues(): Promise<VenueResponse> {
+  static async getPublicVenuesFiltered(filters: VenueFilterParams = {}): Promise<VenueResponse> {
     try {
-      console.log(
-        "🚀 ~ VenueApi ~ getPublicVenues ~ endpoint:",
-        getVenueEndpoint("publicAll")
-      );
-      const response = await api.get(getVenueEndpoint("publicAll"));
-      console.log("🚀 ~ VenueApi ~ getPublicVenues ~ response:", response);
+      const response = await api.get(getVenueEndpoint("publicFilter"), {
+        params: filters,
+      });
+      
+      // Handle both array response and object response
+      if (Array.isArray(response.data)) {
+        return { data: response.data };
+      }
+      
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);
-      console.log("🚀 ~ VenueApi ~ getPublicVenues ~ apiError:", apiError);
+      throw new Error(apiError.message);
+    }
+  }
+
+  /**
+   * Get single public venue by ID
+   */
+  static async getPublicVenueById(id: number): Promise<Venue> {
+    try {
+      
+      const response = await api.get(`${getVenueEndpoint("publicGet")}/${id}`);
+      
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
+
+  /**
+   * Get venues near user location
+   */
+  static async getVenuesNearUser(
+    lat: number, 
+    lng: number, 
+    radius: number = 10
+  ): Promise<VenueResponse> {
+    try {
+      const response = await api.get(getVenueEndpoint("publicVenuesNearUser"), {
+        params: { lat, lng, radius },
+      });
+      
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
       throw new Error(apiError.message);
     }
   }
@@ -106,7 +173,9 @@ export class VenueApi {
 
 // Convenience functions
 export const venueApi = {
-  getPublicVenues: VenueApi.getPublicVenues,
+  getPublicVenuesFiltered: VenueApi.getPublicVenuesFiltered,
+  getPublicVenueById: VenueApi.getPublicVenueById,
+  getVenuesNearUser: VenueApi.getVenuesNearUser,
   getAllVenues: VenueApi.getAllVenues,
   createVenue: VenueApi.createVenue,
   updateVenue: VenueApi.updateVenue,

@@ -18,12 +18,17 @@ export const API_CONFIG = {
       profile: "/user/profile",
       update: "/user/update",
     },
+    event: {
+      publicFilter: "/event/public/filter",
+      publicGet: "/event/public/get",
+      publicEventsNearUser: "/event/public/events-near-user",
+      publicToggleStatus: "/event/public",
+    },
     venue: {
-      publicAll: "/venue/public/draw?length=2&dir=asc",
-      all: "/venue",
-      create: "/venue",
-      update: "/venue",
-      delete: "/venue",
+      publicFilter: "/venue/public/filter",
+      publicGet: "/venue/public/get",
+      publicVenuesNearUser: "/venue/public/venues-near-user",
+     
     },
   },
 } as const;
@@ -45,6 +50,13 @@ export const getUserEndpoint = (
   endpoint: keyof typeof API_CONFIG.endpoints.user
 ): string => {
   return API_CONFIG.endpoints.user[endpoint];
+};
+
+// Helper function to get event endpoints
+export const getEventEndpoint = (
+  endpoint: keyof typeof API_CONFIG.endpoints.event
+): string => {
+  return API_CONFIG.endpoints.event[endpoint];
 };
 
 // Helper function to get venue endpoints

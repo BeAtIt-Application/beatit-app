@@ -147,7 +147,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <Link href="/auth/signup" asChild>
-              <TouchableOpacity className="mt-5 bg-[#F6F6F6] px-3 py-2 w-fit rounded-full flex mx-auto">
+              <TouchableOpacity className="mt-4 mb-2 bg-[#F6F6F6] px-3 py-2 w-fit rounded-full flex mx-auto">
                 <Text className=" text-[#324C6B] text-center">
                   Don't have an account?{" "}
                   <Text className=" text-[#151B23]">Signup</Text>

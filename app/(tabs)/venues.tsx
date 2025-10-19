@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { VenueCard } from "@/components/VenueCard";
 import { CityFilter } from "@/components/filters/CityFilter";
 import { VenueTypeFilter } from "@/components/filters/VenueTypeFilter";
+import { useVenues } from "@/src/hooks/useVenues";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -13,8 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VenuesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [venues, setVenues] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   
   // Modal visibility states
   const [venueTypeModalVisible, setVenueTypeModalVisible] = useState(false);
@@ -26,69 +25,35 @@ export default function VenuesScreen() {
 
   const filters = ["Venue Type", "City"];
 
-  // Mock venues data - will be replaced by API data
-  const mockVenues = [
-    {
-      id: 1,
-      name: "Elegant Garden Venue",
-      date: "Available Now",
-      location: "Adresa, Bitola",
-      image:
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-      venueTypes: ["Pub", "Klub"],
-      stars: 2.5
-    },
-    {
-      id: 2,
-      name: "Modern Conference Hall",
-      date: "Thu 26 May",
-      location: "Kamarite, Bitola",
-      image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-      venueTypes: ["Pub", "Klub"],
-      stars: 3.7
-    },
-    {
-      id: 3,
-      name: "Outdoor Event Space",
-      date: "Fri 27 May",
-      location: "City Center, Skopje",
-      image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
-      venueTypes: ["Kafe", "Klub"],
-      stars: 5
-    },
-  ];
+  // Use the venues hook
+  const { venues, loading, error, total, fetchVenues, refreshVenues } = useVenues();
 
   // Fetch venues with filters
-  const fetchVenues = async () => {
-    setLoading(true);
+  const loadVenues = async () => {
     try {
-      const params = new URLSearchParams();
+      const filters = {
+        search: searchQuery || undefined,
+        venue_type: selectedVenueType || undefined,
+        city: selectedCity || undefined,
+        page: 1,
+        limit: 20,
+      };
       
-      if (searchQuery) params.append('search', searchQuery);
-      if (selectedVenueType) params.append('venueType', selectedVenueType);
-      if (selectedCity) params.append('city', selectedCity);
-      
-      // TODO: Replace with actual API endpoint when backend is ready
-      // const data = await apiGet(`/venues?${params.toString()}`);
-      // setVenues(data);
-      
-      // For now, use mock data
-      console.log('Fetching venues with params:', params.toString());
-      setVenues(mockVenues);
+      const result = await fetchVenues(filters);
     } catch (error) {
       console.error('Failed to fetch venues:', error);
-      setVenues(mockVenues); // Fallback to mock data
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Refetch when filters change
+  // Initial load and refetch when filters change
   useEffect(() => {
-    fetchVenues();
+    loadVenues();
   }, [searchQuery, selectedVenueType, selectedCity]);
+
+  // Initial load on component mount
+  useEffect(() => {
+    loadVenues();
+  }, []);
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
@@ -134,19 +99,32 @@ export default function VenuesScreen() {
         <View className="mb-8 mt-4 px-5">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-black">
-              {loading ? "Loading..." : `Total ${venues.length}`}
+              {loading ? "Loading..." : `Total ${total || venues.length}`}
             </Text>
           </View>
+          {error && (
+            <View className="py-4 items-center">
+              <Text className="text-red-500 text-base">{error}</Text>
+            </View>
+          )}
           <View className="gap-4">
             {venues.map((venue) => (
               <VenueCard
                 key={venue.id}
-                venue={venue}
-                onPress={() => router.push("/venue-detail")}
+                venue={{
+                  id: venue.id,
+                  name: venue.name,
+                  venueType: venue.type,
+                  city: venue.city,
+                  image: venue.image || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+                  venueTypes: [venue.type].filter(Boolean) as string[],
+                  stars: 0, // No rating field in API response
+                }}
+                onPress={() => router.push(`/venue-detail?id=${venue.id}`)}
               />
             ))}
           </View>
-          {venues.length === 0 && !loading && (
+          {venues.length === 0 && !loading && !error && (
             <View className="py-12 items-center">
               <Text className="text-gray-400 text-base">No venues found</Text>
               <Text className="text-gray-400 text-sm mt-2">Try adjusting your filters</Text>
