@@ -30,6 +30,9 @@ const MAPPING = {
   'star.fill': 'star',
   'star': 'star-border',
   'star.leadinghalf.filled': 'star-half',
+  'phone': 'phone',
+  'envelope': 'email',
+  'xmark': 'close',
 } as IconMapping;
 
 /**

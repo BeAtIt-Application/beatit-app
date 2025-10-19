@@ -33,14 +33,14 @@ export const CompactEventCard: React.FC<CompactEventCardProps> = ({
           contentFit="cover"
         />
         <View className="flex-1 justify-center">
-          <Text className="text-base font-semibold text-[#1A1A2E] mb-1">
+          <Text className="text-base font-semibold text-[#1A1A2E]">
             {event.title}
           </Text>
           <Text className="text-sm text-gray-600 mb-1">{event.date}</Text>
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center">
+          <View className="flex-column items-start">
+            <View className="flex-row items-center mb-1">
               <IconSymbol name="location" size={12} color="#666" />
-              <Text className="text-xs text-gray-600 ml-1">
+              <Text className="text-xs text-gray-600">
                 {event.location}
               </Text>
             </View>

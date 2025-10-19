@@ -11,14 +11,25 @@ export interface Venue {
   lng?: number;
   meters?: number;
   type?: string;
+  type_label?: string;
   working_hours_today?: any[];
   bio?: string;
   address?: string;
   country?: string;
   phone_number?: string;
   email?: string;
-  images?: string[];
-  logo?: string[];
+  images?: Array<{
+    id: number;
+    banner: any;
+    card: any;
+    thumbnail: any;
+  }>;
+  logo?: string[] | {
+    id: number;
+    url: string;
+    webp: string[];
+    srcset: string;
+  };
   venue_type_id?: number;
   is_active?: boolean;
   is_boosted?: boolean;
