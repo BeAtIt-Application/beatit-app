@@ -78,7 +78,7 @@ export default function VenuesScreen() {
         }, 300); // 300ms debounce
       };
     })(),
-    [searchQuery, selectedVenueType, selectedCity, fetchVenues]
+    [searchQuery, fetchVenues]
   );
 
   // Fetch venues with filters (immediate for non-search filters)
@@ -109,16 +109,10 @@ export default function VenuesScreen() {
   }, [searchQuery, debouncedLoadVenues]);
 
   // Handle filter changes immediately (no debounce needed)
-  useEffect(() => {
-    if (selectedVenueType !== undefined || selectedCity !== undefined || useLocationFilter !== undefined) {
-      loadVenues();
-    }
-  }, [selectedVenueType, selectedCity, useLocationFilter, userLocation]);
-
-  // Initial load on component mount
+  // This also handles initial load since all states are undefined initially
   useEffect(() => {
     loadVenues();
-  }, []);
+  }, [selectedVenueType, selectedCity, useLocationFilter, userLocation]);
 
   const handleSearchChange = (text: string) => {
     console.log('🔍 Venues Search Query Changed:', text);

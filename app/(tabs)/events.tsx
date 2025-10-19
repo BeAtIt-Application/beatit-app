@@ -132,7 +132,7 @@ export default function EventsScreen() {
         }, 300); // 300ms debounce
       };
     })(),
-    [searchQuery, selectedGenres, selectedDateRange, selectedCity, useLocationFilter, userLocation, locationRadius, fetchEvents]
+    [searchQuery, fetchEvents]
   );
 
   // Fetch events with filters (immediate for non-search filters)
@@ -169,16 +169,10 @@ export default function EventsScreen() {
   }, [searchQuery, debouncedLoadEvents]);
 
   // Handle filter changes immediately (no debounce needed)
-  useEffect(() => {
-    if (selectedGenres !== undefined || selectedDateRange !== undefined || selectedCity !== undefined || useLocationFilter !== undefined) {
-      loadEvents();
-    }
-  }, [selectedGenres, selectedDateRange, selectedCity, useLocationFilter, userLocation]);
-
-  // Initial load on component mount
+  // This also handles initial load since all states are undefined initially
   useEffect(() => {
     loadEvents();
-  }, []);
+  }, [selectedGenres, selectedDateRange, selectedCity, useLocationFilter, userLocation]);
 
   const handleSearchChange = (text: string) => {
     console.log('🔍 Events Search Query Changed:', text);
