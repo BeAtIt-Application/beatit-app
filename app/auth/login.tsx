@@ -7,10 +7,11 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -69,7 +70,12 @@ export default function LoginScreen() {
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View className="flex-1 px-5 pt-8 mb-4 flex flex-col justify-between h-full bg-white">
+      <ScrollView 
+        className="flex-1"
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+      <View className="flex-1 px-5 pt-8 mb-4 flex flex-col justify-between h-full bg-white">
           {/* Main Content */}
           <View className="flex-1 ">
             <Text className="text-[23px] text-[#151B23] font-poppins-bold mb-2">
@@ -125,15 +131,14 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          {!isKeyboardVisible && (
-            <View className="flex-row items-center justify-center">
-              <Image
-                source={require("@/assets/images/splash.png")}
-                style={{ width: 120, height: 64 }}
-                contentFit="contain"
-              />
-            </View>
-          )}
+         
+          <View className="flex-row items-center justify-center">
+            <Image
+              source={require("@/assets/images/splash.png")}
+              style={{ width: 120, height: 64 }}
+              contentFit="contain"
+            />
+          </View>
           {/* Footer */}
           <View className="pt-5">
             <TouchableOpacity
@@ -155,7 +160,8 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </Link>
           </View>
-        </View>
+      </View>
+      </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

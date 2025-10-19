@@ -223,15 +223,14 @@ export default function SignupScreen() {
             </View>
           </View>
 
-          {!isKeyboardVisible && (
-            <View className="flex-row items-center justify-center">
-              <Image
-                source={require("@/assets/images/splash.png")}
-                style={{ width: 120, height: 64 }}
-                resizeMode="contain"
-              />
-            </View>
-          )}
+          
+          <View className="flex-row items-center justify-center">
+            <Image
+              source={require("@/assets/images/splash.png")}
+              style={{ width: 120, height: 64 }}
+              resizeMode="contain"
+            />
+          </View>
           {/* Footer */}
           <View className="pt-5">
             <TouchableOpacity
