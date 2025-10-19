@@ -5,9 +5,9 @@ import { VenueTypeFilter } from "@/components/filters/VenueTypeFilter";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ScrollView,
-    Text,
-    View
+  ScrollView,
+  Text,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -142,7 +142,7 @@ export default function VenuesScreen() {
               <VenueCard
                 key={venue.id}
                 venue={venue}
-                onPress={() => router.push("/event-detail")}
+                onPress={() => router.push("/venue-detail")}
               />
             ))}
           </View>

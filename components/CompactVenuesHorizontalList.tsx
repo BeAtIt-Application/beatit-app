@@ -48,7 +48,7 @@ export function CompactVenuesHorizontalList({
             <CompactVenueCard
               key={venue.id}
               venue={venue}
-              onPress={() => router.push("/event-detail")}
+              onPress={() => router.push("/venue-detail")}
             />
           ))}
         </View>
