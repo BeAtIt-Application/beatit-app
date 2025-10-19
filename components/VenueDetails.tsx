@@ -1,4 +1,5 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Dimensions, Image, Linking, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
@@ -131,6 +132,11 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
     Linking.openURL(url);
   };
 
+  const handleHeartPress = () => {
+    // Handle heart press logic here
+    console.log('Heart pressed for venue:', venue.name);
+  };
+
   return (
     <View className="flex-1 bg-white">
         {/* Hero Section with Banner and Logo */}
@@ -147,8 +153,26 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
           {/* Gradient Overlay */}
           <View className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
           
+          {/* Back Button */}
+          <TouchableOpacity 
+            onPress={() => router.back()}
+            activeOpacity={0.8}
+            className="absolute top-12 left-3 bg-white/90 p-2 rounded-full"
+          >
+            <IconSymbol name="chevron.left" size={16} color="#000" />
+          </TouchableOpacity>
+          
+          {/* Heart Favorite Button */}
+          <TouchableOpacity 
+            onPress={handleHeartPress}
+            activeOpacity={0.8}
+            className="absolute top-12 right-3 bg-white/90 p-2 rounded-full"
+          >
+            <IconSymbol name="heart" size={16} color="#FF6B6B" />
+          </TouchableOpacity>
+          
           {/* Venue Info Card */}
-          <View className="bg-white rounded-t-3xl p-6 ">
+          <View className="bg-white rounded-t-3xl p-5 ">
             <View className="flex justify-start items-center ">
               {venue.logo && (
                 <Image
@@ -252,9 +276,18 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
 
         {/* Working Hours */}
         <View className="mb-6">
-          <Text className="text-xl font-bold text-[#22954B] mb-4">
-            Working Hours
-          </Text>
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="text-xl font-bold text-[#22954B]">
+              Working Hours
+            </Text>
+            {/* Open/Closed Status Flag */}
+            <View className={`flex-row items-center px-3 py-1 rounded-full ${isCurrentlyOpen() ? 'bg-green-100' : 'bg-red-100'}`}>
+              <View className={`w-2 h-2 rounded-full mr-2 ${isCurrentlyOpen() ? 'bg-green-500' : 'bg-red-500'}`} />
+              <Text className={`text-sm font-medium ${isCurrentlyOpen() ? 'text-green-700' : 'text-red-700'}`}>
+                {isCurrentlyOpen() ? 'Open Now' : 'Closed'}
+              </Text>
+            </View>
+          </View>
           <View className="bg-gray-50 rounded-xl p-4">
             {venue.working_hours?.map((hours, index) => (
               <View key={index} className="flex-row justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
