@@ -289,19 +289,14 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
 
           {/* Full Screen Image */}
           {selectedImage && (
-            <TouchableOpacity 
-              activeOpacity={1}
-              onPress={(e) => e.stopPropagation()}
-            >
-              <Image
-                source={{ uri: selectedImage }}
-                style={{
-                  width: screenWidth * 0.9,
-                  height: screenHeight * 0.8,
-                }}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
+            <Image
+              source={{ uri: selectedImage }}
+              style={{
+                width: screenWidth * 0.9,
+                height: screenHeight * 0.8,
+              }}
+              resizeMode="contain"
+            />
           )}
 
           {/* Tap to close hint */}
