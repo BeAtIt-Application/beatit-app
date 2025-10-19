@@ -138,7 +138,7 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1">
         {/* Hero Section with Banner and Logo */}
         <View className="relative">
           {/* Banner Image Background */}
@@ -198,7 +198,7 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
         </View>
 
       {/* Content */}
-      <View className="flex-1 px-5">
+      <View className="flex-1 p-5">
         {/* About Section */}
         <View className="mb-6">
           <Text className="text-xl font-bold text-[#22954B] mb-3">
