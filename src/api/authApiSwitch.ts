@@ -1,14 +1,14 @@
 // Switch between mock and real auth API
 import type {
-  LoginCredentials,
-  LoginResponse,
-  SaveInterestsRequest,
-  SaveInterestsResponse,
-  SignupCredentials,
-  SignupResponse,
-  User,
-  VerifyEmailByCodeRequest,
-  VerifyEmailByCodeResponse,
+    LoginCredentials,
+    LoginResponse,
+    SaveInterestsRequest,
+    SaveInterestsResponse,
+    SignupCredentials,
+    SignupResponse,
+    User,
+    VerifyEmailByCodeRequest,
+    VerifyEmailByCodeResponse,
 } from "./authApi";
 import { authApi } from "./authApi";
 import { mockAuthApi } from "./mockAuth";
@@ -174,5 +174,9 @@ export const authApiWrapper = {
     refreshToken: string
   ): Promise<{ token: string; refreshToken?: string }> {
     return await authApiSwitch.refreshToken(refreshToken);
+  },
+
+  async sendPasswordResetEmail(email: string): Promise<{ message: string }> {
+    return await authApiSwitch.sendPasswordResetEmail(email);
   },
 };

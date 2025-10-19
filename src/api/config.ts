@@ -10,8 +10,9 @@ export const API_CONFIG = {
       resendVerificationEmail: "/auth/send-verification-code",
       verifyEmailByCode: "/auth/verify-email-by-code",
       logout: "/auth/logout",
-      me: "/me/profile",
       refresh: "/auth/refresh",
+      passwordReset: "/auth/password/email",
+      me: "/me/profile",
     },
     user: {
       profile: "/user/profile",

@@ -272,6 +272,19 @@ export class AuthApi {
       throw new Error(apiError.message);
     }
   }
+
+  /**
+   * Send password reset email
+   */
+  static async sendPasswordResetEmail(email: string): Promise<{ message: string }> {
+    try {
+      const response = await api.post(getAuthEndpoint("passwordReset"), { email });
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
 }
 
 // Convenience functions
@@ -284,4 +297,5 @@ export const authApi = {
   logout: AuthApi.logout,
   getCurrentUser: AuthApi.getCurrentUser,
   refreshToken: AuthApi.refreshToken,
+  sendPasswordResetEmail: AuthApi.sendPasswordResetEmail,
 };
