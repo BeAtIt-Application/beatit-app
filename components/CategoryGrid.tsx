@@ -32,7 +32,7 @@ export function CategoryGrid({
           {rowItems.map((item) => (
             <TouchableOpacity
               key={item.id}
-              className="flex-1 bg-gray-100 px-5 py-3 rounded-full items-center bg-white"
+              className="flex-1 bg-gray-100 px-5 py-3 rounded-full justify-center items-center bg-white"
               onPress={() => onItemPress?.(item)}
             >
               <Text className="text-sm text-gray-600 font-medium">

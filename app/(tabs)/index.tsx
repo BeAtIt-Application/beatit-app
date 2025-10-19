@@ -5,14 +5,44 @@ import { EventsHorizontalList } from "@/components/EventsHorizontalList";
 import { HorizontalSavedSlider, SliderCard } from "@/components/HorizontalSavedSlider";
 import { PageHeader } from "@/components/PageHeader";
 import { VenuesHorizontalList } from "@/components/VenuesHorizontalList";
+import { useMusicGenres, useVenueTypes } from "@/src/hooks/useTaxonomies";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Discover");
+  const { genres: allGenres } = useMusicGenres();
+  const { venueTypes: allVenueTypes } = useVenueTypes();
 
   const tabs = ["Discover", "Events", "Venues", "Artists"];
+
+  // Function to get random items from an array
+  const getRandomItems = <T,>(items: T[], count: number): T[] => {
+    if (items.length <= count) return items;
+    
+    const shuffled = [...items].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
+  // Get random 6 genres and venue types
+  const randomGenres = useMemo(() => {
+    if (!allGenres || allGenres.length === 0) return [];
+    return getRandomItems(allGenres, 6).map(genre => ({
+      id: genre.id,
+      label: genre.name,
+      value: genre.name.toLowerCase().replace(/\s+/g, '-'),
+    }));
+  }, [allGenres]);
+
+  const randomVenueTypes = useMemo(() => {
+    if (!allVenueTypes || allVenueTypes.length === 0) return [];
+    return getRandomItems(allVenueTypes, 6).map(venueType => ({
+      id: venueType.id,
+      label: venueType.name,
+      value: venueType.name.toLowerCase().replace(/\s+/g, '-'),
+    }));
+  }, [allVenueTypes]);
 
   const events = [
     {
@@ -128,26 +158,24 @@ export default function HomeScreen() {
     },
   ];
 
-  const genres: CategoryItem[] = [
-    { id: 1, label: "Rock", value: "rock" },
-    { id: 2, label: "Jazz", value: "jazz" },
-    { id: 3, label: "Electronic", value: "electronic" },
-    { id: 4, label: "Hip Hop", value: "hip-hop" },
-    { id: 5, label: "Pop", value: "pop" },
-    { id: 6, label: "Metal", value: "metal" },
-  ];
-
-  const venueTypes: CategoryItem[] = [
-    { id: 1, label: "Pub", value: "pub" },
-    { id: 2, label: "Club", value: "club" },
-    { id: 3, label: "Arena", value: "arena" },
-    { id: 4, label: "Bar", value: "bar" },
-  ];
 
   const handleCategoryPress = (item: CategoryItem) => {
     console.log("Category pressed:", item);
-    // Navigate with filter or handle category selection
-    // router.push(`/events?genre=${item.value}`);
+    
+    // Determine if this is a genre or venue type based on the item's ID
+    // Genres will have IDs from the music genres API, venue types from venue types API
+    const isGenre = randomGenres.some(genre => genre.id === item.id);
+    const isVenueType = randomVenueTypes.some(venueType => venueType.id === item.id);
+    
+    if (isGenre) {
+      // Navigate to events page with genre filter
+      router.push(`/events?genre=${item.value}`);
+    } else if (isVenueType) {
+      // Navigate to venues page with venue type filter
+      router.push(`/venues?venueType=${item.value}`);
+    } else {
+      console.log("Unknown category type:", item);
+    }
   };
 
   // Slider cards data
@@ -189,6 +217,7 @@ export default function HomeScreen() {
           title="Home Feed"
           colors={['#5271FF', '#22954B'] as const}
           showLogo={true}
+          showSearch={false}
           showNotification={true}
         />
 
@@ -236,7 +265,7 @@ export default function HomeScreen() {
         {/* Genres */}
         <CategoryGrid
           title="Genres"
-          items={genres}
+          items={randomGenres}
           onItemPress={handleCategoryPress}
           columns={2}
         />
@@ -244,7 +273,7 @@ export default function HomeScreen() {
         {/* Venue Types */}
         <CategoryGrid
           title="Venue Types"
-          items={venueTypes}
+          items={randomVenueTypes}
           onItemPress={handleCategoryPress}
           columns={2}
         />

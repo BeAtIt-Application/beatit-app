@@ -42,7 +42,10 @@ export function HorizontalSavedSlider({
   const snapInterval = snapToInterval ? defaultCardWidth + spacing : undefined;
 
   return (
-    <View className="gap-2. pl-2 mb-4 pt-8">
+    <View className="mb-4 pt-8">
+      <Text className="pl-5 text-xl font-bold text-[#1A1A2E]">
+        Saved
+      </Text>      
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -58,6 +61,7 @@ export function HorizontalSavedSlider({
               width: defaultCardWidth,
               marginRight: index < cards.length - 1 ? spacing : 0,
             }}
+            className="pl-5 mt-4"
             onPress={card.onPress || (() => console.log('Card pressed:', card.title))}
           >
             <View 

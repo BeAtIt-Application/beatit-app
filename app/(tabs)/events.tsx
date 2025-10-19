@@ -4,8 +4,9 @@ import { CityFilter } from "@/components/filters/CityFilter";
 import { DateFilter } from "@/components/filters/DateFilter";
 import { GenreFilter } from "@/components/filters/GenreFilter";
 import { useEvents } from "@/src/hooks/useEvents";
+import { useMusicGenres } from "@/src/hooks/useTaxonomies";
 import { getCurrentLocation, requestLocationPermission } from "@/src/services/locationService";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -61,6 +62,7 @@ const convertFormattedDateToISO = (formattedDate: string): string => {
 };
 
 export default function EventsScreen() {
+  const { genre } = useLocalSearchParams<{ genre?: string }>();
   const [searchQuery, setSearchQuery] = useState("");
   
   // Modal visibility states
@@ -80,6 +82,22 @@ export default function EventsScreen() {
 
   // Use the events hook
   const { events, loading, error, total, fetchEvents, refreshEvents } = useEvents();
+  const { genres: allGenres } = useMusicGenres();
+
+  // Handle URL parameters on component mount
+  useEffect(() => {
+    if (genre && allGenres && allGenres.length > 0) {
+      // Find the genre by name (case-insensitive)
+      const genreName = genre.replace(/-/g, ' ').toLowerCase();
+      const foundGenre = allGenres.find(g => 
+        g.name.toLowerCase() === genreName
+      );
+      
+      if (foundGenre) {
+        setSelectedGenres([{ id: foundGenre.id, name: foundGenre.name }]);
+      }
+    }
+  }, [genre, allGenres]);
 
   // Debounced search function
   const debouncedLoadEvents = useCallback(

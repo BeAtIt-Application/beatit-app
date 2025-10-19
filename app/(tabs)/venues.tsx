@@ -2,9 +2,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { VenueCard } from "@/components/VenueCard";
 import { CityFilter } from "@/components/filters/CityFilter";
 import { VenueTypeFilter } from "@/components/filters/VenueTypeFilter";
+import { useVenueTypes } from "@/src/hooks/useTaxonomies";
 import { useVenues } from "@/src/hooks/useVenues";
 import { getCurrentLocation, requestLocationPermission } from "@/src/services/locationService";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ScrollView,
@@ -15,6 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VenuesScreen() {
+  const { venueType } = useLocalSearchParams<{ venueType?: string }>();
   const [searchQuery, setSearchQuery] = useState("");
   
   // Modal visibility states
@@ -32,6 +34,22 @@ export default function VenuesScreen() {
 
   // Use the venues hook
   const { venues, loading, error, total, fetchVenues, refreshVenues } = useVenues();
+  const { venueTypes: allVenueTypes } = useVenueTypes();
+
+  // Handle URL parameters on component mount
+  useEffect(() => {
+    if (venueType && allVenueTypes && allVenueTypes.length > 0) {
+      // Find the venue type by name (case-insensitive)
+      const venueTypeName = venueType.replace(/-/g, ' ').toLowerCase();
+      const foundVenueType = allVenueTypes.find(vt => 
+        vt.name.toLowerCase() === venueTypeName
+      );
+      
+      if (foundVenueType) {
+        setSelectedVenueType({ id: foundVenueType.id, name: foundVenueType.name });
+      }
+    }
+  }, [venueType, allVenueTypes]);
 
   // Debounced search function
   const debouncedLoadVenues = useCallback(
