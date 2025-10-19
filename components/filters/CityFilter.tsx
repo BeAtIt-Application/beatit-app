@@ -94,6 +94,7 @@ export function CityFilter({
               <TouchableOpacity
                 key={city}
                 onPress={() => handleSelect(city)}
+                activeOpacity={0.7}
                 className={`p-4 rounded-xl border-2 flex-row justify-between items-center ${
                   isSelected 
                     ? 'bg-[#761CBC]/10 border-[#761CBC]' 

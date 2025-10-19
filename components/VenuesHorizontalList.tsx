@@ -33,7 +33,7 @@ export function VenuesHorizontalList({
           {title}
         </Text>
         {showSeeAll && (
-          <TouchableOpacity onPress={onSeeAll}>
+          <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
             <Text className="text-brand-blue font-semibold">See all</Text>
           </TouchableOpacity>
         )}

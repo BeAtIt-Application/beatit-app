@@ -222,6 +222,7 @@ export function DateFilter({
               <TouchableOpacity
                 key={range.label}
                 onPress={() => handleSelect(range)}
+                activeOpacity={0.7}
                 className={`p-4 rounded-xl border-2 ${
                   isSelected 
                     ? 'bg-[#761CBC]/10 border-[#761CBC]' 
@@ -256,6 +257,7 @@ export function DateFilter({
           {/* Custom Date Range Option */}
           <TouchableOpacity
             onPress={handleCustomDateSelect}
+            activeOpacity={0.7}
             className={`p-4 rounded-xl border-2 ${
               tempSelected?.label === "Custom Range"
                 ? 'bg-[#761CBC]/10 border-[#761CBC]' 
@@ -294,6 +296,7 @@ export function DateFilter({
             {/* Start Date */}
             <TouchableOpacity
               onPress={handleStartDateSelect}
+              activeOpacity={0.7}
               className="mb-3 p-3 bg-white rounded-lg border border-gray-200"
             >
               <Text className="text-xs text-gray-500 mb-1">Start Date</Text>
@@ -305,6 +308,7 @@ export function DateFilter({
             {/* End Date */}
             <TouchableOpacity
               onPress={handleEndDateSelect}
+              activeOpacity={0.7}
               className="mb-3 p-3 bg-white rounded-lg border border-gray-200"
             >
               <Text className="text-xs text-gray-500 mb-1">End Date</Text>
@@ -338,6 +342,7 @@ export function DateFilter({
             {Platform.OS === 'android' && (
               <TouchableOpacity
                 onPress={() => setShowCustomDatePicker(false)}
+                activeOpacity={0.7}
                 className="mt-3 p-2 bg-gray-200 rounded-lg"
               >
                 <Text className="text-center text-gray-700">Cancel</Text>

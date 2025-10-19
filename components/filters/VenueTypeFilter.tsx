@@ -67,6 +67,7 @@ export function VenueTypeFilter({
                 <TouchableOpacity
                   key={venueType.id}
                   onPress={() => handleSelect({ id: venueType.id, name: venueType.name })}
+                  activeOpacity={0.7}
                   className={`p-4 rounded-xl border-2 ${
                     isSelected 
                       ? 'bg-[#761CBC]/10 border-[#761CBC]' 

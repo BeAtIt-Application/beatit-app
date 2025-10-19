@@ -19,8 +19,17 @@ interface EventCardProps {
 }
 
 export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizontalList }) => {
+  const handleHeartPress = (e: any) => {
+    e.stopPropagation();
+    // Handle heart press logic here
+  };
+
   return (
-    <TouchableOpacity onPress={onPress} className={"mb-4 " + (fromHorizontalList ? "max-w-[310] w-[310] mr-4" : "max-w-full w-full")}>
+    <TouchableOpacity 
+      onPress={onPress} 
+      activeOpacity={0.7}
+      className={"mb-4 " + (fromHorizontalList ? "max-w-[310] w-[310] mr-4" : "max-w-full w-full")}
+    >
       <View className="bg-white rounded-2xl">
         {/* Event Image */}
         <View className="relative">
@@ -33,7 +42,11 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
             <Text className="text-white text-sm font-semibold text-center">12</Text>
             <Text className="text-white text-sm font-semibold">May</Text>
           </View>
-          <TouchableOpacity className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full">
+          <TouchableOpacity 
+            onPress={handleHeartPress}
+            activeOpacity={0.8}
+            className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full"
+          >
             <IconSymbol name="heart" size={16} color="#FF6B6B" />
           </TouchableOpacity>
         </View>

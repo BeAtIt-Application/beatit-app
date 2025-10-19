@@ -29,12 +29,12 @@ export function FilterModal({
       <SafeAreaView className="flex-1 bg-white">
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 py-4 border-b border-gray-200">
-          <TouchableOpacity onPress={onClose}>
+          <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
             <Text className="text-lg text-gray-600">Cancel</Text>
           </TouchableOpacity>
           <Text className="text-lg font-bold text-[#1A1A2E]">{title}</Text>
           {onClear && (
-            <TouchableOpacity onPress={onClear}>
+            <TouchableOpacity onPress={onClear} activeOpacity={0.7}>
               <Text className="text-lg text-red-500">Clear</Text>
             </TouchableOpacity>
           )}
@@ -51,6 +51,7 @@ export function FilterModal({
           <View className="px-5 py-4 border-t border-gray-200">
             <TouchableOpacity 
               onPress={onApply}
+              activeOpacity={0.8}
               className="bg-[#761CBC] rounded-xl py-4 items-center"
             >
               <Text className="text-white text-lg font-semibold">Apply Filters</Text>

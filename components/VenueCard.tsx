@@ -18,6 +18,11 @@ interface VenueCardProps {
 }
 
 export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizontalList }) => {
+  const handleHeartPress = (e: any) => {
+    e.stopPropagation();
+    // Handle heart press logic here
+  };
+
   const renderStars = (rating: number) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -46,7 +51,11 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
   };
 
   return (
-    <TouchableOpacity onPress={onPress} className={"mb-4 " + (fromHorizontalList ? "max-w-[310] w-[310] mr-4" : "max-w-full w-full")}>
+    <TouchableOpacity 
+      onPress={onPress} 
+      activeOpacity={0.7}
+      className={"mb-4 " + (fromHorizontalList ? "max-w-[310] w-[310] mr-4" : "max-w-full w-full")}
+    >
       <View className="bg-white rounded-2xl shadow-sm">
         {/* Venue Image */}
         <View className="relative">
@@ -55,7 +64,11 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
             style={{ width: "100%", height: 200, borderTopRightRadius: 16, borderTopLeftRadius: 16 }}
             contentFit="cover"
           />
-          <TouchableOpacity className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full">
+          <TouchableOpacity 
+            onPress={handleHeartPress}
+            activeOpacity={0.8}
+            className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full"
+          >
             <IconSymbol name="heart" size={16} color="#FF6B6B" />
           </TouchableOpacity>
         </View>

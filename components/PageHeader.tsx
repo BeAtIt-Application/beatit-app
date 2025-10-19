@@ -114,6 +114,7 @@ export function PageHeader({
                 <TouchableOpacity
                   key={filter}
                   onPress={() => handleFilterPress(filter)}
+                  activeOpacity={0.7}
                   className={`px-10 py-3 rounded-full ${
                     index < filters.length - 1 ? 'mr-3' : ''
                   } ${

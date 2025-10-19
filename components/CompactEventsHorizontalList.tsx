@@ -30,7 +30,7 @@ export function CompactEventsHorizontalList({
       <View className="flex-row justify-between items-center px-5 mb-4">
         <Text className="text-xl font-bold text-[#1A1A2E]">{title}</Text>
         {showSeeAll && (
-          <TouchableOpacity onPress={onSeeAll}>
+          <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
             <Text className="text-brand-blue font-semibold">See all</Text>
           </TouchableOpacity>
         )}

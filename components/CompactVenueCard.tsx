@@ -40,7 +40,7 @@ export const CompactVenueCard: React.FC<CompactVenueCardProps> = ({
   };
 
   return (
-    <TouchableOpacity onPress={onPress} className="mr-4" style={{ width: 300 }}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7} className="mr-4" style={{ width: 300 }}>
       <View className="flex-row bg-white rounded-xl p-4 shadow-sm">
         <Image
           source={{ uri: venue.image }}
