@@ -7,8 +7,8 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 interface GenreFilterProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (genres: string[]) => void;
-  selectedGenres?: string[];
+  onSelect: (genres: { id: number; name: string }[]) => void;
+  selectedGenres?: { id: number; name: string }[];
 }
 
 export function GenreFilter({ 
@@ -18,10 +18,10 @@ export function GenreFilter({
   selectedGenres = [] 
 }: GenreFilterProps) {
   const { genres, isLoading } = useMusicGenres();
-  const [tempSelected, setTempSelected] = useState<string[]>(selectedGenres);
+  const [tempSelected, setTempSelected] = useState<{ id: number; name: string }[]>(selectedGenres || []);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const GENRE_OPTIONS = genres && genres.length > 0 ? genres.map(genre => genre.name).sort() : [];
+  const GENRE_OPTIONS = genres && genres.length > 0 ? genres.sort((a, b) => a.name.localeCompare(b.name)) : [];
 
   useEffect(() => {
     if (visible) {
@@ -31,12 +31,12 @@ export function GenreFilter({
   }, [visible, selectedGenres]);
 
   const filteredGenres = GENRE_OPTIONS.filter(genre =>
-    genre.toLowerCase().includes(searchQuery.toLowerCase())
+    genre.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const toggleGenre = (genre: string) => {
-    if (tempSelected.includes(genre)) {
-      setTempSelected(tempSelected.filter(g => g !== genre));
+  const toggleGenre = (genre: { id: number; name: string }) => {
+    if (tempSelected.some(g => g.id === genre.id)) {
+      setTempSelected(tempSelected.filter(g => g.id !== genre.id));
     } else {
       setTempSelected([...tempSelected, genre]);
     }
@@ -103,10 +103,10 @@ export function GenreFilter({
             {filteredGenres.length > 0 ? (
               <View className="gap-2">
                 {filteredGenres.map((genre) => {
-                  const isSelected = tempSelected.includes(genre);
+                  const isSelected = tempSelected.some(g => g.id === genre.id);
                   return (
                     <TouchableOpacity
-                      key={genre}
+                      key={genre.id}
                       onPress={() => toggleGenre(genre)}
                       className={`p-4 rounded-xl border-2 flex-row justify-between items-center ${
                         isSelected 
@@ -119,7 +119,7 @@ export function GenreFilter({
                           isSelected ? 'text-[#761CBC]' : 'text-gray-800'
                         }`}
                       >
-                        {genre}
+                        {genre.name}
                       </Text>
                       {isSelected && (
                         <View className="w-6 h-6 bg-[#761CBC] rounded-full items-center justify-center">
@@ -149,8 +149,8 @@ export function GenreFilter({
                 </Text>
                 <View className="flex-row flex-wrap gap-1.5">
                   {tempSelected.map((genre) => (
-                    <View key={genre} className="bg-[#761CBC] px-2 py-1 rounded-md">
-                      <Text className="text-xs text-white">{genre}</Text>
+                    <View key={genre.id} className="bg-[#761CBC] px-2 py-1 rounded-md">
+                      <Text className="text-xs text-white">{genre.name}</Text>
                     </View>
                   ))}
                 </View>

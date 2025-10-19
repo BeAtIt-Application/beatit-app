@@ -6,8 +6,8 @@ import { Text, TouchableOpacity, View } from "react-native";
 interface VenueTypeFilterProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (venueType: string | null) => void;
-  selectedVenueType?: string | null;
+  onSelect: (venueType: { id: number; name: string } | null) => void;
+  selectedVenueType?: { id: number; name: string } | null;
 }
 
 export function VenueTypeFilter({ 
@@ -17,7 +17,7 @@ export function VenueTypeFilter({
   selectedVenueType 
 }: VenueTypeFilterProps) {
   const { venueTypes, isLoading } = useVenueTypes();
-  const [tempSelected, setTempSelected] = useState<string | null>(selectedVenueType || null);
+  const [tempSelected, setTempSelected] = useState<{ id: number; name: string } | null>(selectedVenueType || null);
 
   useEffect(() => {
     if (visible) {
@@ -25,8 +25,8 @@ export function VenueTypeFilter({
     }
   }, [visible, selectedVenueType]);
 
-  const handleSelect = (venueTypeId: string) => {
-    setTempSelected(venueTypeId);
+  const handleSelect = (venueType: { id: number; name: string }) => {
+    setTempSelected(venueType);
   };
 
   const handleApply = () => {
@@ -62,11 +62,11 @@ export function VenueTypeFilter({
         {!isLoading && venueTypes && venueTypes.length > 0 && (
           <View className="gap-3">
             {venueTypes.map((venueType) => {
-              const isSelected = tempSelected === venueType.id.toString();
+              const isSelected = tempSelected?.id === venueType.id;
               return (
                 <TouchableOpacity
                   key={venueType.id}
-                  onPress={() => handleSelect(venueType.id.toString())}
+                  onPress={() => handleSelect({ id: venueType.id, name: venueType.name })}
                   className={`p-4 rounded-xl border-2 ${
                     isSelected 
                       ? 'bg-[#761CBC]/10 border-[#761CBC]' 

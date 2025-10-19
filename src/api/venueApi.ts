@@ -39,11 +39,18 @@ export interface VenueFilterParams {
   search?: string;
   city?: string;
   venue_type?: string;
+  venueType?: number; // Venue type ID for map filtering
   page?: number;
   limit?: number;
   lat?: number;
   lng?: number;
   radius?: number;
+  // Map-based filtering parameters
+  latNE?: number; // Northeast corner latitude
+  lngNE?: number; // Northeast corner longitude
+  latSW?: number; // Southwest corner latitude
+  lngSW?: number; // Southwest corner longitude
+  zoom?: number; // Map zoom level (default: 14)
 }
 
 export interface VenueResponse {
@@ -113,62 +120,6 @@ export class VenueApi {
     }
   }
 
-  /**
-   * Get all venues (requires authentication)
-   */
-  static async getAllVenues(): Promise<VenueResponse> {
-    try {
-      const response = await api.get(getVenueEndpoint("all"));
-      return response.data;
-    } catch (error) {
-      const apiError = handleApiError(error as any);
-      throw new Error(apiError.message);
-    }
-  }
-
-  /**
-   * Create a new venue (requires authentication)
-   */
-  static async createVenue(venueData: Partial<Venue>): Promise<Venue> {
-    try {
-      const response = await api.post(getVenueEndpoint("create"), venueData);
-      return response.data;
-    } catch (error) {
-      const apiError = handleApiError(error as any);
-      throw new Error(apiError.message);
-    }
-  }
-
-  /**
-   * Update a venue (requires authentication)
-   */
-  static async updateVenue(
-    id: number,
-    venueData: Partial<Venue>
-  ): Promise<Venue> {
-    try {
-      const response = await api.put(
-        `${getVenueEndpoint("update")}/${id}`,
-        venueData
-      );
-      return response.data;
-    } catch (error) {
-      const apiError = handleApiError(error as any);
-      throw new Error(apiError.message);
-    }
-  }
-
-  /**
-   * Delete a venue (requires authentication)
-   */
-  static async deleteVenue(id: number): Promise<void> {
-    try {
-      await api.delete(`${getVenueEndpoint("delete")}/${id}`);
-    } catch (error) {
-      const apiError = handleApiError(error as any);
-      throw new Error(apiError.message);
-    }
-  }
 }
 
 // Convenience functions
@@ -176,10 +127,6 @@ export const venueApi = {
   getPublicVenuesFiltered: VenueApi.getPublicVenuesFiltered,
   getPublicVenueById: VenueApi.getPublicVenueById,
   getVenuesNearUser: VenueApi.getVenuesNearUser,
-  getAllVenues: VenueApi.getAllVenues,
-  createVenue: VenueApi.createVenue,
-  updateVenue: VenueApi.updateVenue,
-  deleteVenue: VenueApi.deleteVenue,
 };
 
 

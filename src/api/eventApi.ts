@@ -27,13 +27,24 @@ export interface EventFilterParams {
   search?: string;
   city?: string;
   genre?: string;
+  musicGenre?: number; // Music genre ID for map filtering
+  venueType?: number; // Venue type ID for map filtering
   date_from?: string;
   date_to?: string;
+  dateFilter?: 'today' | 'this_week' | 'next_2_weeks' | 'this_month' | 'this_year' | 'custom';
+  startDate?: string; // Custom date range start
+  endDate?: string; // Custom date range end
   page?: number;
   limit?: number;
   lat?: number;
   lng?: number;
   radius?: number;
+  // Map-based filtering parameters
+  latNE?: number; // Northeast corner latitude
+  lngNE?: number; // Northeast corner longitude
+  latSW?: number; // Southwest corner latitude
+  lngSW?: number; // Southwest corner longitude
+  zoom?: number; // Map zoom level (default: 14)
 }
 
 export interface EventResponse {
