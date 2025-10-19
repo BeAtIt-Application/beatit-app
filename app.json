@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "BeatIt",
-    "slug": "beat-it",
+    "name": "BeAtIt",
+    "slug": "beatit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/splash.png",
@@ -50,6 +50,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "efedad3f-6e22-4b31-9e1c-147831e5d8c6"
+      }
+    },
+    "owner": "beatit"
   }
 }

@@ -64,10 +64,10 @@ export const CompactVenueCard: React.FC<CompactVenueCardProps> = ({
               </Text>
             </View>
           )}
-          <View className="flex-row items-center justify-between">
+          <View className="flex-column items-start">
             <View className="flex-row items-center">
               <IconSymbol name="location" size={12} color="#666" />
-              <Text className="text-xs text-gray-600 ml-1">
+              <Text className="text-xs text-gray-600 mb-1">
                 {venue.location}
               </Text>
             </View>
