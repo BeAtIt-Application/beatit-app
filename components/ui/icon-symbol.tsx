@@ -44,6 +44,8 @@ const MAPPING = {
   'gear': 'settings',
   'pencil': 'edit',
   'globe': 'language',
+  'eye': 'visibility',
+  'eye.slash': 'visibility-off',
 } as IconMapping;
 
 /**

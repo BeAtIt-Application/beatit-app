@@ -16,7 +16,10 @@ export const API_CONFIG = {
     },
     user: {
       profile: "/user/profile",
-      update: "/user/update",
+      updateProfile: "/user/profile",
+      updatePassword: "/user/password",
+      uploadAvatar: "/user/avatar",
+      updateInterests: "/user/update-interests",
     },
     userPublic: {
       artists: "/user/public/artists",
