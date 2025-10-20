@@ -102,22 +102,31 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   };
 
   const isCurrentlyOpen = () => {
-    if (!venue.working_hours || venue.working_hours.length === 0) return false;
+    if (!venue.working_hours || venue.working_hours.length === 0) {
+      return false;
+    }
     
     const now = new Date();
     const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
     const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
     
+    
     const todayHours = venue.working_hours.find(hours => 
       hours.day_of_week === currentDay
     );
     
-    if (!todayHours || todayHours.is_closed) return false;
+    if (!todayHours || todayHours.is_closed) {
+      return false;
+    }
     
     const formatTimeToMinutes = (time: any) => {
       if (!time) return null;
-      if (time.hour !== undefined && time.minute !== undefined) {
-        return time.hour * 60 + time.minute;
+      // Check for both 'hours'/'minutes' (API format) and 'hour'/'minute' (alternative format)
+      const hours = time.hours !== undefined ? time.hours : time.hour;
+      const minutes = time.minutes !== undefined ? time.minutes : time.minute;
+      
+      if (hours !== undefined && minutes !== undefined) {
+        return hours * 60 + minutes;
       }
       return null;
     };
@@ -127,7 +136,17 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
     
     if (openMinutes === null || closeMinutes === null) return false;
     
-    return currentTime >= openMinutes && currentTime <= closeMinutes;
+    // Handle closing times that go past midnight (e.g., open 16:58, close 01:15 next day)
+    let isOpen = false;
+    if (closeMinutes < openMinutes) {
+      // Closes after midnight - venue is open if current time is after opening OR before closing
+      isOpen = currentTime >= openMinutes || currentTime <= closeMinutes;
+    } else {
+      // Normal hours - venue is open if current time is between opening and closing
+      isOpen = currentTime >= openMinutes && currentTime <= closeMinutes;
+    }
+
+    return isOpen;
   };
 
   const handlePhoneCall = () => {

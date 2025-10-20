@@ -90,15 +90,10 @@ export class VenueApi {
         params: filters,
       });
       
-      console.log('=== VENUES LIST API RESPONSE ===');
-      console.log('Full response:', JSON.stringify(response.data, null, 2));
+      // Handle both array response and object response
       if (Array.isArray(response.data)) {
-        console.log('First venue in list:', JSON.stringify(response.data[0], null, 2));
         return { data: response.data };
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        console.log('First venue in list:', JSON.stringify(response.data.data[0], null, 2));
       }
-      console.log('================================');
       
       return response.data;
     } catch (error) {
