@@ -34,6 +34,16 @@ const MAPPING = {
   'phone': 'phone',
   'envelope': 'email',
   'xmark': 'close',
+  'photo': 'photo-camera',
+  'person.2': 'people',
+  'play.rectangle.fill': 'play-arrow',
+  'music.note.list': 'queue-music',
+  'waveform.path': 'graphic-eq',
+  'person.circle': 'account-circle',
+  'arrow.right.square': 'logout',
+  'gear': 'settings',
+  'pencil': 'edit',
+  'globe': 'language',
 } as IconMapping;
 
 /**

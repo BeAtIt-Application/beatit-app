@@ -1,5 +1,6 @@
 import { CategoryGrid, CategoryItem } from "@/components/CategoryGrid";
 import { CompactEventsHorizontalList } from "@/components/CompactEventsHorizontalList";
+import { CompactUsersHorizontalList } from "@/components/CompactUsersHorizontalList";
 import { CompactVenuesHorizontalList } from "@/components/CompactVenuesHorizontalList";
 import { EventsHorizontalList } from "@/components/EventsHorizontalList";
 import { HorizontalSavedSlider, SliderCard } from "@/components/HorizontalSavedSlider";
@@ -158,6 +159,108 @@ export default function HomeScreen() {
     },
   ];
 
+  // Mock data for artists (matching API response structure)
+  const compactArtists = [
+    {
+      id: 1,
+      first_name: "Marko",
+      last_name: "Petrovski",
+      username: "marko_petrovski",
+      artist_tag: "DJ & Producer",
+      bio: "Electronic music producer and DJ",
+      city_from: "Skopje",
+      country_from: "Macedonia",
+      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      role: "Artist",
+      email: "marko@example.com",
+      preferred_music_genres: [
+        { id: 1, name: "Electronic" },
+        { id: 2, name: "House" }
+      ],
+    },
+    {
+      id: 2,
+      first_name: "Ana",
+      last_name: "Jovanovska",
+      username: "ana_vocals",
+      artist_tag: "Vocalist & Songwriter",
+      bio: "Jazz and soul vocalist",
+      city_from: "Bitola",
+      country_from: "Macedonia",
+      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      role: "Artist",
+      email: "ana@example.com",
+      preferred_music_genres: [
+        { id: 3, name: "Jazz" },
+        { id: 4, name: "Soul" }
+      ],
+    },
+    {
+      id: 3,
+      first_name: "Stefan",
+      last_name: "Nikolov",
+      username: "stefan_guitar",
+      artist_tag: "Guitarist",
+      bio: "Rock and blues guitarist",
+      city_from: "Ohrid",
+      country_from: "Macedonia",
+      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      role: "Artist",
+      email: "stefan@example.com",
+      preferred_music_genres: [
+        { id: 5, name: "Rock" },
+        { id: 6, name: "Blues" }
+      ],
+    },
+  ];
+
+  // Mock data for organizations (matching API response structure)
+  const compactOrganizations = [
+    {
+      id: 10,
+      first_name: "Beat",
+      last_name: "Events",
+      username: "beat_events",
+      artist_tag: "Event Organizer",
+      bio: "Professional event management and production",
+      city_from: "Skopje",
+      country_from: "Macedonia",
+      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      role: "Organization",
+      email: "info@beatevents.com",
+      contact_phone: "+389 70 123 456",
+      contact_email: "contact@beatevents.com",
+      preferred_venue_types: [
+        { id: 1, name: "Club" },
+        { id: 2, name: "Concert Hall" }
+      ],
+    },
+    {
+      id: 11,
+      first_name: "Music",
+      last_name: "Production MK",
+      username: "music_production_mk",
+      artist_tag: "Music Label",
+      bio: "Independent music label and studio",
+      city_from: "Bitola",
+      country_from: "Macedonia",
+      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      role: "Organization",
+      email: "info@musicproduction.mk",
+      contact_phone: "+389 70 987 654",
+      contact_email: "studio@musicproduction.mk",
+      preferred_music_genres: [
+        { id: 1, name: "Electronic" },
+        { id: 5, name: "Rock" }
+      ],
+    },
+  ];
+
 
   const handleCategoryPress = (item: CategoryItem) => {
     console.log("Category pressed:", item);
@@ -260,6 +363,20 @@ export default function HomeScreen() {
           title="Compact Venues"
           venues={compactVenues}
           onSeeAll={() => router.push("/venues")}
+        />
+
+        {/* Artists - Compact Cards */}
+        <CompactUsersHorizontalList
+          title="Featured Artists"
+          users={compactArtists}
+          onSeeAll={() => console.log('See all artists')}
+        />
+
+        {/* Organizations - Compact Cards */}
+        <CompactUsersHorizontalList
+          title="Organizations"
+          users={compactOrganizations}
+          onSeeAll={() => console.log('See all organizations')}
         />
 
         {/* Genres */}

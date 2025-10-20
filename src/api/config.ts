@@ -18,6 +18,11 @@ export const API_CONFIG = {
       profile: "/user/profile",
       update: "/user/update",
     },
+    userPublic: {
+      artists: "/user/public/artists",
+      organizations: "/user/public/organizations",
+      detail: "/user/public",
+    },
     event: {
       publicFilter: "/event/public/filter",
       publicGet: "/event/public/get",
@@ -64,4 +69,11 @@ export const getVenueEndpoint = (
   endpoint: keyof typeof API_CONFIG.endpoints.venue
 ): string => {
   return API_CONFIG.endpoints.venue[endpoint];
+};
+
+// Helper function to get user public endpoints
+export const getUserPublicEndpoint = (
+  endpoint: keyof typeof API_CONFIG.endpoints.userPublic
+): string => {
+  return API_CONFIG.endpoints.userPublic[endpoint];
 };

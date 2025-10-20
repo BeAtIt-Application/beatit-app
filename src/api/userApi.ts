@@ -1,28 +1,95 @@
-import type { User } from "./authApi";
 import { api, handleApiError } from "./client";
-import { getUserEndpoint } from "./config";
+import { getUserPublicEndpoint } from "./config";
 
 // Types
-export interface UpdateUserData {
-  name?: string;
-  email?: string;
-  // Add other updatable user fields as needed
+export interface MusicGenre {
+  id: number;
+  name: string;
 }
 
-export interface UserProfile extends User {
-  createdAt: string;
-  updatedAt: string;
-  // Add other profile-specific fields
+export interface VenueType {
+  id: number;
+  name: string;
+}
+
+export interface PublicUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number?: string;
+  username: string;
+  artist_tag?: string;
+  bio?: string;
+  city_from?: string;
+  country_from?: string;
+  avatar_url?: string;
+  avatar_thumbnail?: string;
+  instagram_link?: string;
+  instagram_video?: string;
+  facebook_link?: string;
+  facebook_video?: string;
+  soundcloud_link?: string;
+  soundcloud_track?: string;
+  spotify_link?: string;
+  spotify_track?: string;
+  youtube_link?: string;
+  youtube_video?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  email_verified_at?: string;
+  role?: string;
+  is_disabled?: boolean;
+  permissions_array?: string[];
+  preferred_music_genres?: MusicGenre[];
+  preferred_venue_types?: VenueType[];
+}
+
+export type Artist = PublicUser;
+export type Organization = PublicUser;
+
+export interface UserPagination {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+  from: number;
+  to: number;
+}
+
+export interface UserListResponse {
+  data: PublicUser[];
+  pagination: UserPagination;
+}
+
+export interface UserFilterParams {
+  length?: number;
+  column?: string;
+  dir?: 'asc' | 'desc';
+  search?: string;
+  draw?: number;
 }
 
 // User API service
 export class UserApi {
   /**
-   * Get user profile with additional details
+   * Get filtered public artists
    */
-  static async getProfile(): Promise<UserProfile> {
+  static async getPublicArtists(filters: UserFilterParams = {}): Promise<UserListResponse> {
     try {
-      return await api.get(getUserEndpoint("profile"));
+      const params = {
+        length: filters.length || 10,
+        column: filters.column || 'users.first_name',
+        dir: filters.dir || 'asc',
+        search: filters.search || '',
+        draw: filters.draw || 1,
+      };
+
+      const response = await api.get(getUserPublicEndpoint("artists"), {
+        params,
+      });
+      
+      return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);
       throw new Error(apiError.message);
@@ -30,11 +97,36 @@ export class UserApi {
   }
 
   /**
-   * Update user profile
+   * Get filtered public organizations
    */
-  static async updateProfile(data: UpdateUserData): Promise<User> {
+  static async getPublicOrganizations(filters: UserFilterParams = {}): Promise<UserListResponse> {
     try {
-      return await api.put(getUserEndpoint("update"), data);
+      const params = {
+        length: filters.length || 10,
+        column: filters.column || 'users.first_name',
+        dir: filters.dir || 'asc',
+        search: filters.search || '',
+        draw: filters.draw || 1,
+      };
+
+      const response = await api.get(getUserPublicEndpoint("organizations"), {
+        params,
+      });
+      
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
+
+  /**
+   * Get single public user (artist/organization) by ID
+   */
+  static async getPublicUserById(id: number): Promise<PublicUser> {
+    try {
+      const response = await api.get(`${getUserPublicEndpoint("detail")}/${id}`);
+      return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);
       throw new Error(apiError.message);
@@ -42,8 +134,9 @@ export class UserApi {
   }
 }
 
-// Convenience functions
+// Convenience wrapper with default error handling
 export const userApi = {
-  getProfile: UserApi.getProfile,
-  updateProfile: UserApi.updateProfile,
+  getPublicArtists: UserApi.getPublicArtists,
+  getPublicOrganizations: UserApi.getPublicOrganizations,
+  getPublicUserById: UserApi.getPublicUserById,
 };
