@@ -18,6 +18,12 @@ export interface Venue {
   country?: string;
   phone_number?: string;
   email?: string;
+  banner?: {
+    id: number;
+    url: string;
+    srcset: string;
+    webp: string[];
+  };
   images?: Array<{
     id: number;
     banner: any;
@@ -84,10 +90,15 @@ export class VenueApi {
         params: filters,
       });
       
-      // Handle both array response and object response
+      console.log('=== VENUES LIST API RESPONSE ===');
+      console.log('Full response:', JSON.stringify(response.data, null, 2));
       if (Array.isArray(response.data)) {
+        console.log('First venue in list:', JSON.stringify(response.data[0], null, 2));
         return { data: response.data };
+      } else if (response.data.data && Array.isArray(response.data.data)) {
+        console.log('First venue in list:', JSON.stringify(response.data.data[0], null, 2));
       }
+      console.log('================================');
       
       return response.data;
     } catch (error) {
@@ -103,7 +114,6 @@ export class VenueApi {
     try {
       
       const response = await api.get(`${getVenueEndpoint("publicGet")}/${id}`);
-      
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);

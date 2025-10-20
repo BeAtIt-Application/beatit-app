@@ -14,17 +14,30 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-  // Get a random banner image from the gallery
+  // Get the banner image from the venue's root banner field
   const getBannerImage = () => {
-    if (!venue.images || venue.images.length === 0) {
-      return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    // First priority: Use the root-level banner field
+    if (venue.banner?.url) {
+      return venue.banner.url;
     }
-    const randomIndex = Math.floor(Math.random() * venue.images.length);
-    const image = venue.images[randomIndex];
-    return image.banner?.url || image.card?.url || image.thumbnail?.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    
+    // Fallback: Use the first image's banner URL from images array
+    if (venue.images && venue.images.length > 0) {
+      const firstImage = venue.images[0];
+      if (firstImage.banner?.url) {
+        return firstImage.banner.url;
+      }
+      return firstImage.card?.url || firstImage.thumbnail?.url;
+    }
+    
+    // Final fallback: placeholder image
+    return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
   };
 
   const bannerImageUrl = getBannerImage();
+  
+  // Debug: Log which banner image is being used
+  console.log('Selected banner image URL:', bannerImageUrl);
 
   // Debug: Log working hours to see the actual structure
   React.useEffect(() => {

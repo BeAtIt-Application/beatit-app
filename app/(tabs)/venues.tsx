@@ -8,10 +8,10 @@ import { getCurrentLocation, requestLocationPermission } from "@/src/services/lo
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -225,6 +225,8 @@ export default function VenuesScreen() {
                   venueType: venue.type,
                   city: venue.city,
                   image: venue.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+                  banner: venue.banner,
+                  images: venue.images,
                   venueTypes: [venue.type].filter(Boolean) as string[],
                   stars: 0, // No rating field in API response
                 }}
