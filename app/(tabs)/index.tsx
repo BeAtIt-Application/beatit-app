@@ -3,6 +3,7 @@ import { CompactEventsHorizontalList } from "@/components/CompactEventsHorizonta
 import { CompactUsersHorizontalList } from "@/components/CompactUsersHorizontalList";
 import { CompactVenuesHorizontalList } from "@/components/CompactVenuesHorizontalList";
 import { EventsHorizontalList } from "@/components/EventsHorizontalList";
+import { HorizontalArtistSlider } from "@/components/HorizontalArtistSlider";
 import { HorizontalSavedSlider, SliderCard } from "@/components/HorizontalSavedSlider";
 import { PageHeader } from "@/components/PageHeader";
 import { VenuesHorizontalList } from "@/components/VenuesHorizontalList";
@@ -363,6 +364,15 @@ export default function HomeScreen() {
           title="Compact Venues"
           venues={compactVenues}
           onSeeAll={() => router.push("/venues")}
+        />
+        
+        {/* Saved Artists Slider */}
+        <HorizontalArtistSlider
+          title="Featured Artists"
+          artists={compactArtists}
+          cardWidth={220}
+          cardHeight={200}
+          blurRadius={10}
         />
 
         {/* Artists - Compact Cards */}
