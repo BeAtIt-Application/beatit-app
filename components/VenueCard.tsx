@@ -7,7 +7,6 @@ interface VenueCardProps {
   venue: {
     id: number;
     name: string;
-    venueType?: string;
     city: string;
     image: string;
     banner?: {
@@ -16,12 +15,6 @@ interface VenueCardProps {
       srcset: string;
       webp: string[];
     };
-    images?: Array<{
-      id: number;
-      banner: any;
-      card: any;
-      thumbnail: any;
-    }>;
     stars?: number;
     venueTypes?: string[];
   };
@@ -35,18 +28,17 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
     // Handle heart press logic here
   };
 
-  // Get the banner image - use venue.banner.url if available, otherwise use venue.image (thumbnail)
-  const getBannerImage = () => {
-    // Use the dedicated banner field if available (from individual venue API)
+  // Get the banner image - prioritize banner.url over image (thumbnail)
+  const getCardImage = () => {
+    // Use banner if available (from venues list API when it includes banner)
     if (venue.banner?.url) {
       return venue.banner.url;
     }
-    
-    // Use the thumbnail image from venues list API
+    // Fallback to image (thumbnail) from venues list API
     return venue.image;
   };
 
-  const bannerImageUrl = getBannerImage();
+  const cardImageUrl = getCardImage();
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -85,7 +77,7 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
         {/* Venue Image */}
         <View className="relative">
           <Image
-            source={{ uri: bannerImageUrl }}
+            source={{ uri: cardImageUrl }}
             style={{ width: "100%", height: 200, borderTopRightRadius: 16, borderTopLeftRadius: 16 }}
             contentFit="cover"
           />

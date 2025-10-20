@@ -8,6 +8,8 @@ interface Event {
   title: string;
   date: string;
   location: string;
+  venueName?: string;
+  city?: string;
   image: string;
   tags: string[];
 }
@@ -49,7 +51,7 @@ export function EventsHorizontalList({
             <EventCard
               key={event.id}
               event={event}
-              onPress={() => router.push("/event-detail")}
+              onPress={() => router.push(`/event-detail?id=${event.id}`)}
               fromHorizontalList={true}
             />
           ))}

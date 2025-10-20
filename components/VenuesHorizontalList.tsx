@@ -6,9 +6,14 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 interface Venue {
   id: number;
   name: string;
-  type?: string;
   city: string;
   image: string;
+  banner?: {
+    id: number;
+    url: string;
+    srcset: string;
+    webp: string[];
+  };
   stars?: number;
   venueTypes?: string[];
 }
@@ -50,7 +55,7 @@ export function VenuesHorizontalList({
             <VenueCard
               key={venue.id}
               venue={venue}
-              onPress={() => router.push("/venue-detail")}
+              onPress={() => router.push(`/venue-detail?id=${venue.id}`)}
               fromHorizontalList={true}
             />
           ))}
