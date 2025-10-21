@@ -11,7 +11,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.beatit.app",
       "config": {
-        "googleMapsApiKey": "AIzaSyCF8mgOvA10SGp-CP9gyGPbxReVIQcCkqA"
+        "googleMapsApiKey": "APIKEY"
       },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show events and venues near you on the map.",
@@ -30,7 +30,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCF8mgOvA10SGp-CP9gyGPbxReVIQcCkqA"
+          "apiKey": "APIKEY"
         }
       },
       "intentFilters": [
