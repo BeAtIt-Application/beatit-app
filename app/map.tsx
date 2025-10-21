@@ -24,6 +24,53 @@ interface DateRange {
   label: string;
 }
 
+// Custom map style to hide POIs (Points of Interest) and other default markers
+const customMapStyle = [
+  {
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.business",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.attraction",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.government",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.medical",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.place_of_worship",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.school",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.sports_complex",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+];
+
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
   const [mapMode, setMapMode] = useState<MapMode>("events");
@@ -297,6 +344,7 @@ export default function MapScreen() {
             ref={mapRef}
             provider={PROVIDER_GOOGLE}
             style={styles.map}
+            customMapStyle={customMapStyle}
             initialRegion={region}
             onRegionChangeComplete={setRegion}
             onPress={() => setSelectedMarker(null)}
@@ -435,45 +483,47 @@ export default function MapScreen() {
               })}
         </ScrollView>
           ) : (
-            <TouchableOpacity
-              onPress={() => handleCardPress("venue", (selectedMarker.data as Venue).id)}
-              activeOpacity={0.7}
-              style={styles.card}
-            >
-              <Image
-                source={{ 
-                  uri: (selectedMarker.data as Venue).banner?.url || 
-                       (selectedMarker.data as Venue).image || 
-                       "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" 
-                }}
-                style={styles.cardImage}
-                contentFit="cover"
-              />
-              <View style={styles.cardContent}>
-                <Text style={styles.cardTitle} numberOfLines={2}>
-                  {(selectedMarker.data as Venue).name}
-                </Text>
-                {(selectedMarker.data as Venue).type_label && (
-                  <View style={styles.cardRow}>
-                    <IconSymbol name="building.2" size={14} color="#4ECDC4" />
-                    <Text style={styles.cardVenueTypeText}>
-                      {(selectedMarker.data as Venue).type_label}
-                    </Text>
-                  </View>
-                )}
-                {(selectedMarker.data as Venue).city && (
-                  <View style={styles.cardRow}>
-                    <IconSymbol name="location" size={14} color="#666" />
-                    <Text style={styles.cardText}>{(selectedMarker.data as Venue).city}</Text>
-                  </View>
-                )}
-                {(selectedMarker.data as Venue).address && (
-                  <Text style={styles.cardAddress} numberOfLines={2}>
-                    {(selectedMarker.data as Venue).address}
+            <View style={styles.cardsContainer}>
+              <TouchableOpacity
+                onPress={() => handleCardPress("venue", (selectedMarker.data as Venue).id)}
+                activeOpacity={0.7}
+                style={styles.venueCard}
+              >
+                <Image
+                  source={{ 
+                    uri: (selectedMarker.data as Venue).banner?.url || 
+                         (selectedMarker.data as Venue).image || 
+                         "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" 
+                  }}
+                  style={styles.cardImage}
+                  contentFit="cover"
+                />
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle} numberOfLines={2}>
+                    {(selectedMarker.data as Venue).name || 'Untitled Venue'}
                   </Text>
-                )}
-              </View>
-            </TouchableOpacity>
+                  {(selectedMarker.data as Venue).type && (
+                    <View style={styles.cardRow}>
+                      <IconSymbol name="building.2" size={14} color="#4ECDC4" />
+                      <Text style={styles.cardVenueTypeText}>
+                        {(selectedMarker.data as Venue).type}
+                      </Text>
+                    </View>
+                  )}
+                  {(selectedMarker.data as Venue).city && (
+                    <View style={styles.cardRow}>
+                      <IconSymbol name="location" size={14} color="#666" />
+                      <Text style={styles.cardText}>{(selectedMarker.data as Venue).city}</Text>
+                    </View>
+                  )}
+                  {(selectedMarker.data as Venue).address && (
+                    <Text style={styles.cardAddress} numberOfLines={2}>
+                      {(selectedMarker.data as Venue).address}
+                    </Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       )}
@@ -745,6 +795,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     shadowColor: "#000",
+    paddingBottom: 40,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -752,11 +803,20 @@ const styles = StyleSheet.create({
     maxHeight: 240,
   },
   cardsContainer: {
-    padding: 16,
+    padding: 8,
     gap: 12,
   },
   card: {
     width: width - 80,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    flexDirection: "row",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  venueCard: {
+    width: "100%",
     backgroundColor: "#fff",
     borderRadius: 12,
     flexDirection: "row",
@@ -770,7 +830,7 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     flex: 1,
-    padding: 12,
+    padding: 8,
     justifyContent: "space-between",
   },
   cardTitle: {
