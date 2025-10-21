@@ -90,7 +90,7 @@ export const useUser = () => {
     } catch (error) {
       console.error("Error hydrating auth state:", error);
       // Only clear auth state if it's an authentication error
-      if (error instanceof Error && (error.message.includes("401") || error.message.includes("unauthorized"))) {
+      if (error instanceof Error && (error.message.includes("401") || error.message.includes("unauthorized") || error.message.includes("Unauthenticated"))) {
         await logout();
       }
     }
@@ -111,8 +111,8 @@ export const useUser = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
 
-      // If it's a 401 error, logout user
-      if (error instanceof Error && error.message.includes("401")) {
+      // If it's an authentication error, logout user
+      if (error instanceof Error && (error.message.includes("401") || error.message.includes("Unauthenticated") || error.message.includes("unauthorized"))) {
         await logout();
         return null;
       }
@@ -167,8 +167,8 @@ export const initializeAppAuth = async (): Promise<void> => {
             error
           );
 
-          // If it's a 401 error, logout user
-          if (error instanceof Error && error.message.includes("401")) {
+          // If it's an authentication error, logout user
+          if (error instanceof Error && (error.message.includes("401") || error.message.includes("Unauthenticated"))) {
             await currentState.logout();
           }
         }
@@ -179,7 +179,7 @@ export const initializeAppAuth = async (): Promise<void> => {
   } catch (error) {
     console.error("Error initializing app auth:", error);
     // Only clear auth state if it's an authentication error
-    if (error instanceof Error && (error.message.includes("401") || error.message.includes("unauthorized"))) {
+    if (error instanceof Error && (error.message.includes("401") || error.message.includes("unauthorized") || error.message.includes("Unauthenticated"))) {
       const state = useAuthStore.getState();
       await state.logout();
     }
@@ -188,10 +188,10 @@ export const initializeAppAuth = async (): Promise<void> => {
 
 // Export types for external use
 export type {
-  LoginCredentials,
-  LoginResponse,
-  SignupCredentials,
-  SignupResponse,
-  User
+    LoginCredentials,
+    LoginResponse,
+    SignupCredentials,
+    SignupResponse,
+    User
 } from "../api/authApi";
 
