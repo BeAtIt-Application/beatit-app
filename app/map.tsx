@@ -24,6 +24,50 @@ interface DateRange {
   label: string;
 }
 
+// Helper function to map date range labels to API dateFilter values
+const getDateFilterType = (label?: string): 'today' | 'this_week' | 'next_2_weeks' | 'this_month' | 'this_year' | 'custom' | undefined => {
+  if (!label) return undefined;
+  
+  switch (label) {
+    case "Today":
+      return "today";
+    case "This Week":
+      return "this_week";
+    case "Next 2 Weeks":
+      return "next_2_weeks";
+    case "This Month":
+      return "this_month";
+    case "This Year":
+      return "this_year";
+    case "Custom Range":
+      return "custom";
+    default:
+      return undefined;
+  }
+};
+
+// Helper function to convert formatted date back to ISO format for API
+const convertFormattedDateToISO = (formattedDate: string): string => {
+  // Parse formatted date like "26th Sept 2025" back to ISO format
+  const parts = formattedDate.split(' ');
+  if (parts.length !== 3) return formattedDate; // Return as-is if not in expected format
+  
+  const day = parts[0].replace(/\D/g, ''); // Remove ordinal suffix
+  const month = parts[1];
+  const year = parts[2];
+  
+  const monthMap: { [key: string]: string } = {
+    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+    'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+    'Sept': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+  };
+  
+  const monthNum = monthMap[month];
+  if (!monthNum) return formattedDate; // Return as-is if month not found
+  
+  return `${year}-${monthNum}-${day.padStart(2, '0')}`;
+};
+
 // Custom map style to hide POIs (Points of Interest) and other default markers
 const customMapStyle = [
   {
@@ -275,6 +319,14 @@ export default function MapScreen() {
   useEffect(() => {
     const fetchMapData = async () => {
       try {
+        // Prepare common filter parameters for events
+        const eventFilters = {
+          musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined,
+          dateFilter: selectedDateRange ? getDateFilterType(selectedDateRange.label) : undefined,
+          startDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.from || '') : undefined,
+          endDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.to || '') : undefined,
+        };
+
         // Use proximity-based APIs when user location is available AND proximity search is enabled
         if (userLocation && useProximitySearch) {
           // Convert radius to kilometers for API (API expects radius param in km)
@@ -284,7 +336,8 @@ export default function MapScreen() {
             await fetchEventsNearUser(
               userLocation.latitude,
               userLocation.longitude,
-              radiusInKm
+              radiusInKm,
+              eventFilters
             );
           }
           if (mapMode === "venues" || mapMode === "both") {
@@ -306,10 +359,7 @@ export default function MapScreen() {
           if (mapMode === "events" || mapMode === "both") {
             await fetchEvents({
               ...baseFilters,
-              musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined,
-              dateFilter: selectedDateRange?.label === "Custom Range" ? "custom" : undefined,
-              startDate: selectedDateRange?.from,
-              endDate: selectedDateRange?.to,
+              ...eventFilters,
             });
           }
           if (mapMode === "venues" || mapMode === "both") {

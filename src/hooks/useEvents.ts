@@ -123,12 +123,17 @@ export const useEventsNearUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchEventsNearUser = useCallback(async (lat: number, lng: number, radius: number = 10) => {
+  const fetchEventsNearUser = useCallback(async (
+    lat: number, 
+    lng: number, 
+    radius: number = 10, 
+    filters: Omit<EventFilterParams, 'lat' | 'lng' | 'radius'> = {}
+  ) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await eventApi.getEventsNearUser(lat, lng, radius);
+      const response = await eventApi.getEventsNearUser(lat, lng, radius, filters);
       setEvents(response.data || []);
       return response;
     } catch (err) {
