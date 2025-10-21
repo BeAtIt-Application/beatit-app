@@ -28,7 +28,6 @@ export const useProfile = (autoFetch = true): UseProfileResult => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch profile';
       setError(errorMessage);
-      console.error('Error fetching profile:', err);
     } finally {
       setLoading(false);
     }
