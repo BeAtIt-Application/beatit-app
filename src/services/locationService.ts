@@ -1,5 +1,4 @@
 import * as Location from 'expo-location';
-import { Alert } from 'react-native';
 
 export interface LocationCoordinates {
   latitude: number;
@@ -23,7 +22,6 @@ export const requestLocationPermission = async (): Promise<LocationPermissionSta
       canAskAgain,
     };
   } catch (error) {
-    console.error('Error requesting location permission:', error);
     return {
       granted: false,
       canAskAgain: false,
@@ -40,19 +38,8 @@ export const getCurrentLocation = async (): Promise<LocationCoordinates | null> 
     const { status } = await Location.getForegroundPermissionsAsync();
     
     if (status !== 'granted') {
-      const permissionResult = await requestLocationPermission();
-      
-      if (!permissionResult.granted) {
-        Alert.alert(
-          'Location Permission Required',
-          'Please enable location access to discover events and venues near you.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Settings', onPress: () => Location.openSettingsAsync() },
-          ]
-        );
-        return null;
-      }
+      console.log('Location permission not granted');
+      return null;
     }
 
     // Get current position
@@ -66,13 +53,15 @@ export const getCurrentLocation = async (): Promise<LocationCoordinates | null> 
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     };
-  } catch (error) {
-    console.error('Error getting current location:', error);
-    Alert.alert(
-      'Location Error',
-      'Unable to get your current location. Please check your location settings.',
-      [{ text: 'OK' }]
-    );
+  } catch (error: any) {
+    // Handle different error types
+    if (error.code === 'E_LOCATION_SETTINGS_UNSATISFIED') {
+      console.log('Location services are disabled');
+    } else if (error.code === 'E_LOCATION_UNAVAILABLE') {
+      console.log('Location is temporarily unavailable');
+    } else {
+      console.log('Error getting current location:', error.message || error);
+    }
     return null;
   }
 };
