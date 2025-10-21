@@ -207,15 +207,17 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
           <View className="bg-white rounded-t-3xl p-5 ">
             <View className="flex justify-start items-center ">
               {venue.logo && (
-                <Image
-                  source={{ 
-                    uri: typeof venue.logo === 'string' 
-                      ? venue.logo 
-                      : (venue.logo as any)?.url || (venue.logo as any)?.[0]
-                  }}
-                  className="w-32 h-32 rounded-full bg-white p-2 mb-4 shadow-lg absolute top-[-100px]"
-                  resizeMode="contain"
-                />
+                <View className="bg-white rounded-full p-2 shadow-lg absolute top-[-100px]">
+                  <Image
+                    source={{ 
+                      uri: typeof venue.logo === 'string' 
+                        ? venue.logo 
+                        : (venue.logo as any)?.url || (venue.logo as any)?.[0]
+                    }}
+                    style={{ width: 120, height: 120, borderRadius: 60 }}
+                    resizeMode="cover"
+                  />
+                </View>
               )}
               <Text className="text-3xl font-bold text-[#22954B] mb-2 mt-8">
                 {venue.name}
