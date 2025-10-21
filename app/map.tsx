@@ -686,16 +686,9 @@ export default function MapScreen() {
                       longitude: parseFloat(lng),
                     }}
                     onPress={() => handleMarkerPress("event", eventGroup)}
-                  >
-                    <View style={styles.eventMarker}>
-                      <IconSymbol name="calendar" size={20} color="#fff" />
-                      {eventGroup.length > 1 && (
-                        <View style={styles.markerBadge}>
-                          <Text style={styles.markerBadgeText}>{eventGroup.length}</Text>
-                        </View>
-                      )}
-                    </View>
-                  </Marker>
+                    title={eventGroup[0].name}
+                    pinColor="#FF3B30"
+                  />
                 );
               })}
 
@@ -709,11 +702,9 @@ export default function MapScreen() {
                     longitude: venue.lng,
                   }}
                   onPress={() => handleMarkerPress("venue", venue)}
-                >
-                  <View style={styles.venueMarker}>
-                    <IconSymbol name="building.2" size={20} color="#fff" />
-                  </View>
-                </Marker>
+                  pinColor="#FF3B30"
+                  title={venue.name}
+                />
               ))}
           </MapView>
         )}
