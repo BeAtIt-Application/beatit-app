@@ -123,12 +123,12 @@ export const useVenuesNearUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchVenuesNearUser = useCallback(async (lat: number, lng: number, radius: number = 10) => {
+  const fetchVenuesNearUser = useCallback(async (lat: number, lng: number, radiusInMeters: number = 10000) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await venueApi.getVenuesNearUser(lat, lng, radius);
+      const response = await venueApi.getVenuesNearUser(lat, lng, radiusInMeters);
       setVenues(response.data || []);
       return response;
     } catch (err) {

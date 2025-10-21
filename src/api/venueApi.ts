@@ -120,20 +120,22 @@ export class VenueApi {
    * Get venues near user location
    * @param lat - User latitude
    * @param lng - User longitude
-   * @param radiusInKm - Search radius in kilometers (will be converted to meters for API)
+   * @param radiusInMeters - Search radius in meters
    */
   static async getVenuesNearUser(
     lat: number, 
     lng: number, 
-    radiusInKm: number = 10
+    radiusInMeters: number = 10000
   ): Promise<VenueResponse> {
     try {
-      // Convert km to meters as backend expects radiusInMeters
-      const radiusInMeters = radiusInKm * 1000;
+      const endpoint = getVenueEndpoint("publicVenuesNearUser");
+      const params = { lat, lng, radiusInMeters };
       
-      const response = await api.get(getVenueEndpoint("publicVenuesNearUser"), {
-        params: { lat, lng, radiusInMeters },
-      });
+      const response = await api.get(endpoint, { params });
+      // Handle both direct array response and nested object response
+      if (Array.isArray(response.data)) {
+        return { data: response.data };
+      }
       
       return response.data;
     } catch (error) {

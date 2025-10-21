@@ -8,6 +8,7 @@ import { useEvents, useEventsNearUser } from "@/src/hooks/useEvents";
 import { useMusicGenres, useVenueTypes } from "@/src/hooks/useTaxonomies";
 import { useVenues, useVenuesNearUser } from "@/src/hooks/useVenues";
 import { getCurrentLocation, requestLocationPermission } from "@/src/services/locationService";
+import Slider from "@react-native-community/slider";
 import { Image } from "expo-image";
 import { router, Stack } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -17,6 +18,7 @@ import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 const { width } = Dimensions.get("window");
 
 type MapMode = "events" | "venues" | "both";
+
 
 interface DateRange {
   from: string;
@@ -129,7 +131,7 @@ export default function MapScreen() {
   const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
   const [showLocationPrompt, setShowLocationPrompt] = useState(true);
   const [selectedMarker, setSelectedMarker] = useState<{ type: "event" | "venue"; data: Event[] | Venue } | null>(null);
-  const [searchRadius, setSearchRadius] = useState(5000); // Default 5km in meters
+  const [searchRadius, setSearchRadius] = useState(10000); // Default 10km in meters
   const [showRadiusControl, setShowRadiusControl] = useState(false);
   const [useProximitySearch, setUseProximitySearch] = useState(false); // Toggle for near me feature - starts OFF
   
@@ -329,23 +331,25 @@ export default function MapScreen() {
 
         // Use proximity-based APIs when user location is available AND proximity search is enabled
         if (userLocation && useProximitySearch) {
-          // Convert radius to kilometers for API (API expects radius param in km)
-          const radiusInKm = searchRadius / 1000;
+          // Pass radius directly in meters to API
+          const radiusInMeters = searchRadius;
           
           if (mapMode === "events" || mapMode === "both") {
-            await fetchEventsNearUser(
+            const eventsResponse = await fetchEventsNearUser(
               userLocation.latitude,
               userLocation.longitude,
-              radiusInKm,
+              radiusInMeters,
               eventFilters
             );
+            console.log('Events response:', eventsResponse);
           }
           if (mapMode === "venues" || mapMode === "both") {
-            await fetchVenuesNearUser(
+            const venuesResponse = await fetchVenuesNearUser(
               userLocation.latitude,
               userLocation.longitude,
-              radiusInKm
+              radiusInMeters
             );
+            console.log('Venues response:', venuesResponse);
           }
         } else {
           // Fallback to generic filter endpoints with map region
@@ -448,8 +452,11 @@ export default function MapScreen() {
   const formatRadius = (radiusInMeters: number): string => {
     if (radiusInMeters < 1000) {
       return `${radiusInMeters}m`;
+    } else if (radiusInMeters < 100000) {
+      return `${(radiusInMeters / 1000).toFixed(1)}km`;
+    } else {
+      return `${Math.round(radiusInMeters / 1000)}km`;
     }
-    return `${(radiusInMeters / 1000).toFixed(1)}km`;
   };
 
   return (
@@ -609,24 +616,26 @@ export default function MapScreen() {
               
               {showRadiusControl && (
                 <View style={styles.radiusSliderContainer}>
-                  <View style={styles.radiusPresetsContainer}>
-                    {[1000, 2000, 5000, 10000, 20000, 50000].map((radius) => (
-                      <TouchableOpacity
-                        key={radius}
-                        style={[
-                          styles.radiusPresetButton,
-                          searchRadius === radius && styles.radiusPresetButtonActive
-                        ]}
-                        onPress={() => setSearchRadius(radius)}
-                      >
-                        <Text style={[
-                          styles.radiusPresetText,
-                          searchRadius === radius && styles.radiusPresetTextActive
-                        ]}>
-                          {formatRadius(radius)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                  <View style={styles.radiusSliderWrapper}>
+                    <Text style={styles.radiusSliderLabel}>Search Radius</Text>
+                    <View style={styles.radiusSliderRow}>
+                      <Text style={styles.radiusSliderMinLabel}>5m</Text>
+                      <Slider
+                        style={styles.radiusSlider}
+                        minimumValue={5}
+                        maximumValue={20000}
+                        value={searchRadius}
+                        onValueChange={setSearchRadius}
+                        minimumTrackTintColor="#5271FF"
+                        maximumTrackTintColor="#e0e0e0"
+                        thumbTintColor="#5271FF"
+                        step={1}
+                      />
+                      <Text style={styles.radiusSliderMaxLabel}>20km</Text>
+                    </View>
+                    <Text style={styles.radiusSliderValue}>
+                      Current: {formatRadius(searchRadius)}
+                    </Text>
                   </View>
                   <Text style={styles.radiusResultsHint}>
                     {nearbyEventsLoading || nearbyVenuesLoading ? 'Searching...' : 
@@ -1087,31 +1096,55 @@ const styles = StyleSheet.create({
   radiusSliderContainer: {
     paddingTop: 8,
   },
-  radiusPresetsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
+  radiusSliderWrapper: {
     marginBottom: 8,
   },
-  radiusPresetButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: "#f5f5f5",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  radiusPresetButtonActive: {
-    backgroundColor: "#5271FF",
-    borderColor: "#5271FF",
-  },
-  radiusPresetText: {
-    fontSize: 12,
+  radiusSliderLabel: {
+    fontSize: 13,
     fontWeight: "600",
-    color: "#666",
+    color: "#333",
+    marginBottom: 8,
+    textAlign: "center",
   },
-  radiusPresetTextActive: {
-    color: "#fff",
+  radiusSliderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 4,
+  },
+  radiusSliderMinLabel: {
+    fontSize: 11,
+    color: "#666",
+    fontWeight: "500",
+    minWidth: 30,
+  },
+  radiusSlider: {
+    flex: 1,
+    height: 40,
+  },
+  radiusSliderMaxLabel: {
+    fontSize: 11,
+    color: "#666",
+    fontWeight: "500",
+    minWidth: 40,
+  },
+  radiusSliderValue: {
+    fontSize: 12,
+    color: "#5271FF",
+    fontWeight: "600",
+    textAlign: "center",
+    marginTop: 6,
+  },
+  radiusStepLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+    paddingHorizontal: 8,
+  },
+  radiusStepLabel: {
+    fontSize: 10,
+    color: "#999",
+    fontWeight: "500",
   },
   radiusResultsHint: {
     fontSize: 11,

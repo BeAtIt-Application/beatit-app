@@ -126,14 +126,14 @@ export const useEventsNearUser = () => {
   const fetchEventsNearUser = useCallback(async (
     lat: number, 
     lng: number, 
-    radius: number = 10, 
+    radiusInMeters: number = 10000, 
     filters: Omit<EventFilterParams, 'lat' | 'lng' | 'radius'> = {}
   ) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await eventApi.getEventsNearUser(lat, lng, radius, filters);
+      const response = await eventApi.getEventsNearUser(lat, lng, radiusInMeters, filters);
       setEvents(response.data || []);
       return response;
     } catch (err) {
