@@ -12,9 +12,31 @@ export interface LocationPermissionStatus {
 
 /**
  * Request location permission from the user
+ * This will show the system permission dialog if the user hasn't been asked before
+ * or if they can be asked again.
  */
 export const requestLocationPermission = async (): Promise<LocationPermissionStatus> => {
   try {
+    // First check current status
+    const currentStatus = await Location.getForegroundPermissionsAsync();
+    
+    // If already granted, return immediately
+    if (currentStatus.status === 'granted') {
+      return {
+        granted: true,
+        canAskAgain: true,
+      };
+    }
+    
+    // If we can't ask again, return the current status
+    if (!currentStatus.canAskAgain) {
+      return {
+        granted: false,
+        canAskAgain: false,
+      };
+    }
+    
+    // Request permission (will show system dialog)
     const { status, canAskAgain } = await Location.requestForegroundPermissionsAsync();
     
     return {
@@ -22,6 +44,7 @@ export const requestLocationPermission = async (): Promise<LocationPermissionSta
       canAskAgain,
     };
   } catch (error) {
+    console.error('Error requesting location permission:', error);
     return {
       granted: false,
       canAskAgain: false,

@@ -4,14 +4,14 @@ import { VenueTypeFilter } from "@/components/filters/VenueTypeFilter";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Event } from "@/src/api/eventApi";
 import { Venue } from "@/src/api/venueApi";
-import { useEvents } from "@/src/hooks/useEvents";
+import { useEvents, useEventsNearUser } from "@/src/hooks/useEvents";
 import { useMusicGenres, useVenueTypes } from "@/src/hooks/useTaxonomies";
-import { useVenues } from "@/src/hooks/useVenues";
+import { useVenues, useVenuesNearUser } from "@/src/hooks/useVenues";
 import { getCurrentLocation, requestLocationPermission } from "@/src/services/locationService";
 import { Image } from "expo-image";
 import { router, Stack } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, AppState, Dimensions, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 const { width } = Dimensions.get("window");
@@ -82,7 +82,12 @@ export default function MapScreen() {
   });
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(true);
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(true);
   const [selectedMarker, setSelectedMarker] = useState<{ type: "event" | "venue"; data: Event[] | Venue } | null>(null);
+  const [searchRadius, setSearchRadius] = useState(5000); // Default 5km in meters
+  const [showRadiusControl, setShowRadiusControl] = useState(false);
+  const [useProximitySearch, setUseProximitySearch] = useState(false); // Toggle for near me feature - starts OFF
   
   // Filter modal states
   const [genreModalVisible, setGenreModalVisible] = useState(false);
@@ -94,19 +99,26 @@ export default function MapScreen() {
   const [selectedVenueType, setSelectedVenueType] = useState<{ id: number; name: string } | null>(null);
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange | null>(null);
 
-  // Fetch events and venues
-  const { events, loading: eventsLoading, fetchEvents } = useEvents();
-  const { venues, loading: venuesLoading, fetchVenues } = useVenues();
+  // Fetch events and venues - use proximity hooks when user location available
+  const { events: genericEvents, loading: eventsLoading, fetchEvents } = useEvents();
+  const { venues: genericVenues, loading: venuesLoading, fetchVenues } = useVenues();
+  const { events: nearbyEvents, loading: nearbyEventsLoading, fetchEventsNearUser } = useEventsNearUser();
+  const { venues: nearbyVenues, loading: nearbyVenuesLoading, fetchVenuesNearUser } = useVenuesNearUser();
   const { genres } = useMusicGenres();
   const { venueTypes } = useVenueTypes();
+
+  // Use proximity data when user location is available AND proximity search is enabled
+  const events = (userLocation && useProximitySearch) ? nearbyEvents : genericEvents;
+  const venues = (userLocation && useProximitySearch) ? nearbyVenues : genericVenues;
 
   // Get user location on mount
   useEffect(() => {
     const getUserLocation = async () => {
       try {
-        const hasPermission = await requestLocationPermission();
-        if (!hasPermission) {
+        const permissionStatus = await requestLocationPermission();
+        if (!permissionStatus.granted) {
           console.log("Location permission denied, using default location");
+          setLocationPermissionDenied(true);
           setLoadingLocation(false);
           return;
         }
@@ -123,11 +135,14 @@ export default function MapScreen() {
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           });
+          setLocationPermissionDenied(false);
         } else {
           console.log("Could not get location, using default location");
+          setLocationPermissionDenied(true);
         }
       } catch (error) {
         console.log("Error getting user location, using default location:", error);
+        setLocationPermissionDenied(true);
       } finally {
         setLoadingLocation(false);
       }
@@ -136,36 +151,173 @@ export default function MapScreen() {
     getUserLocation();
   }, []);
 
+  // Function to retry location permission or open settings
+  const handleEnableLocation = useCallback(async () => {
+    setLoadingLocation(true);
+    try {
+      const permissionStatus = await requestLocationPermission();
+      
+      if (!permissionStatus.granted) {
+        console.log("Location permission still denied");
+        setLocationPermissionDenied(true);
+        setLoadingLocation(false);
+        
+        // If we can't ask again, the user needs to go to settings
+        if (!permissionStatus.canAskAgain) {
+          Alert.alert(
+            "Location Permission Required",
+            "To use the 'Near Me' feature, please enable location access in your device settings.",
+            [
+              {
+                text: "Cancel",
+                style: "cancel"
+              },
+              {
+                text: "Open Settings",
+                onPress: () => {
+                  if (Platform.OS === 'ios') {
+                    Linking.openURL('app-settings:');
+                  } else {
+                    Linking.openSettings();
+                  }
+                }
+              }
+            ]
+          );
+        }
+        return;
+      }
+
+      // Permission granted, get location
+      const location = await getCurrentLocation();
+      if (location) {
+        setUserLocation({
+          latitude: location.latitude,
+          longitude: location.longitude,
+        });
+        setRegion({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        });
+        setLocationPermissionDenied(false);
+        setShowLocationPrompt(false);
+        
+        // Center map on user location
+        if (mapRef.current) {
+          mapRef.current.animateToRegion({
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          }, 1000);
+        }
+      } else {
+        setLocationPermissionDenied(true);
+      }
+    } catch (error) {
+      console.log("Error enabling location:", error);
+      setLocationPermissionDenied(true);
+    } finally {
+      setLoadingLocation(false);
+    }
+  }, []);
+
+  // Check location permission when app comes to foreground (user returns from settings)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
+      if (nextAppState === 'active' && locationPermissionDenied) {
+        // User returned to app, check if they enabled location in settings
+        try {
+          const location = await getCurrentLocation();
+          if (location) {
+            setUserLocation({
+              latitude: location.latitude,
+              longitude: location.longitude,
+            });
+            setRegion({
+              latitude: location.latitude,
+              longitude: location.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            });
+            setLocationPermissionDenied(false);
+            setShowLocationPrompt(false);
+            
+            // Center map on user location
+            if (mapRef.current) {
+              mapRef.current.animateToRegion({
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+              }, 1000);
+            }
+          }
+        } catch (error) {
+          console.log("Could not get location on app resume:", error);
+        }
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [locationPermissionDenied]);
+
   // Hide bottom card when map mode changes
   useEffect(() => {
     setSelectedMarker(null);
   }, [mapMode]);
 
-  // Fetch data when region or filters change
+  // Fetch data when location, radius or filters change (with debouncing)
   useEffect(() => {
     const fetchMapData = async () => {
       try {
-        const baseFilters = {
-          lat: region.latitude,
-          lng: region.longitude,
-          radius: 50,
-          limit: 100,
-        };
+        // Use proximity-based APIs when user location is available AND proximity search is enabled
+        if (userLocation && useProximitySearch) {
+          // Convert radius to kilometers for API (API expects radius param in km)
+          const radiusInKm = searchRadius / 1000;
+          
+          if (mapMode === "events" || mapMode === "both") {
+            await fetchEventsNearUser(
+              userLocation.latitude,
+              userLocation.longitude,
+              radiusInKm
+            );
+          }
+          if (mapMode === "venues" || mapMode === "both") {
+            await fetchVenuesNearUser(
+              userLocation.latitude,
+              userLocation.longitude,
+              radiusInKm
+            );
+          }
+        } else {
+          // Fallback to generic filter endpoints with map region
+          const baseFilters = {
+            lat: region.latitude,
+            lng: region.longitude,
+            radius: 50,
+            limit: 100,
+          };
 
-        if (mapMode === "events" || mapMode === "both") {
-          await fetchEvents({
-            ...baseFilters,
-            musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined,
-            dateFilter: selectedDateRange?.label === "Custom Range" ? "custom" : undefined,
-            startDate: selectedDateRange?.from,
-            endDate: selectedDateRange?.to,
-          });
-        }
-        if (mapMode === "venues" || mapMode === "both") {
-          await fetchVenues({
-            ...baseFilters,
-            venueType: selectedVenueType?.id,
-          });
+          if (mapMode === "events" || mapMode === "both") {
+            await fetchEvents({
+              ...baseFilters,
+              musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined,
+              dateFilter: selectedDateRange?.label === "Custom Range" ? "custom" : undefined,
+              startDate: selectedDateRange?.from,
+              endDate: selectedDateRange?.to,
+            });
+          }
+          if (mapMode === "venues" || mapMode === "both") {
+            await fetchVenues({
+              ...baseFilters,
+              venueType: selectedVenueType?.id,
+            });
+          }
         }
       } catch (error) {
         console.error("Error fetching map data:", error);
@@ -173,9 +325,14 @@ export default function MapScreen() {
     };
 
     if (!loadingLocation) {
-      fetchMapData();
+      // Debounce radius changes to avoid excessive API calls
+      const debounceTimer = setTimeout(() => {
+        fetchMapData();
+      }, 300);
+
+      return () => clearTimeout(debounceTimer);
     }
-  }, [region, mapMode, selectedGenres, selectedVenueType, selectedDateRange, loadingLocation]);
+  }, [userLocation, useProximitySearch, searchRadius, region, mapMode, selectedGenres, selectedVenueType, selectedDateRange, loadingLocation]);
 
   const centerOnUserLocation = useCallback(() => {
     if (userLocation && mapRef.current) {
@@ -236,6 +393,13 @@ export default function MapScreen() {
       console.log('Error formatting date:', error);
       return 'Date TBA';
     }
+  };
+
+  const formatRadius = (radiusInMeters: number): string => {
+    if (radiusInMeters < 1000) {
+      return `${radiusInMeters}m`;
+    }
+    return `${(radiusInMeters / 1000).toFixed(1)}km`;
   };
 
   return (
@@ -332,6 +496,113 @@ export default function MapScreen() {
         </ScrollView>
       </View>
 
+      {/* Location Prompt - Show when location is not available */}
+      {!userLocation && !loadingLocation && showLocationPrompt && locationPermissionDenied && (
+        <View style={styles.locationPromptContainer}>
+          <View style={styles.locationPromptContent}>
+            <IconSymbol name="location.slash.fill" size={20} color="#FF9800" />
+            <View style={styles.locationPromptTextContainer}>
+              <Text style={styles.locationPromptTitle}>Enable Location</Text>
+              <Text style={styles.locationPromptSubtitle}>
+                Turn on location to discover events and venues near you
+              </Text>
+            </View>
+          </View>
+          <View style={styles.locationPromptActions}>
+            <TouchableOpacity
+              style={styles.locationPromptDismiss}
+              onPress={() => setShowLocationPrompt(false)}
+            >
+              <Text style={styles.locationPromptDismissText}>Dismiss</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.locationPromptButton}
+              onPress={handleEnableLocation}
+            >
+              <IconSymbol name="location.fill" size={14} color="#fff" />
+              <Text style={styles.locationPromptButtonText}>Enable</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* Radius Control - Only show when user location is available */}
+      {userLocation && (
+        <View style={styles.radiusControlContainer}>
+          {useProximitySearch ? (
+            <>
+              <View style={styles.radiusHeaderRow}>
+                <TouchableOpacity
+                  style={styles.radiusToggleButton}
+                  onPress={() => setShowRadiusControl(!showRadiusControl)}
+                >
+                  <IconSymbol name="location.circle" size={16} color="#5271FF" />
+                  <Text style={styles.radiusToggleText}>
+                    Near Me: {formatRadius(searchRadius)}
+                  </Text>
+                  <IconSymbol 
+                    name={showRadiusControl ? "chevron.up" : "chevron.down"} 
+                    size={14} 
+                    color="#666" 
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.disableNearMeButton}
+                  onPress={() => {
+                    setUseProximitySearch(false);
+                    setShowRadiusControl(false);
+                  }}
+                >
+                  <Text style={styles.disableNearMeText}>Disable</Text>
+                </TouchableOpacity>
+              </View>
+              
+              {showRadiusControl && (
+                <View style={styles.radiusSliderContainer}>
+                  <View style={styles.radiusPresetsContainer}>
+                    {[1000, 2000, 5000, 10000, 20000, 50000].map((radius) => (
+                      <TouchableOpacity
+                        key={radius}
+                        style={[
+                          styles.radiusPresetButton,
+                          searchRadius === radius && styles.radiusPresetButtonActive
+                        ]}
+                        onPress={() => setSearchRadius(radius)}
+                      >
+                        <Text style={[
+                          styles.radiusPresetText,
+                          searchRadius === radius && styles.radiusPresetTextActive
+                        ]}>
+                          {formatRadius(radius)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <Text style={styles.radiusResultsHint}>
+                    {nearbyEventsLoading || nearbyVenuesLoading ? 'Searching...' : 
+                     `Found ${events.length} events, ${venues.length} venues`}
+                  </Text>
+                </View>
+              )}
+            </>
+          ) : (
+            <TouchableOpacity
+              style={styles.enableNearMeButton}
+              onPress={() => {
+                setUseProximitySearch(true);
+                setShowRadiusControl(true); // Auto-expand radius controls when enabling
+              }}
+            >
+              <IconSymbol name="location.fill" size={16} color="#5271FF" />
+              <View style={styles.enableNearMeTextContainer}>
+                <Text style={styles.enableNearMeText}>Enable Near Me</Text>
+                <Text style={styles.enableNearMeSubtext}>Search by distance from your location</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
       {/* Map */}
       <View style={styles.mapContainer}>
         {loadingLocation ? (
@@ -403,18 +674,8 @@ export default function MapScreen() {
             style={styles.locationButton}
             onPress={centerOnUserLocation}
           >
-            <IconSymbol name="location.fill" size={24} color="#5271FF" />
+            <IconSymbol name="location.fill" size={24} color="#1A1A2E" />
           </TouchableOpacity>
-        )}
-
-        {/* Location Unavailable Message */}
-        {!userLocation && !loadingLocation && (
-          <View style={styles.locationUnavailableBox}>
-            <IconSymbol name="location.slash" size={16} color="#666" />
-            <Text style={styles.locationUnavailableText}>
-              Location unavailable - Showing default area
-            </Text>
-          </View>
         )}
 
         {/* Loading Indicator */}
@@ -662,6 +923,160 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     color: "#fff",
+  },
+  locationPromptContainer: {
+    backgroundColor: "#FFF3E0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#FFB74D",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  locationPromptContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 12,
+  },
+  locationPromptTextContainer: {
+    flex: 1,
+  },
+  locationPromptTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#E65100",
+    marginBottom: 4,
+  },
+  locationPromptSubtitle: {
+    fontSize: 12,
+    color: "#5D4037",
+    lineHeight: 16,
+  },
+  locationPromptActions: {
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "flex-end",
+  },
+  locationPromptDismiss: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "transparent",
+  },
+  locationPromptDismissText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#666",
+  },
+  locationPromptButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#FF9800",
+  },
+  locationPromptButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  radiusControlContainer: {
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  radiusHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  radiusToggleButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 4,
+  },
+  radiusToggleText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#333",
+  },
+  disableNearMeButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#FFE5E5",
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#FF6B6B",
+  },
+  disableNearMeText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#FF6B6B",
+  },
+  enableNearMeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: "#F0F4FF",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#5271FF",
+  },
+  enableNearMeTextContainer: {
+    flex: 1,
+  },
+  enableNearMeText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#5271FF",
+    marginBottom: 2,
+  },
+  enableNearMeSubtext: {
+    fontSize: 11,
+    color: "#7B91FF",
+  },
+  radiusSliderContainer: {
+    paddingTop: 8,
+  },
+  radiusPresetsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 8,
+  },
+  radiusPresetButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: "#f5f5f5",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  radiusPresetButtonActive: {
+    backgroundColor: "#5271FF",
+    borderColor: "#5271FF",
+  },
+  radiusPresetText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#666",
+  },
+  radiusPresetTextActive: {
+    color: "#fff",
+  },
+  radiusResultsHint: {
+    fontSize: 11,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 4,
   },
   mapContainer: {
     flex: 1,

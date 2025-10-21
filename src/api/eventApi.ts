@@ -105,15 +105,21 @@ export class EventApi {
 
   /**
    * Get events near user location
+   * @param lat - User latitude
+   * @param lng - User longitude
+   * @param radiusInKm - Search radius in kilometers (will be converted to meters for API)
    */
   static async getEventsNearUser(
     lat: number, 
     lng: number, 
-    radius: number = 10
+    radiusInKm: number = 10
   ): Promise<EventResponse> {
     try {
+      // Convert km to meters as backend expects radiusInMeters
+      const radiusInMeters = radiusInKm * 1000;
+      
       const response = await api.get(getEventEndpoint("publicEventsNearUser"), {
-        params: { lat, lng, radius },
+        params: { lat, lng, radiusInMeters },
       });
       
       return response.data;
