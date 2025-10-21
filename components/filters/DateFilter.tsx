@@ -39,6 +39,26 @@ const formatDisplayDate = (date: Date) => {
   return `${day}${getOrdinalSuffix(day)} ${month} ${year}`;
 };
 
+const parseDisplayDate = (dateString: string): Date => {
+  // Parse formatted date strings like "15th Dec 2024" back to Date objects
+  const parts = dateString.split(' ');
+  if (parts.length !== 3) return new Date();
+  
+  const day = parseInt(parts[0].replace(/\D/g, '')); // Remove ordinal suffix
+  const monthName = parts[1];
+  const year = parseInt(parts[2]);
+  
+  const monthMap: { [key: string]: number } = {
+    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+  };
+  
+  const month = monthMap[monthName];
+  if (month === undefined || isNaN(day) || isNaN(year)) return new Date();
+  
+  return new Date(year, month, day);
+};
+
 const getDateRanges = (): DateRange[] => {
   const today = new Date();
   
@@ -109,8 +129,8 @@ export function DateFilter({
       
       // If the selected range is a custom range, populate the custom dates
       if (selectedDateRange?.label === "Custom Range") {
-        setCustomStartDate(new Date(selectedDateRange.from));
-        setCustomEndDate(new Date(selectedDateRange.to));
+        setCustomStartDate(parseDisplayDate(selectedDateRange.from));
+        setCustomEndDate(parseDisplayDate(selectedDateRange.to));
         setCustomDateRange(selectedDateRange);
       } else {
         setCustomDateRange(null);
