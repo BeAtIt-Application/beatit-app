@@ -1,6 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useEvent, useToggleEventStatus } from "@/src/hooks/useEvents";
-import { useMusicGenres } from "@/src/hooks/useTaxonomies";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -12,16 +11,6 @@ export default function EventDetailScreen() {
   
   const { event, loading, error } = useEvent(eventId);
   const { toggleStatus, loading: toggleLoading } = useToggleEventStatus();
-  const { genres } = useMusicGenres();
-
-  // Function to get genre names from genre IDs
-  const getGenreNames = (genreIds: number[] | undefined) => {
-    if (!genreIds || !genres || genres.length === 0) return [];
-    
-    return genreIds
-      .map(id => genres.find(genre => genre.id === id)?.name)
-      .filter(Boolean) as string[];
-  };
 
   const handleToggleStatus = async (status: 'interested' | 'going') => {
     if (!eventId) return;
@@ -137,12 +126,9 @@ export default function EventDetailScreen() {
             {event.name}
           </Text>
           <Text className="text-lg text-gray-800 mb-2">
-            {(() => {
-              const genreNames = getGenreNames((event as any).genreIds);
-              return genreNames.length > 0 
-                ? genreNames.join(' • ') 
-                : 'Event';
-            })()}
+            {event.music_genres && event.music_genres.length > 0 
+              ? event.music_genres.join(' • ') 
+              : 'Event'}
           </Text>
           <View className="flex-row items-center">
             <IconSymbol name="location" size={16} color="#666" />
