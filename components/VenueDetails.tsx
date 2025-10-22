@@ -219,7 +219,7 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
                   />
                 </View>
               )}
-              <Text className="text-3xl font-bold text-[#22954B] mb-2 mt-8">
+              <Text className="text-3xl font-bold text-[#22954B] mb-2 mt-10">
                 {venue.name}
               </Text>
             </View>
