@@ -18,8 +18,15 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: "#FFFFFF",
             borderTopWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
+            boxShadow: '0px -2px 4px 0px rgba(0, 0, 0, 0.1)',
+            elevation: 4, // For Android shadow
+            shadowOpacity: 0.1, // For iOS shadow
+            shadowColor: "#000", // Shadow color
+            shadowOffset: {
+              width: 0,
+              height: -2, // Negative value to cast shadow upward (top only)
+            },
+            shadowRadius: 4, // Shadow blur radius
             height: 80,
             paddingBottom: 20,
             paddingTop: 10,
@@ -93,6 +100,15 @@ export default function TabLayout() {
             alignItems: "center",
             borderTopWidth: 2,
             borderTopColor: "#FFFFFF",
+            // Box shadow only on top
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 4, // Negative value to cast shadow upward
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 4, // For Android
           }}
           onPress={() => router.push("/map")}
         >
