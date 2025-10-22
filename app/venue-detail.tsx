@@ -30,32 +30,29 @@ export default function VenueDetailScreen() {
     );
   }
 
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: "Live Music Night",
-      date: "Fri 15 Dec, 20:00",
-      location: venue.name,
-      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      tag: "Live Music",
-    },
-    {
-      id: 2,
-      title: "DJ Set Weekend",
-      date: "Sat 16 Dec, 22:00",
-      location: venue.name,
-      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      tag: "DJ Set",
-    },
-    {
-      id: 3,
-      title: "Acoustic Session",
-      date: "Sun 17 Dec, 19:00",
-      location: venue.name,
-      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      tag: "Acoustic",
-    },
-  ];
+  // Transform API events to match CompactEvent interface
+  const transformEvent = (event: any) => {
+    const eventDate = new Date(event.event_start);
+    const formattedDate = eventDate.toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    return {
+      id: event.id,
+      title: event.name,
+      date: formattedDate,
+      location: event.venue_name,
+      image: event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+      tag: event.music_genres?.[0] || "Event",
+    };
+  };
+
+  const upcomingEvents = (venue as any).upcoming_events?.map(transformEvent) || [];
+  const pastEvents = (venue as any).past_events?.map(transformEvent) || [];
 
   return (
     <View className="flex-1">
@@ -67,17 +64,21 @@ export default function VenueDetailScreen() {
         <VenueDetails venue={venue} />
 
         {/* Events Section */}
-        <CompactEventsHorizontalList
-          title="Upcoming Events"
-          events={upcomingEvents}
-          showSeeAll={false}
-        />
+        {upcomingEvents.length > 0 && (
+          <CompactEventsHorizontalList
+            title="Upcoming Events"
+            events={upcomingEvents}
+            showSeeAll={false}
+          />
+        )}
 
-        <CompactEventsHorizontalList
-          title="Past Events"
-          events={upcomingEvents}
-          showSeeAll={false}
-        />
+        {pastEvents.length > 0 && (
+          <CompactEventsHorizontalList
+            title="Past Events"
+            events={pastEvents}
+            showSeeAll={false}
+          />
+        )}
       </ScrollView>
     </View>
   );

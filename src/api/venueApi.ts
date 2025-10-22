@@ -43,6 +43,14 @@ export interface Venue {
   user_id?: number;
   collaborator_id?: number;
   working_hours?: WorkingHour[];
+  // Additional properties from API response
+  upcoming_events?: VenueEvent[];
+  past_events?: VenueEvent[];
+  average_rating?: number;
+  total_ratings?: number;
+  current_user_rating?: number | null;
+  is_favourite?: boolean;
+  gallery?: any[];
 }
 
 export interface WorkingHour {
@@ -50,6 +58,20 @@ export interface WorkingHour {
   opens_at: any;
   closes_at: any;
   is_closed: boolean;
+}
+
+export interface VenueEvent {
+  id: number;
+  name: string;
+  event_start: string;
+  image?: string | null;
+  venue_name: string;
+  city: string;
+  lat?: number;
+  lng?: number;
+  meters?: number | null;
+  music_genres?: string[];
+  ticket_price?: number;
 }
 
 export interface VenueFilterParams {
@@ -109,6 +131,7 @@ export class VenueApi {
     try {
       
       const response = await api.get(`${getVenueEndpoint("publicGet")}/${id}`);
+      console.log("Venue API Response:", response.data);
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);
