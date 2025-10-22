@@ -13,6 +13,8 @@ export const API_CONFIG = {
       refresh: "/auth/refresh",
       passwordReset: "/auth/password/email",
       me: "/me/profile",
+      updateProfile: "/me/profile",
+      updatePassword: "/me/password",
     },
     user: {
       profile: "/user/profile",
