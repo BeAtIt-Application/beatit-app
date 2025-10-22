@@ -54,13 +54,6 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onPress, fromHorizonta
     return 'User';
   };
 
-  // Get music genres as string
-  const getMusicGenres = () => {
-    if (user.preferred_music_genres && user.preferred_music_genres.length > 0) {
-      return user.preferred_music_genres.map(genre => genre.name).join(', ');
-    }
-    return 'No genres specified';
-  };
 
   return (
     <TouchableOpacity
@@ -131,10 +124,18 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onPress, fromHorizonta
       
         {/* Music Genres */}
         <View className="mb-3">
-          <Text className="text-gray-500 text-xs mb-1">Music Genres</Text>
-          <Text className="text-gray-700 text-sm" numberOfLines={1}>
-            {getMusicGenres()}
-          </Text>
+          <Text className="text-gray-500 text-xs mb-2">Music Genres</Text>
+          <View className="flex-row flex-wrap gap-1">
+            {user.preferred_music_genres && user.preferred_music_genres.length > 0 ? (
+              user.preferred_music_genres.map((genre, index) => (
+                <View key={index} className="bg-[#761CBC] px-2 py-1 rounded-2xl">
+                  <Text className="text-xs text-white font-medium">{genre.name}</Text>
+                </View>
+              ))
+            ) : (
+              <Text className="text-gray-400 text-sm">No genres specified</Text>
+            )}
+          </View>
         </View>
 
         {/* Social Links */}

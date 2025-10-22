@@ -222,7 +222,7 @@ export default function VenuesScreen() {
           filters={filters}
           showSearch={true}
           showLogo={true}
-          showNotification={true}
+          showNotification={false}
           onSearchChange={handleSearchChange}
           onFilterChange={handleFilterChange}
           selectedFilters={selectedFilters}

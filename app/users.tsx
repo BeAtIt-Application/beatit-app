@@ -138,16 +138,18 @@ export default function UsersScreen() {
           showSearch={true}
           showLogo={true}
           showNotification={false}
+          showBackButton={false}
           onSearchChange={handleSearchChange}
           onFilterChange={handleFilterChange}
           selectedFilters={selectedFilters}
         />
 
-        {/* Custom Back Button */}
+        {/* Back Button Overlay */}
         <TouchableOpacity 
           onPress={() => router.back()}
           activeOpacity={0.8}
-          className="absolute top-8 left-5 w-10 h-10 bg-white/90 rounded-full justify-center items-center shadow-lg z-10"
+          className="absolute top-12 left-5 w-10 h-10 bg-white/90 rounded-full justify-center items-center shadow-lg z-[9999]"
+          style={{ elevation: 9999 }}
         >
           <IconSymbol name="chevron.left" size={20} color="#000" />
         </TouchableOpacity>
