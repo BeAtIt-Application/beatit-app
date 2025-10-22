@@ -172,17 +172,17 @@ export default function EventDetailScreen() {
           </Text>
         </View>
 
-        {/* Location Section */}
+        {/* Location Section
         <View className="mb-6">
           <Text className="text-xl font-bold text-brand-purple mb-3">
             Location
           </Text>
           <TouchableOpacity>
             <Text className="text-brand-purple text-lg underline">
-              {event.address || `${event.city}, ${event.country?.toUpperCase()}`}
+              {event.address || `${event.city}, ${event.venue_name?.toUpperCase()}`}
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* Date and Time Section */}
         <View className="mb-6">
