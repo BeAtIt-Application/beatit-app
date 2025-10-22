@@ -131,7 +131,6 @@ export class VenueApi {
     try {
       
       const response = await api.get(`${getVenueEndpoint("publicGet")}/${id}`);
-      console.log("Venue API Response:", response.data);
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);

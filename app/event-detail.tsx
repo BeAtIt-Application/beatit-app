@@ -43,24 +43,13 @@ export default function EventDetailScreen() {
     );
   }
 
-  // Get banner image from event images
+  // Get banner image from event image
   const getBannerImage = () => {
-    if (!event.images) {
+    if (!event.event_image) {
       return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
     }
     
-    // Handle new API structure where images is an object with banner, card, thumbnail
-    if (typeof event.images === 'object' && !Array.isArray(event.images)) {
-      return event.images.banner?.url || event.images.card?.url || event.images.thumbnail?.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-    }
-    
-    // Handle old API structure where images is an array
-    if (Array.isArray(event.images) && event.images.length > 0) {
-      const firstImage = event.images[0];
-      return firstImage.banner?.url || firstImage.card?.url || firstImage.thumbnail?.url || firstImage.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-    }
-    
-    return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    return event.event_image;
   };
 
   const bannerImageUrl = getBannerImage();

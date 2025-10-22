@@ -9,6 +9,7 @@ export interface Event {
   event_start: string;
   city: string;
   image?: string;
+  event_image?: string;
   lat?: string;
   lng?: string;
   meters?: number;
