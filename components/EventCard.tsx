@@ -42,13 +42,6 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
             <Text className="text-white text-sm font-semibold text-center">12</Text>
             <Text className="text-white text-sm font-semibold">May</Text>
           </View>
-          <TouchableOpacity 
-            onPress={handleHeartPress}
-            activeOpacity={0.8}
-            className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full"
-          >
-            <IconSymbol name="heart" size={16} color="#FF6B6B" />
-          </TouchableOpacity>
         </View>
 
         {/* Event Details */}

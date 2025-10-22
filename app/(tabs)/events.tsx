@@ -8,7 +8,7 @@ import { useMusicGenres } from "@/src/hooks/useTaxonomies";
 import { getCurrentLocation, requestLocationPermission } from "@/src/services/locationService";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface DateRange {
@@ -81,7 +81,7 @@ export default function EventsScreen() {
   const filters = ["Genre", "Date", "City"];
 
   // Use the events hook
-  const { events, loading, error, total, fetchEvents, refreshEvents } = useEvents();
+  const { events, loading, error, total, page, lastPage, hasMoreData, fetchEvents, loadMoreEvents, refreshEvents } = useEvents();
   const { genres: allGenres } = useMusicGenres();
 
   // Handle URL parameters on component mount
@@ -202,6 +202,57 @@ export default function EventsScreen() {
     setUseLocationFilter(false);
   };
 
+  // Load more events function
+  const handleLoadMore = async () => {
+    if (loading || !hasMoreData) return;
+    
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined,
+        dateFilter: selectedDateRange ? (selectedDateRange.label === "Custom Range" ? "custom" : getDateFilterType(selectedDateRange.label)) : undefined,
+        startDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.from || '') : undefined,
+        endDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.to || '') : undefined,
+        date_from: convertFormattedDateToISO(selectedDateRange?.from || ''),
+        date_to: convertFormattedDateToISO(selectedDateRange?.to || ''),
+        city: useLocationFilter ? undefined : selectedCity || undefined,
+        lat: useLocationFilter ? userLocation?.lat : undefined,
+        lng: useLocationFilter ? userLocation?.lng : undefined,
+        radius: useLocationFilter ? locationRadius : undefined,
+        limit: 20,
+      };
+
+      await loadMoreEvents(filters);
+    } catch (error) {
+      console.error('Failed to load more events:', error);
+    }
+  };
+
+  // Handle pull to refresh
+  const handleRefresh = async () => {
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined,
+        dateFilter: selectedDateRange ? (selectedDateRange.label === "Custom Range" ? "custom" : getDateFilterType(selectedDateRange.label)) : undefined,
+        startDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.from || '') : undefined,
+        endDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.to || '') : undefined,
+        date_from: convertFormattedDateToISO(selectedDateRange?.from || ''),
+        date_to: convertFormattedDateToISO(selectedDateRange?.to || ''),
+        city: useLocationFilter ? undefined : selectedCity || undefined,
+        lat: useLocationFilter ? userLocation?.lat : undefined,
+        lng: useLocationFilter ? userLocation?.lng : undefined,
+        radius: useLocationFilter ? locationRadius : undefined,
+        page: 1,
+        limit: 20,
+      };
+
+      await refreshEvents(filters);
+    } catch (error) {
+      console.error('Failed to refresh events:', error);
+    }
+  };
+
   const handleLocationFilter = async () => {
     try {
       const permission = await requestLocationPermission();
@@ -229,11 +280,19 @@ export default function EventsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[linear-gradient(180deg,#6932D4_0%,#3F6AE9_100%)]bg-white">
-      <ScrollView 
-        className="flex-1" 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 90 }}
-      >
+        <ScrollView 
+          className="flex-1" 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 90 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={handleRefresh}
+              tintColor="#5271FF"
+              colors={["#5271FF"]}
+            />
+          }
+        >
         <PageHeader
           title="Events"
           colors={['#761CBC', '#5271FF'] as const}
@@ -308,6 +367,38 @@ export default function EventsScreen() {
             <View className="py-12 items-center">
               <Text className="text-gray-400 text-base">No events found</Text>
               <Text className="text-gray-400 text-sm mt-2">Try adjusting your filters</Text>
+            </View>
+          )}
+          
+          {/* Load More Button */}
+          {events.length > 0 && hasMoreData && (
+            <View className="py-4 items-center">
+              <TouchableOpacity
+                onPress={handleLoadMore}
+                disabled={loading}
+                className={`px-6 py-3 rounded-full ${
+                  loading ? 'bg-gray-300' : 'bg-[#5271FF]'
+                }`}
+              >
+                <Text className={`text-sm font-semibold ${
+                  loading ? 'text-gray-500' : 'text-white'
+                }`}>
+                  {loading ? 'Loading...' : 'Load More Events'}
+                </Text>
+              </TouchableOpacity>
+              <Text className="text-gray-500 text-xs mt-2">
+                Page {page} of {lastPage} • {total} total events
+              </Text>
+            </View>
+          )}
+          
+          {/* No More Results */}
+          {events.length > 0 && !hasMoreData && (
+            <View className="py-4 items-center">
+              <Text className="text-gray-400 text-sm">No more results</Text>
+              <Text className="text-gray-500 text-xs mt-1">
+                Showing all {total} events
+              </Text>
             </View>
           )}
         </View>
