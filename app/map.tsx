@@ -737,23 +737,21 @@ export default function MapScreen() {
       </View>
 
       {/* Bottom Card */}
-      {selectedMarker && (
-        <View style={styles.bottomCard}>
-          {selectedMarker.type === "event" ? (
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.cardsContainer}
-            >
-              {(selectedMarker.data as Event[]).map((event) => {
-                if (!event || !event.id) return null;
-                return (
-                  <TouchableOpacity
-                    key={event.id}
-                    onPress={() => handleCardPress("event", event.id)}
-                    activeOpacity={0.7}
-                    style={styles.card}
-                  >
+        {selectedMarker && (
+          <View style={styles.bottomCard}>
+            {selectedMarker.type === "event" ? (
+            (selectedMarker.data as Event[]).length === 1 ? (
+              // Single event - full width
+              <View style={styles.cardsContainer}>
+                {(selectedMarker.data as Event[]).map((event) => {
+                  if (!event || !event.id) return null;
+                  return (
+                    <TouchableOpacity
+                      key={event.id}
+                      onPress={() => handleCardPress("event", event.id)}
+                      activeOpacity={0.7}
+                      style={styles.fullWidthCard}
+                    >
                     <Image
                       source={{ uri: event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" }}
                       style={styles.cardImage}
@@ -789,10 +787,66 @@ export default function MapScreen() {
                       </View>
                     )}
                   </View>
-                </TouchableOpacity>
-                );
-              })}
-        </ScrollView>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : (
+              // Multiple events - horizontal scroll
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.cardsContainer}
+              >
+                {(selectedMarker.data as Event[]).map((event) => {
+                  if (!event || !event.id) return null;
+                  return (
+                    <TouchableOpacity
+                      key={event.id}
+                      onPress={() => handleCardPress("event", event.id)}
+                      activeOpacity={0.7}
+                      style={styles.card}
+                    >
+                      <Image
+                        source={{ uri: event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" }}
+                        style={styles.cardImage}
+                        contentFit="cover"
+                      />
+                      <View style={styles.cardContent}>
+                        <Text style={styles.cardTitle} numberOfLines={2}>
+                          {event.name || 'Untitled Event'}
+                        </Text>
+                        <View style={styles.cardRow}>
+                          <IconSymbol name="calendar" size={14} color="#666" />
+                          <Text style={styles.cardText}>{formatEventDate(event.event_start)}</Text>
+                        </View>
+                        {event.venue_name && (
+                          <View style={styles.cardRow}>
+                            <IconSymbol name="building.2" size={14} color="#2FCC67" />
+                            <Text style={styles.cardVenueText} numberOfLines={1}>{event.venue_name}</Text>
+                          </View>
+                        )}
+                        {event.city && (
+                          <View style={styles.cardRow}>
+                            <IconSymbol name="location" size={14} color="#666" />
+                            <Text style={styles.cardText}>{event.city}</Text>
+                          </View>
+                        )}
+                        {event.music_genres && event.music_genres.length > 0 && (
+                          <View style={styles.tagsContainer}>
+                            {event.music_genres.slice(0, 2).map((genre, index) => (
+                              <View key={`${event.id}-genre-${index}`} style={styles.eventTag}>
+                                <Text style={styles.tagText}>{genre}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            )
           ) : (
             <View style={styles.cardsContainer}>
               <TouchableOpacity
@@ -1299,6 +1353,15 @@ const styles = StyleSheet.create({
   },
   card: {
     width: width - 80,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    flexDirection: "row",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  fullWidthCard: {
+    width: "100%",
     backgroundColor: "#fff",
     borderRadius: 12,
     flexDirection: "row",
