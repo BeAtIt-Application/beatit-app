@@ -148,7 +148,18 @@ export default function EventDetailScreen() {
             <View className="flex-row items-center ml-1">
               {event.venue_name ? (
                 <>
-                  <Text className="text-gray-500 font-medium text-[#1A1A2E]">{event.venue_name}</Text>
+                  <TouchableOpacity 
+                    onPress={() => {
+                      if (event.venue_id) {
+                        router.push(`/venue-detail?id=${event.venue_id}`);
+                      } 
+                    }}
+                    style={{ opacity: 1 }}
+                  >
+                    <Text className="font-medium text-[#2FCC67] underline">
+                      {event.venue_name}
+                    </Text>
+                  </TouchableOpacity>
                   <Text className="text-gray-500">, {event.city}</Text>
                 </>
               ) : (
