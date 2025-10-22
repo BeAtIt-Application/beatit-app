@@ -93,11 +93,7 @@ export default function ProfileScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView 
-        className="flex-1 bg-white" 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
+      <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
         {/* Header with Avatar */}
         <View className="relative bg-[#5271FF]" style={{ height: 200 }}>
         {/* Back Button */}
@@ -297,7 +293,7 @@ export default function ProfileScreen() {
         )}
 
         {/* Action Buttons */}
-        <View className="mb-6">
+        <View className="mb-32">
           <Text className="text-xl font-bold text-brand-purple mb-3">
             Actions
           </Text>

@@ -18,22 +18,19 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: "#FFFFFF",
             borderTopWidth: 0,
-            boxShadow: '0px -2px 4px 0px rgba(0, 0, 0, 0.1)',
-            elevation: 4, // For Android shadow
-            shadowOpacity: 0.1, // For iOS shadow
-            shadowColor: "#000", // Shadow color
-            shadowOffset: {
-              width: 0,
-              height: -2, // Negative value to cast shadow upward (top only)
-            },
-            shadowRadius: 4, // Shadow blur radius
-            height: 80,
-            paddingBottom: 20,
+            elevation: 0,
+            shadowOpacity: 0,
+            height: 75 + insets.bottom, // Include safe area in height
+            paddingBottom: 20 + insets.bottom, // Add safe area to padding
             paddingTop: 10,
-            marginBottom: insets.bottom,
+            marginBottom: 0, // Remove margin since we're including safe area in height
             position: "absolute",
             borderTopLeftRadius: 20,
+            boxShadow: '0px -2px 4px 0px rgba(0, 0, 0, 0.1)',
             borderTopRightRadius: 20,
+            bottom: 0, // Ensure it's at the very bottom
+            left: 0,
+            right: 0,
           },
           tabBarLabelStyle: {
             fontSize: 12,
@@ -84,7 +81,7 @@ export default function TabLayout() {
       <View
         style={{
           position: "absolute",
-          bottom: 50 + insets.bottom,
+          bottom: 50 + insets.bottom, // Keep same positioning relative to tab bar
           alignSelf: 'center',
           alignItems: 'center',
           zIndex: 1000,
@@ -104,7 +101,7 @@ export default function TabLayout() {
             shadowColor: "#000",
             shadowOffset: {
               width: 0,
-              height: 4, // Negative value to cast shadow upward
+              height: -2, // Negative value to cast shadow upward
             },
             shadowOpacity: 0.1,
             shadowRadius: 4,
