@@ -695,7 +695,6 @@ export default function MapScreen() {
                       longitude: parseFloat(lng),
                     }}
                     onPress={() => handleMarkerPress("event", eventGroup)}
-                    title={eventGroup[0].name}
                     pinColor="#FF3B30"
                   />
                 );
@@ -712,7 +711,6 @@ export default function MapScreen() {
                   }}
                   onPress={() => handleMarkerPress("venue", venue)}
                   pinColor="#FF3B30"
-                  title={venue.name}
                 />
               ))}
           </MapView>
@@ -722,9 +720,11 @@ export default function MapScreen() {
         {userLocation && !loadingLocation && (
           <TouchableOpacity
             style={styles.locationButton}
-            onPress={centerOnUserLocation}
+            onPress={() => {
+              centerOnUserLocation();
+            }}
           >
-            <IconSymbol name="location.fill" size={24} color="#1A1A2E" />
+            <Text style={{ fontSize: 24, color: "#5271FF", fontWeight: "bold" }}>📍</Text>
           </TouchableOpacity>
         )}
 
@@ -1230,11 +1230,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#5271FF",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 10,
   },
   locationUnavailableBox: {
     position: "absolute",
