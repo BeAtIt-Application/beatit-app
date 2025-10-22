@@ -143,10 +143,11 @@ export default function SelectInterestsScreen() {
                     <TouchableOpacity
                       key={genre.id}
                       onPress={() => toggleGenre(genre.id)}
+                      activeOpacity={1}
                       className={`px-4 py-2 rounded-full border-2 ${
                         isSelected
                           ? "bg-[#761CBC] border-[#761CBC]"
-                          : "bg-white border-gray-300"
+                          : "bg-white border-[#761CBC]"
                       }`}
                     >
                       <Text
@@ -192,10 +193,11 @@ export default function SelectInterestsScreen() {
                     <TouchableOpacity
                       key={venueType.id}
                       onPress={() => toggleVenueType(venueType.id)}
+                      activeOpacity={1}
                       className={`px-4 py-2 rounded-full border-2 ${
                         isSelected
-                          ? "bg-[#761CBC] border-[#761CBC]"
-                          : "bg-white border-gray-300"
+                          ? "bg-[#2FCC67] border-[#2FCC67]"
+                          : "bg-white border-[#2FCC67]"
                       }`}
                     >
                       <Text

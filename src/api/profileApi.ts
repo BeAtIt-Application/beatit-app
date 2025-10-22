@@ -111,12 +111,15 @@ export class ProfileApi {
 
   /**
    * Upload avatar for current user or specified user
+   * @param file - The avatar image file
+   * @param userId - Optional user ID. If not provided, uploads for authenticated user
    */
   static async uploadAvatar(file: File | Blob, userId?: number): Promise<AvatarUploadResponse> {
     try {
       const formData = new FormData();
       formData.append('avatar', file as any);
 
+      // Use /user/avatar/{id} if userId provided, otherwise /user/avatar for current user
       const endpoint = userId 
         ? `${getUserEndpoint("uploadAvatar")}/${userId}`
         : getUserEndpoint("uploadAvatar");
@@ -139,7 +142,7 @@ export class ProfileApi {
    */
   static async updateInterests(data: UpdateInterestsRequest): Promise<InterestsUpdateResponse> {
     try {
-      const response = await api.patch(getUserEndpoint("updateInterests"), data);
+      const response = await api.post(getUserEndpoint("updateInterests"), data);
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);
