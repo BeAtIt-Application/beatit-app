@@ -82,7 +82,19 @@ export default function EventDetailScreen() {
   };
 
   const startDateTime = formatEventDateTime(event.event_start);
-  const endDateTime = formatEventDateTime(event.event_end);
+  
+  // Calculate end time - if event_end exists, use it, otherwise estimate 3 hours after start
+  const getEndTime = () => {
+    if ((event as any).event_end) {
+      return (event as any).event_end;
+    }
+    // Estimate 3 hours after start time
+    const startDate = new Date(event.event_start);
+    const endDate = new Date(startDate.getTime() + (3 * 60 * 60 * 1000)); // Add 3 hours
+    return endDate.toISOString();
+  };
+  
+  const endDateTime = formatEventDateTime(getEndTime());
 
   const artists = [
     {
