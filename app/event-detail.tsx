@@ -1,3 +1,4 @@
+import { HorizontalArtistSlider } from "@/components/HorizontalArtistSlider";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useEvent, useToggleEventStatus } from "@/src/hooks/useEvents";
 import { Image } from "expo-image";
@@ -233,27 +234,12 @@ export default function EventDetailScreen() {
         </View>
 
         {/* Artists Section */}
-        <View className="mb-8">
-          <Text className="text-xl font-bold text-brand-purple mb-4">
-            Artists
-          </Text>
-          <View className="flex-row gap-4">
-            {artists.map((artist) => (
-              <View key={artist.id} className="flex-1">
-                <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                  <Image
-                    source={{ uri: artist.image }}
-                    style={{ width: "100%", height: 120, borderRadius: 12 }}
-                    contentFit="cover"
-                  />
-                  <Text className="text-gray-800 font-medium text-center mt-3">
-                    {artist.name}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
+        <HorizontalArtistSlider
+          artists={artists}
+          title="Artists"
+          cardWidth={200}
+          cardHeight={150}
+        />
       </View>
     </ScrollView>
   );
