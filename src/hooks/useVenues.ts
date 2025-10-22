@@ -8,6 +8,8 @@ export const useVenues = () => {
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
 
   const fetchVenues = useCallback(async (filters: VenueFilterParams = {}) => {
     setLoading(true);
@@ -21,8 +23,10 @@ export const useVenues = () => {
       });
       
       setVenues(response.data || []);
-      setTotal(response.total || 0);
-      setPage(response.page || 1);
+      setTotal(response.pagination?.total || 0);
+      setPage(response.pagination?.currentPage || 1);
+      setLastPage(response.pagination?.lastPage || 1);
+      setHasMoreData((response.pagination?.currentPage || 1) < (response.pagination?.lastPage || 1));
       
       return response;
     } catch (err) {
@@ -49,8 +53,10 @@ export const useVenues = () => {
       });
       
       setVenues(prev => [...prev, ...(response.data || [])]);
-      setTotal(response.total || 0);
+      setTotal(response.pagination?.total || 0);
       setPage(nextPage);
+      setLastPage(response.pagination?.lastPage || 1);
+      setHasMoreData(nextPage < (response.pagination?.lastPage || 1));
       
       return response;
     } catch (err) {
@@ -64,6 +70,7 @@ export const useVenues = () => {
 
   const refreshVenues = useCallback(async (filters: VenueFilterParams = {}) => {
     setPage(1);
+    setHasMoreData(true);
     return fetchVenues({ ...filters, page: 1 });
   }, [fetchVenues]);
 
@@ -73,6 +80,8 @@ export const useVenues = () => {
     error,
     total,
     page,
+    lastPage,
+    hasMoreData,
     fetchVenues,
     loadMoreVenues,
     refreshVenues,

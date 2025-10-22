@@ -67,7 +67,7 @@ export function HorizontalArtistSlider({
               width: defaultCardWidth,
               marginRight: index < artists.length - 1 ? spacing : 0,
             }}
-            className="pl-5 mt-4"
+            className="mt-4"
             onPress={() => router.push(`/user-detail?id=${artist.id}`)}
           >
             <View 

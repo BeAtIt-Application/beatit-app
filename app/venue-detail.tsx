@@ -67,19 +67,17 @@ export default function VenueDetailScreen() {
         <VenueDetails venue={venue} />
 
         {/* Events Section */}
-        <View className="px-5 py-6">
-          <CompactEventsHorizontalList
-            title="Upcoming Events"
-            events={upcomingEvents}
-            showSeeAll={false}
-          />
+        <CompactEventsHorizontalList
+          title="Upcoming Events"
+          events={upcomingEvents}
+          showSeeAll={false}
+        />
 
-          <CompactEventsHorizontalList
-            title="Past Events"
-            events={upcomingEvents}
-            showSeeAll={false}
-          />
-        </View>
+        <CompactEventsHorizontalList
+          title="Past Events"
+          events={upcomingEvents}
+          showSeeAll={false}
+        />
       </ScrollView>
     </View>
   );

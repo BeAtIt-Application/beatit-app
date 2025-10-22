@@ -8,6 +8,7 @@ import { getCurrentLocation, requestLocationPermission } from "@/src/services/lo
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+    RefreshControl,
     ScrollView,
     Text,
     TouchableOpacity,
@@ -33,7 +34,7 @@ export default function VenuesScreen() {
   const filters = ["Venue Type", "City"];
 
   // Use the venues hook
-  const { venues, loading, error, total, fetchVenues, refreshVenues } = useVenues();
+  const { venues, loading, error, total, page, lastPage, hasMoreData, fetchVenues, loadMoreVenues, refreshVenues } = useVenues();
   const { venueTypes: allVenueTypes } = useVenueTypes();
 
   // Handle URL parameters on component mount
@@ -138,6 +139,47 @@ export default function VenuesScreen() {
     setUseLocationFilter(false);
   };
 
+  // Load more venues function
+  const handleLoadMore = async () => {
+    if (loading || !hasMoreData) return;
+    
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        venueType: selectedVenueType?.id || undefined,
+        city: useLocationFilter ? undefined : selectedCity || undefined,
+        lat: useLocationFilter ? userLocation?.lat : undefined,
+        lng: useLocationFilter ? userLocation?.lng : undefined,
+        radius: useLocationFilter ? locationRadius : undefined,
+        limit: 20,
+      };
+
+      await loadMoreVenues(filters);
+    } catch (error) {
+      console.error('Failed to load more venues:', error);
+    }
+  };
+
+  // Handle pull to refresh
+  const handleRefresh = async () => {
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        venueType: selectedVenueType?.id || undefined,
+        city: useLocationFilter ? undefined : selectedCity || undefined,
+        lat: useLocationFilter ? userLocation?.lat : undefined,
+        lng: useLocationFilter ? userLocation?.lng : undefined,
+        radius: useLocationFilter ? locationRadius : undefined,
+        page: 1,
+        limit: 20,
+      };
+
+      await refreshVenues(filters);
+    } catch (error) {
+      console.error('Failed to refresh venues:', error);
+    }
+  };
+
   const handleLocationFilter = async () => {
     try {
       const permission = await requestLocationPermission();
@@ -168,6 +210,14 @@ export default function VenuesScreen() {
         className="flex-1" 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 90 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={handleRefresh}
+            tintColor="#5271FF"
+            colors={["#5271FF"]}
+          />
+        }
       >
         <PageHeader
           title="Venues"
@@ -238,6 +288,38 @@ export default function VenuesScreen() {
             <View className="py-12 items-center">
               <Text className="text-gray-400 text-base">No venues found</Text>
               <Text className="text-gray-400 text-sm mt-2">Try adjusting your filters</Text>
+            </View>
+          )}
+          
+          {/* Load More Button */}
+          {venues.length > 0 && hasMoreData && (
+            <View className="py-4 items-center">
+              <TouchableOpacity
+                onPress={handleLoadMore}
+                disabled={loading}
+                className={`px-6 py-3 rounded-full ${
+                  loading ? 'bg-gray-300' : 'bg-[#5271FF]'
+                }`}
+              >
+                <Text className={`text-sm font-semibold ${
+                  loading ? 'text-gray-500' : 'text-white'
+                }`}>
+                  {loading ? 'Loading...' : 'Load More Venues'}
+                </Text>
+              </TouchableOpacity>
+              <Text className="text-gray-500 text-xs mt-2">
+                Page {page} of {lastPage} • {total} total venues
+              </Text>
+            </View>
+          )}
+          
+          {/* No More Results */}
+          {venues.length > 0 && !hasMoreData && (
+            <View className="py-4 items-center">
+              <Text className="text-gray-400 text-sm">No more results</Text>
+              <Text className="text-gray-500 text-xs mt-1">
+                Showing all {total} venues
+              </Text>
             </View>
           )}
         </View>

@@ -1,6 +1,6 @@
+import { HorizontalArtistSlider } from "@/components/HorizontalArtistSlider";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useEvent, useToggleEventStatus } from "@/src/hooks/useEvents";
-import { useMusicGenres } from "@/src/hooks/useTaxonomies";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -12,16 +12,6 @@ export default function EventDetailScreen() {
   
   const { event, loading, error } = useEvent(eventId);
   const { toggleStatus, loading: toggleLoading } = useToggleEventStatus();
-  const { genres } = useMusicGenres();
-
-  // Function to get genre names from genre IDs
-  const getGenreNames = (genreIds: number[] | undefined) => {
-    if (!genreIds || !genres || genres.length === 0) return [];
-    
-    return genreIds
-      .map(id => genres.find(genre => genre.id === id)?.name)
-      .filter(Boolean) as string[];
-  };
 
   const handleToggleStatus = async (status: 'interested' | 'going') => {
     if (!eventId) return;
@@ -93,7 +83,19 @@ export default function EventDetailScreen() {
   };
 
   const startDateTime = formatEventDateTime(event.event_start);
-  const endDateTime = formatEventDateTime(event.event_end);
+  
+  // Calculate end time - if event_end exists, use it, otherwise estimate 3 hours after start
+  const getEndTime = () => {
+    if ((event as any).event_end) {
+      return (event as any).event_end;
+    }
+    // Estimate 3 hours after start time
+    const startDate = new Date(event.event_start);
+    const endDate = new Date(startDate.getTime() + (3 * 60 * 60 * 1000)); // Add 3 hours
+    return endDate.toISOString();
+  };
+  
+  const endDateTime = formatEventDateTime(getEndTime());
 
   const artists = [
     {
@@ -137,12 +139,9 @@ export default function EventDetailScreen() {
             {event.name}
           </Text>
           <Text className="text-lg text-gray-800 mb-2">
-            {(() => {
-              const genreNames = getGenreNames((event as any).genreIds);
-              return genreNames.length > 0 
-                ? genreNames.join(' • ') 
-                : 'Event';
-            })()}
+            {event.music_genres && event.music_genres.length > 0 
+              ? event.music_genres.join(' • ') 
+              : 'Event'}
           </Text>
           <View className="flex-row items-center">
             <IconSymbol name="location" size={16} color="#666" />
@@ -173,17 +172,17 @@ export default function EventDetailScreen() {
           </Text>
         </View>
 
-        {/* Location Section */}
+        {/* Location Section
         <View className="mb-6">
           <Text className="text-xl font-bold text-brand-purple mb-3">
             Location
           </Text>
           <TouchableOpacity>
             <Text className="text-brand-purple text-lg underline">
-              {event.address || `${event.city}, ${event.country?.toUpperCase()}`}
+              {event.address || `${event.city}, ${event.venue_name?.toUpperCase()}`}
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* Date and Time Section */}
         <View className="mb-6">
@@ -235,27 +234,12 @@ export default function EventDetailScreen() {
         </View>
 
         {/* Artists Section */}
-        <View className="mb-8">
-          <Text className="text-xl font-bold text-brand-purple mb-4">
-            Artists
-          </Text>
-          <View className="flex-row gap-4">
-            {artists.map((artist) => (
-              <View key={artist.id} className="flex-1">
-                <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                  <Image
-                    source={{ uri: artist.image }}
-                    style={{ width: "100%", height: 120, borderRadius: 12 }}
-                    contentFit="cover"
-                  />
-                  <Text className="text-gray-800 font-medium text-center mt-3">
-                    {artist.name}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
+        <HorizontalArtistSlider
+          artists={artists}
+          title="Artists"
+          cardWidth={200}
+          cardHeight={150}
+        />
       </View>
     </ScrollView>
   );

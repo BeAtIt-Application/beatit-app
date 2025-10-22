@@ -88,7 +88,7 @@ export class ProfileApi {
   static async updateProfile(data: UpdateProfileRequest): Promise<UserProfile> {
     try {
       // Use /me/profile endpoint for updating current user's profile
-      const response = await api.patch(getAuthEndpoint("me"), data);
+      const response = await api.patch(getAuthEndpoint("updateProfile"), data);
       return response.data.user || response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);
@@ -101,7 +101,7 @@ export class ProfileApi {
    */
   static async updatePassword(data: UpdatePasswordRequest): Promise<PasswordUpdateResponse> {
     try {
-      const response = await api.patch(getUserEndpoint("updatePassword"), data);
+      const response = await api.patch(getAuthEndpoint("updatePassword"), data);
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);

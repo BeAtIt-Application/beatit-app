@@ -82,19 +82,19 @@ export const useUser = () => {
   const hydrateAuthState = useCallback(async (): Promise<void> => {
     try {
       await initializeAuth();
-
-      // If we have a token, fetch fresh user data from /me endpoint
-      if (token) {
-        await fetchUserData();
-      }
+      
+      // Don't automatically fetch user data on startup
+      // Let the app load with stored user data first
+      // User data can be refreshed when needed (e.g., on profile page)
+      
     } catch (error) {
       console.error("Error hydrating auth state:", error);
-      // Only clear auth state if it's an authentication error
-      if (error instanceof Error && (error.message.includes("401") || error.message.includes("unauthorized") || error.message.includes("Unauthenticated"))) {
+      // Only clear auth state if it's a storage error, not API errors
+      if (error instanceof Error && error.message.includes("SecureStore")) {
         await logout();
       }
     }
-  }, [token, initializeAuth, logout]);
+  }, [initializeAuth, logout]);
 
   // Fetch user data from /me endpoint
   const fetchUserData = useCallback(async (): Promise<User | null> => {
@@ -111,12 +111,20 @@ export const useUser = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
 
-      // If it's an authentication error, logout user
-      if (error instanceof Error && (error.message.includes("401") || error.message.includes("Unauthenticated") || error.message.includes("unauthorized"))) {
+      // Only logout on specific authentication errors, not on network or server errors
+      if (error instanceof Error && (
+        error.message.includes("401") || 
+        error.message.includes("Unauthenticated") || 
+        error.message.includes("unauthorized") ||
+        error.message.includes("Invalid token") ||
+        error.message.includes("Token expired")
+      )) {
         await logout();
         return null;
       }
 
+      // For other errors (network, server issues), just throw the error
+      // Don't logout the user for temporary issues
       throw error;
     }
   }, [token, setUser, logout]);
@@ -167,8 +175,14 @@ export const initializeAppAuth = async (): Promise<void> => {
             error
           );
 
-          // If it's an authentication error, logout user
-          if (error instanceof Error && (error.message.includes("401") || error.message.includes("Unauthenticated"))) {
+          // Only logout on specific authentication errors, not on network or server errors
+          if (error instanceof Error && (
+            error.message.includes("401") || 
+            error.message.includes("Unauthenticated") || 
+            error.message.includes("unauthorized") ||
+            error.message.includes("Invalid token") ||
+            error.message.includes("Token expired")
+          )) {
             await currentState.logout();
           }
         }
@@ -188,10 +202,10 @@ export const initializeAppAuth = async (): Promise<void> => {
 
 // Export types for external use
 export type {
-    LoginCredentials,
-    LoginResponse,
-    SignupCredentials,
-    SignupResponse,
-    User
+  LoginCredentials,
+  LoginResponse,
+  SignupCredentials,
+  SignupResponse,
+  User
 } from "../api/authApi";
 

@@ -8,6 +8,8 @@ export const useEvents = () => {
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
 
   const fetchEvents = useCallback(async (filters: EventFilterParams = {}) => {
     setLoading(true);
@@ -21,8 +23,10 @@ export const useEvents = () => {
       });
       
       setEvents(response.data || []);
-      setTotal(response.total || 0);
-      setPage(response.page || 1);
+      setTotal(response.pagination?.total || 0);
+      setPage(response.pagination?.currentPage || 1);
+      setLastPage(response.pagination?.lastPage || 1);
+      setHasMoreData((response.pagination?.currentPage || 1) < (response.pagination?.lastPage || 1));
       
       return response;
     } catch (err) {
@@ -49,8 +53,10 @@ export const useEvents = () => {
       });
       
       setEvents(prev => [...prev, ...(response.data || [])]);
-      setTotal(response.total || 0);
+      setTotal(response.pagination?.total || 0);
       setPage(nextPage);
+      setLastPage(response.pagination?.lastPage || 1);
+      setHasMoreData(nextPage < (response.pagination?.lastPage || 1));
       
       return response;
     } catch (err) {
@@ -64,6 +70,7 @@ export const useEvents = () => {
 
   const refreshEvents = useCallback(async (filters: EventFilterParams = {}) => {
     setPage(1);
+    setHasMoreData(true);
     return fetchEvents({ ...filters, page: 1 });
   }, [fetchEvents]);
 
@@ -73,6 +80,8 @@ export const useEvents = () => {
     error,
     total,
     page,
+    lastPage,
+    hasMoreData,
     fetchEvents,
     loadMoreEvents,
     refreshEvents,
