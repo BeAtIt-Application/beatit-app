@@ -163,7 +163,6 @@ export default function MapScreen() {
       try {
         const permissionStatus = await requestLocationPermission();
         if (!permissionStatus.granted) {
-          console.log("Location permission denied, using default location");
           setLocationPermissionDenied(true);
           setLoadingLocation(false);
           return;
@@ -183,11 +182,9 @@ export default function MapScreen() {
           });
           setLocationPermissionDenied(false);
         } else {
-          console.log("Could not get location, using default location");
           setLocationPermissionDenied(true);
         }
       } catch (error) {
-        console.log("Error getting user location, using default location:", error);
         setLocationPermissionDenied(true);
       } finally {
         setLoadingLocation(false);
@@ -204,7 +201,6 @@ export default function MapScreen() {
       const permissionStatus = await requestLocationPermission();
       
       if (!permissionStatus.granted) {
-        console.log("Location permission still denied");
         setLocationPermissionDenied(true);
         setLoadingLocation(false);
         
@@ -263,7 +259,6 @@ export default function MapScreen() {
         setLocationPermissionDenied(true);
       }
     } catch (error) {
-      console.log("Error enabling location:", error);
       setLocationPermissionDenied(true);
     } finally {
       setLoadingLocation(false);
@@ -341,7 +336,6 @@ export default function MapScreen() {
               radiusInMeters,
               eventFilters
             );
-            console.log('Events response:', eventsResponse);
           }
           if (mapMode === "venues" || mapMode === "both") {
             const venuesResponse = await fetchVenuesNearUser(
@@ -349,7 +343,6 @@ export default function MapScreen() {
               userLocation.longitude,
               radiusInMeters
             );
-            console.log('Venues response:', venuesResponse);
           }
         } else {
           // Fallback to generic filter endpoints with map region
@@ -444,7 +437,6 @@ export default function MapScreen() {
         minute: '2-digit'
       });
     } catch (error) {
-      console.log('Error formatting date:', error);
       return 'Date TBA';
     }
   };

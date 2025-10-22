@@ -109,8 +109,6 @@ export default function EditProfileScreen() {
       if (formData.spotify_link) cleanedData.spotify_link = formData.spotify_link;
       if (formData.soundcloud_link) cleanedData.soundcloud_link = formData.soundcloud_link;
       
-      console.log('Sending profile update:', cleanedData);
-      
       await updateProfile(cleanedData);
       
       // Refetch the updated profile data

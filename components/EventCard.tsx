@@ -38,7 +38,6 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
       
       return { day, month };
     } catch (error) {
-      console.log('Error formatting date:', error);
       return { day: '--', month: '---' };
     }
   };

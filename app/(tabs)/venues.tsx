@@ -8,11 +8,11 @@ import { getCurrentLocation, requestLocationPermission } from "@/src/services/lo
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -59,7 +59,6 @@ export default function VenuesScreen() {
       return () => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(async () => {
-          console.log('🔍 Venues Debounced Search Triggered with query:', searchQuery);
           try {
             const filters = {
               search: searchQuery || undefined,
@@ -116,7 +115,6 @@ export default function VenuesScreen() {
   }, [selectedVenueType, selectedCity, useLocationFilter, userLocation]);
 
   const handleSearchChange = (text: string) => {
-    console.log('🔍 Venues Search Query Changed:', text);
     setSearchQuery(text);
   };
 
@@ -184,7 +182,6 @@ export default function VenuesScreen() {
     try {
       const permission = await requestLocationPermission();
       if (!permission.granted) {
-        console.log('Location permission denied');
         return;
       }
 

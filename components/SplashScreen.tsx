@@ -15,9 +15,6 @@ export default function Splash() {
   const [scaleAnim] = useState(new Animated.Value(0.3));
 
   useEffect(() => {
-    console.log("🎬 Custom splash screen component mounted!");
-    console.log("🎯 Starting animations...");
-
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,

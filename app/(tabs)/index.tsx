@@ -264,7 +264,6 @@ export default function HomeScreen() {
 
 
   const handleCategoryPress = (item: CategoryItem) => {
-    console.log("Category pressed:", item);
     
     // Determine if this is a genre or venue type based on the item's ID
     // Genres will have IDs from the music genres API, venue types from venue types API

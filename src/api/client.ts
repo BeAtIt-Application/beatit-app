@@ -217,15 +217,9 @@ export const getToken = async (): Promise<string | null> => {
 
 // Error handler utility
 export const handleApiError = (error: AxiosError): ApiError => {
-  console.log("handleApiError: Processing error:", error);
   
   if (error.response) {
     // Server responded with error status
-    console.log("handleApiError: Server error response:", {
-      status: error.response.status,
-      statusText: error.response.statusText,
-      data: error.response.data
-    });
     
     let errorMessage = "An error occurred";
     

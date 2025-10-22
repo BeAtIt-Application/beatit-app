@@ -106,7 +106,6 @@ export default function EventsScreen() {
       return () => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(async () => {
-          console.log('🔍 Events Debounced Search Triggered with query:', searchQuery);
           try {
             const filters = {
               search: searchQuery || undefined,
@@ -175,7 +174,6 @@ export default function EventsScreen() {
   }, [selectedGenres, selectedDateRange, selectedCity, useLocationFilter, userLocation]);
 
   const handleSearchChange = (text: string) => {
-    console.log('🔍 Events Search Query Changed:', text);
     setSearchQuery(text);
   };
 
@@ -257,7 +255,6 @@ export default function EventsScreen() {
     try {
       const permission = await requestLocationPermission();
       if (!permission.granted) {
-        console.log('Location permission denied');
         return;
       }
 

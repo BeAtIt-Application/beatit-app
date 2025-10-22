@@ -61,7 +61,6 @@ export const getCurrentLocation = async (): Promise<LocationCoordinates | null> 
     const { status } = await Location.getForegroundPermissionsAsync();
     
     if (status !== 'granted') {
-      console.log('Location permission not granted');
       return null;
     }
 

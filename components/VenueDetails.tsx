@@ -35,16 +35,6 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   };
 
   const bannerImageUrl = getBannerImage();
-  
-  // Debug: Log which banner image is being used
-  console.log('Selected banner image URL:', bannerImageUrl);
-
-  // Debug: Log working hours to see the actual structure
-  React.useEffect(() => {
-    if (venue.working_hours) {
-      console.log('Working hours data:', venue.working_hours);
-    }
-  }, [venue.working_hours]);
 
   const openImageModal = (imageUrl: string) => {
     setSelectedImage(imageUrl);
