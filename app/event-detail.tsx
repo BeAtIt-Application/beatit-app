@@ -88,13 +88,13 @@ export default function EventDetailScreen() {
   const artists = [
     {
       id: 1,
-      name: "Saso Parketo",
+      name: "Artist 1",
       image:
         "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
     },
     {
       id: 2,
-      name: "I brat mu",
+      name: "Artist 2",
       image:
         "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
     },

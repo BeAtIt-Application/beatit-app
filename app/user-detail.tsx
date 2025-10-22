@@ -61,7 +61,13 @@ export default function UserDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen 
+        options={{ 
+          headerShown: false,
+          headerTransparent: true,
+          headerBackground: () => null,
+        }} 
+      />
       <ScrollView className="flex-1 bg-white">
       {/* Header with Avatar */}
       <View className="relative bg-[#5271FF]" style={{ height: 200 }}>

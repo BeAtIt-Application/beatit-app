@@ -1,7 +1,7 @@
 import { CompactEventsHorizontalList } from "@/components/CompactEventsHorizontalList";
 import { VenueDetails } from "@/components/VenueDetails";
 import { useVenue } from "@/src/hooks/useVenues";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -55,11 +55,19 @@ export default function VenueDetailScreen() {
   const pastEvents = (venue as any).past_events?.map(transformEvent) || [];
 
   return (
-    <View className="flex-1">
-      {/* Back Button Overlay */}
-  
+    <>
+      <Stack.Screen 
+        options={{ 
+          headerShown: false,
+          headerTransparent: true,
+          headerBackground: () => null,
+        }} 
+      />
+      <View className="flex-1">
+        {/* Back Button Overlay */}
+    
 
-      <ScrollView className="flex-1">
+        <ScrollView className="flex-1">
         {/* Venue Details Component */}
         <VenueDetails venue={venue} />
 
@@ -80,6 +88,7 @@ export default function VenueDetailScreen() {
           />
         )}
       </ScrollView>
-    </View>
+      </View>
+    </>
   );
 }

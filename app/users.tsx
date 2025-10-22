@@ -133,7 +133,7 @@ export default function UsersScreen() {
         >
         <PageHeader
           title={pageTitle}
-          colors={['#2FCC67', '#5C1593'] as const}
+          colors={['#5271FF', '#5C1593'] as const}
           filters={filters}
           showSearch={true}
           showLogo={true}
