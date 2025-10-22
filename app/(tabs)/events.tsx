@@ -353,6 +353,7 @@ export default function EventsScreen() {
                     hour: '2-digit', 
                     minute: '2-digit' 
                   }),
+                  event_start: event.event_start,
                   location: event.venue_name ? `${event.venue_name}, ${event.city}` : event.city,
                   venueName: event.venue_name,
                   city: event.city,

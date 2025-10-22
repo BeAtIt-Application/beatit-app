@@ -7,7 +7,8 @@ interface EventCardProps {
   event: {
     id: number;
     title: string;
-    date: string;
+    date?: string; // Keep for backward compatibility
+    event_start?: string; // Actual API field
     location: string;
     venueName?: string;
     city?: string;
@@ -24,6 +25,26 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
     // Handle heart press logic here
   };
 
+  // Format event date to extract day and month
+  const formatEventDate = (dateString: string) => {
+    try {
+      if (!dateString) return { day: '--', month: '---' };
+      
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return { day: '--', month: '---' };
+      
+      const day = date.getDate().toString();
+      const month = date.toLocaleDateString('en-US', { month: 'short' }); // Max 3 letters
+      
+      return { day, month };
+    } catch (error) {
+      console.log('Error formatting date:', error);
+      return { day: '--', month: '---' };
+    }
+  };
+
+  const { day, month } = formatEventDate(event.event_start || event.date || '');
+
   return (
     <TouchableOpacity 
       onPress={onPress} 
@@ -39,8 +60,8 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
             contentFit="cover"
           />
           <View className="absolute top-3 left-3 bg-black/70 px-3 py-2 rounded-md">
-            <Text className="text-white text-sm font-semibold text-center">12</Text>
-            <Text className="text-white text-sm font-semibold">May</Text>
+            <Text className="text-white text-sm font-semibold text-center">{day}</Text>
+            <Text className="text-white text-sm font-semibold">{month}</Text>
           </View>
         </View>
 
