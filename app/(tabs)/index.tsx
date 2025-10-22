@@ -378,14 +378,14 @@ export default function HomeScreen() {
         <CompactUsersHorizontalList
           title="Featured Artists"
           users={compactArtists}
-          onSeeAll={() => console.log('See all artists')}
+          onSeeAll={() => router.push('/users?type=artists')}
         />
 
         {/* Organizations - Compact Cards */}
         <CompactUsersHorizontalList
           title="Organizations"
           users={compactOrganizations}
-          onSeeAll={() => console.log('See all organizations')}
+          onSeeAll={() => router.push('/users?type=organizations')}
         />
 
         {/* Genres */}

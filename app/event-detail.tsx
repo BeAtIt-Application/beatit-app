@@ -1,4 +1,3 @@
-import { HorizontalArtistSlider } from "@/components/HorizontalArtistSlider";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useEvent, useToggleEventStatus } from "@/src/hooks/useEvents";
 import { Image } from "expo-image";
@@ -234,12 +233,12 @@ export default function EventDetailScreen() {
         </View>
 
         {/* Artists Section */}
-        <HorizontalArtistSlider
+        {/* <HorizontalArtistSlider
           artists={artists}
           title="Artists"
           cardWidth={200}
           cardHeight={150}
-        />
+        /> */}
       </View>
     </ScrollView>
   );

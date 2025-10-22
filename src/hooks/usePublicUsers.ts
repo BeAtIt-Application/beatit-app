@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Artist, Organization, PublicUser, userApi, UserFilterParams, UserPagination } from '../api/userApi';
 
 interface UseArtistsResult {
@@ -156,6 +156,65 @@ export const usePublicUser = (id: number | null): UsePublicUserResult => {
     user,
     loading,
     error,
+    refetch,
+  };
+};
+
+// Combined hook for both artists and organizations
+interface UseUsersResult {
+  users: PublicUser[];
+  loading: boolean;
+  error: string | null;
+  pagination: UserPagination | null;
+  fetchUsers: (filters?: UserFilterParams) => Promise<void>;
+  refetch: () => Promise<void>;
+}
+
+export const useUsers = (userType: 'artists' | 'organizations', initialFilters?: UserFilterParams): UseUsersResult => {
+  const [users, setUsers] = useState<PublicUser[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<UserPagination | null>(null);
+  const [filters, setFilters] = useState<UserFilterParams>(initialFilters || {});
+
+  const fetchUsers = useCallback(async (newFilters?: UserFilterParams) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const filtersToUse = newFilters || filters;
+      setFilters(filtersToUse);
+      
+      const response = userType === 'organizations' 
+        ? await userApi.getPublicOrganizations(filtersToUse)
+        : await userApi.getPublicArtists(filtersToUse);
+      
+      setUsers(response.data);
+      setPagination(response.pagination);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : `Failed to fetch ${userType}`;
+      setError(errorMessage);
+      console.error(`Error fetching ${userType}:`, err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userType, filters]);
+
+  const refetch = useCallback(async () => {
+    await fetchUsers();
+  }, [fetchUsers]);
+
+  // Auto-fetch on mount
+  useEffect(() => {
+    fetchUsers(initialFilters);
+  }, []);
+
+  return {
+    users,
+    loading,
+    error,
+    pagination,
+    fetchUsers,
     refetch,
   };
 };
