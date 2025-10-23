@@ -23,7 +23,7 @@ const VoteButtons = React.memo<VoteButtonsProps>(({ localVoteData, toggleLoading
     <View className="flex-row gap-4 mb-8">
       <TouchableOpacity
         onPress={() => onToggleStatus('going')}
-        disabled={toggleLoading}
+        disabled={toggleLoading || localVoteData.current_user_vote === 'going'}
         activeOpacity={1}
         className={`flex-1 py-4 rounded-xl ${
           localVoteData.current_user_vote === 'going' ? 'bg-[#2FCC67] opacity-70' : 'bg-[#2FCC67]'
@@ -37,7 +37,7 @@ const VoteButtons = React.memo<VoteButtonsProps>(({ localVoteData, toggleLoading
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => onToggleStatus('interested')}
-        disabled={toggleLoading}
+        disabled={toggleLoading  || localVoteData.current_user_vote === 'interested'}
         activeOpacity={1}
         className={`flex-1 py-4 rounded-xl ${
           localVoteData.current_user_vote === 'interested' ? 'bg-[#FFCC00] opacity-70' : 'bg-[#FFCC00]'
