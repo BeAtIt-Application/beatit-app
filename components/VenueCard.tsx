@@ -97,9 +97,11 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
           </Text>
           {venue.stars !== undefined && (
             <View className="flex-row items-center gap-1 mb-1">
-              {renderStars(venue.stars)}
+              {/* {renderStars(venue.stars)} */}
+              {renderStars(5)}
               <Text className="text-sm font-semibold text-gray-700 ml-1">
-                {venue.stars.toFixed(1)}
+                {/* {venue.stars.toFixed(1)} */}
+                5.0
               </Text>
             </View>
           )}
