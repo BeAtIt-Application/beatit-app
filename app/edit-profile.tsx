@@ -2,22 +2,23 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { UpdateProfileRequest } from "@/src/api/profileApi";
 import { useProfile } from "@/src/hooks/useProfile";
 import { Image } from "expo-image";
+import * as ImagePicker from 'expo-image-picker';
 import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function EditProfileScreen() {
-  const { profile, loading, updateProfile, refetch } = useProfile();
+  const { profile, loading, updateProfile, refetch, uploadAvatar } = useProfile();
   
   const [formData, setFormData] = useState<UpdateProfileRequest>({
     first_name: "",
@@ -39,6 +40,7 @@ export default function EditProfileScreen() {
   });
 
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -138,6 +140,82 @@ export default function EditProfileScreen() {
     }
   };
 
+  const handleAvatarUpload = async () => {
+    try {
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please grant camera roll permissions to upload an avatar.');
+        return;
+      }
+
+      // Show action sheet for camera or gallery
+      Alert.alert(
+        'Select Avatar',
+        'Choose how you want to select your avatar',
+        [
+          { text: 'Camera', onPress: () => openImagePicker('camera') },
+          { text: 'Photo Library', onPress: () => openImagePicker('library') },
+          { text: 'Cancel', style: 'cancel' }
+        ]
+      );
+    } catch (error) {
+      console.error('Error requesting permissions:', error);
+      Alert.alert('Error', 'Failed to request permissions');
+    }
+  };
+
+  const openImagePicker = async (source: 'camera' | 'library') => {
+    try {
+      setUploadingAvatar(true);
+
+      const options: ImagePicker.ImagePickerOptions = {
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: false,
+      };
+
+      let result;
+      if (source === 'camera') {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Required', 'Please grant camera permissions to take a photo.');
+          setUploadingAvatar(false);
+          return;
+        }
+        result = await ImagePicker.launchCameraAsync(options);
+      } else {
+        result = await ImagePicker.launchImageLibraryAsync(options);
+      }
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
+        
+        // Create a file object for React Native
+        const file = {
+          uri: asset.uri,
+          type: 'image/jpeg',
+          name: 'avatar.jpg',
+        } as any;
+        
+        // Upload the avatar
+        await uploadAvatar(file);
+        
+        // Refetch profile to get updated avatar URLs
+        await refetch();
+        
+        Alert.alert('Success', 'Avatar updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      Alert.alert('Error', 'Failed to upload avatar. Please try again.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const avatarUrl = profile?.avatar_url || profile?.avatar_thumbnail || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
 
   if (loading && !profile) {
@@ -184,13 +262,25 @@ export default function EditProfileScreen() {
             </View>
 
             <View className="absolute -bottom-16 left-0 right-0 items-center">
-              <View className="bg-white rounded-full p-2 shadow-lg">
+              <TouchableOpacity 
+                onPress={handleAvatarUpload}
+                disabled={uploadingAvatar}
+                className="bg-white rounded-full p-2 shadow-lg"
+              >
                 <Image
                   source={{ uri: avatarUrl }}
                   style={{ width: 120, height: 120, borderRadius: 60 }}
                   contentFit="cover"
                 />
-              </View>
+                {uploadingAvatar && (
+                  <View className="absolute inset-0 bg-black/50 rounded-full justify-center items-center">
+                    <ActivityIndicator size="large" color="white" />
+                  </View>
+                )}
+                <View className="absolute bottom-2 right-2 w-8 h-8 bg-[#5271FF] rounded-full justify-center items-center">
+                  <IconSymbol name="camera" size={16} color="white" />
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
 

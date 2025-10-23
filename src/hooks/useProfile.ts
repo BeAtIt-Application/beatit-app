@@ -8,7 +8,7 @@ interface UseProfileResult {
   fetchProfile: () => Promise<void>;
   updateProfile: (data: UpdateProfileRequest) => Promise<void>;
   updatePassword: (data: UpdatePasswordRequest) => Promise<void>;
-  uploadAvatar: (file: File | Blob) => Promise<void>;
+  uploadAvatar: (file: any) => Promise<void>;
   updateInterests: (data: UpdateInterestsRequest) => Promise<void>;
   refetch: () => Promise<void>;
 }
@@ -66,12 +66,18 @@ export const useProfile = (autoFetch = true): UseProfileResult => {
     }
   };
 
-  const uploadAvatar = async (file: File | Blob) => {
+  const uploadAvatar = async (file: any) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await profileApi.uploadAvatar(file);
+      // Pass the user ID to the API
+      const userId = profile?.id;
+      if (!userId) {
+        throw new Error('User ID not found');
+      }
+      
+      const response = await profileApi.uploadAvatar(file, userId);
       
       // Update profile with new avatar URLs
       if (profile) {

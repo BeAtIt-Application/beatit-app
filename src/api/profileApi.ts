@@ -111,13 +111,15 @@ export class ProfileApi {
 
   /**
    * Upload avatar for current user or specified user
-   * @param file - The avatar image file
+   * @param file - The avatar image file (React Native file object with uri, type, name)
    * @param userId - Optional user ID. If not provided, uploads for authenticated user
    */
-  static async uploadAvatar(file: File | Blob, userId?: number): Promise<AvatarUploadResponse> {
+  static async uploadAvatar(file: any, userId?: number): Promise<AvatarUploadResponse> {
     try {
       const formData = new FormData();
-      formData.append('avatar', file as any);
+      
+      // For React Native, append the file object directly
+      formData.append('avatar', file);
 
       // Use /user/avatar/{id} if userId provided, otherwise /user/avatar for current user
       const endpoint = userId 
