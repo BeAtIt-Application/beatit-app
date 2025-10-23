@@ -278,7 +278,7 @@ export default function EditProfileScreen() {
                   </View>
                 )}
                 <View className="absolute bottom-2 right-2 w-8 h-8 bg-[#5271FF] rounded-full justify-center items-center">
-                  <IconSymbol name="camera" size={16} color="white" />
+                  <IconSymbol name="photo" size={16} color="white" />
                 </View>
               </TouchableOpacity>
             </View>
