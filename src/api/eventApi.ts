@@ -20,6 +20,11 @@ export interface Event {
   user_status?: 'interested' | 'going' | null;
   interested_count?: number;
   going_count?: number;
+  // New fields from API response
+  current_user_vote?: 'interested' | 'going' | null;
+  interested_percentage?: number;
+  going_percentage?: number;
+  total_votes?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -63,9 +68,16 @@ export interface EventToggleStatusRequest {
 
 export interface EventToggleStatusResponse {
   message: string;
-  user_status: 'interested' | 'going' | null;
-  interested_count: number;
-  going_count: number;
+  status: 'interested' | 'going' | null;
+  previous_status?: 'interested' | 'going' | null;
+  action?: string;
+  success: boolean;
+  // Optional count fields (may not be present in all responses)
+  interested_count?: number;
+  going_count?: number;
+  // Optional percentage fields in case API returns them directly
+  interested_percentage?: number;
+  going_percentage?: number;
 }
 
 // Event API service

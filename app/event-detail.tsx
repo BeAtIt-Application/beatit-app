@@ -2,26 +2,132 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useEvent, useToggleEventStatus } from "@/src/hooks/useEvents";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useCallback } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+
+// Separate memoized VoteButtons component
+interface VoteButtonsProps {
+  localVoteData: {
+    current_user_vote: 'interested' | 'going' | null;
+    interested_percentage: number;
+    going_percentage: number;
+  } | null;
+  toggleLoading: boolean;
+  onToggleStatus: (status: 'interested' | 'going') => void;
+}
+
+const VoteButtons = React.memo<VoteButtonsProps>(({ localVoteData, toggleLoading, onToggleStatus }) => {
+  if (!localVoteData) return null;
+
+  return (
+    <View className="flex-row gap-4 mb-8">
+      <TouchableOpacity
+        onPress={() => onToggleStatus('going')}
+        disabled={toggleLoading}
+        activeOpacity={1}
+        className={`flex-1 py-4 rounded-xl ${
+          localVoteData.current_user_vote === 'going' ? 'bg-[#2FCC67] opacity-70' : 'bg-[#2FCC67]'
+        }`}
+      >
+        <Text className={`text-center font-bold text-lg ${
+          localVoteData.current_user_vote === 'going' ? 'text-white' : 'text-gray-800'
+        }`}>
+          {toggleLoading ? 'Loading...' : `GOING ${localVoteData.going_percentage}%`}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => onToggleStatus('interested')}
+        disabled={toggleLoading}
+        activeOpacity={1}
+        className={`flex-1 py-4 rounded-xl ${
+          localVoteData.current_user_vote === 'interested' ? 'bg-[#FFCC00] opacity-70' : 'bg-[#FFCC00]'
+        }`}
+      >
+        <Text className={`text-center font-bold text-lg ${
+          localVoteData.current_user_vote === 'interested' ? 'text-white' : 'text-gray-800'
+        }`}>
+          {toggleLoading ? 'Loading...' : `INTERESTED ${localVoteData.interested_percentage}%`}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+});
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const eventId = id ? parseInt(id) : null;
   
-  const { event, loading, error } = useEvent(eventId);
+  const { event, loading, error, fetchEvent } = useEvent(eventId);
   const { toggleStatus, loading: toggleLoading } = useToggleEventStatus();
+  
+  // Local state for vote data to avoid full page reload
+  const [localVoteData, setLocalVoteData] = React.useState<{
+    current_user_vote: 'interested' | 'going' | null;
+    interested_percentage: number;
+    going_percentage: number;
+  } | null>(null);
+  
+  // Flag to prevent UI updates during vote refetch
+  const [isRefetchingVotes, setIsRefetchingVotes] = React.useState(false);
+  
+  // Update local vote data when event changes (but not during vote refetch)
+  React.useEffect(() => {
+    if (event && !isRefetchingVotes) {
+      const newData = {
+        current_user_vote: event.current_user_vote || null,
+        interested_percentage: event.interested_percentage || 0,
+        going_percentage: event.going_percentage || 0,
+      };
+      setLocalVoteData(newData);
+    }
+  }, [event, isRefetchingVotes]);
 
-  const handleToggleStatus = async (status: 'interested' | 'going') => {
+  const handleToggleStatus = useCallback(async (status: 'interested' | 'going') => {
     if (!eventId) return;
     
     try {
-      await toggleStatus(eventId, status);
-      // The event data will be refetched automatically by the hook
+      // Update the status immediately for instant feedback
+      setLocalVoteData(prev => prev ? { ...prev, current_user_vote: status } : null);
+      
+      // Make the API call
+      const response = await toggleStatus(eventId, status);
+      
+      // The API response doesn't include vote counts or percentages
+      // We need to refetch the event to get the updated data
+      // Set flag to prevent UI updates during refetch
+      setIsRefetchingVotes(true);
+      
+      const updatedEvent = await fetchEvent(eventId);
+      
+      // Update only the vote data from the refetched event
+      if (updatedEvent) {
+        const newVoteData = {
+          current_user_vote: updatedEvent.current_user_vote || status,
+          interested_percentage: updatedEvent.interested_percentage || 0,
+          going_percentage: updatedEvent.going_percentage || 0,
+        };
+        
+        setLocalVoteData(newVoteData);
+      }
+      
+      // Clear the flag
+      setIsRefetchingVotes(false);
+      
     } catch (error) {
       console.error('Failed to toggle event status:', error);
+      setIsRefetchingVotes(false);
+      
+      // Revert the optimistic update on error
+      if (event) {
+        setLocalVoteData({
+          current_user_vote: event.current_user_vote || null,
+          interested_percentage: event.interested_percentage || 0,
+          going_percentage: event.going_percentage || 0,
+        });
+      }
     }
-  };
+  }, [eventId, toggleStatus, event]);
+
 
   if (loading) {
     return (
@@ -202,35 +308,12 @@ export default function EventDetailScreen() {
           </View>
         </View>
 
-        {/* Action Buttons */}
-        <View className="flex-row gap-4 mb-8">
-          <TouchableOpacity
-            onPress={() => handleToggleStatus('going')}
-            disabled={toggleLoading}
-            className={`flex-1 py-4 rounded-xl ${
-              event.user_status === 'going' ? 'bg-brand-purple' : 'bg-gray-200'
-            }`}
-          >
-            <Text className={`text-center font-bold text-lg ${
-              event.user_status === 'going' ? 'text-white' : 'text-gray-800'
-            }`}>
-              {toggleLoading ? 'Loading...' : `GOING ${event.going_count || 0}`}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleToggleStatus('interested')}
-            disabled={toggleLoading}
-            className={`flex-1 py-4 rounded-xl ${
-              event.user_status === 'interested' ? 'bg-brand-purple' : 'bg-gray-200'
-            }`}
-          >
-            <Text className={`text-center font-bold text-lg ${
-              event.user_status === 'interested' ? 'text-white' : 'text-gray-800'
-            }`}>
-              {toggleLoading ? 'Loading...' : `INTERESTED ${event.interested_count || 0}`}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* Action Buttons - Separate Memoized Component */}
+        <VoteButtons 
+          localVoteData={localVoteData}
+          toggleLoading={toggleLoading}
+          onToggleStatus={handleToggleStatus}
+        />
 
         {/* Artists Section */}
         {/* <HorizontalArtistSlider
