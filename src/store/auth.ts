@@ -40,7 +40,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       // Update state
       set({ user, token, isLoading: false });
     } catch (error) {
-      console.error("Error during login:", error);
       set({ isLoading: false });
       throw error;
     }
@@ -55,7 +54,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       // Clear state
       set({ user: null, token: null, isLoading: false });
     } catch (error) {
-      console.error("Error during logout:", error);
       set({ isLoading: false });
       throw error;
     }
@@ -92,7 +90,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         set({ user: null, token: null, isLoading: false });
       }
     } catch (error) {
-      console.error("Error initializing auth:", error);
       set({ user: null, token: null, isLoading: false });
     }
   },

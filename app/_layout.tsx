@@ -26,9 +26,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import "../global.css";
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
+// Removed unstable_settings anchor to allow proper authentication flow
+// export const unstable_settings = {
+//   anchor: "(tabs)",
+// };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete
 SplashScreen.preventAutoHideAsync();
@@ -51,10 +52,11 @@ export default function RootLayout() {
     Inter_900Black,
   });
 
-  useEffect(() => {
-    // Initialize authentication state when app starts
-    hydrateAuthState();
-  }, [hydrateAuthState]);
+  // Auth initialization is now handled in app/index.tsx
+  // useEffect(() => {
+  //   // Initialize authentication state when app starts
+  //   hydrateAuthState();
+  // }, [hydrateAuthState]);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -71,6 +73,7 @@ export default function RootLayout() {
       <FavoritesProvider>
         <ThemeProvider value={DefaultTheme}>
           <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="onboarding" options={{ headerShown: false }} />
             <Stack.Screen name="auth" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
