@@ -74,6 +74,8 @@ export interface UserFilterParams {
   draw?: number;
   page?: number;
   limit?: number;
+  music_genre?: number[]; // Array of genre IDs for filtering
+  city?: string; // City name for filtering
 }
 
 // User API service
@@ -83,7 +85,7 @@ export class UserApi {
    */
   static async getPublicArtists(filters: UserFilterParams = {}): Promise<UserListResponse> {
     try {
-      const params = {
+      const params: any = {
         length: filters.limit || filters.length || 20,
         column: filters.column || 'users.first_name',
         dir: filters.dir || 'asc',
@@ -91,6 +93,16 @@ export class UserApi {
         draw: filters.draw || 1,
         page: filters.page || 1,
       };
+
+      // Add music_genre filter if provided
+      if (filters.music_genre && filters.music_genre.length > 0) {
+        params.music_genre = filters.music_genre;
+      }
+
+      // Add city filter if provided
+      if (filters.city) {
+        params.city = filters.city;
+      }
 
       const response = await api.get(getUserPublicEndpoint("artists"), {
         params,
@@ -108,7 +120,7 @@ export class UserApi {
    */
   static async getPublicOrganizations(filters: UserFilterParams = {}): Promise<UserListResponse> {
     try {
-      const params = {
+      const params: any = {
         length: filters.limit || filters.length || 20,
         column: filters.column || 'users.first_name',
         dir: filters.dir || 'asc',
@@ -116,6 +128,16 @@ export class UserApi {
         draw: filters.draw || 1,
         page: filters.page || 1,
       };
+
+      // Add music_genre filter if provided
+      if (filters.music_genre && filters.music_genre.length > 0) {
+        params.music_genre = filters.music_genre;
+      }
+
+      // Add city filter if provided
+      if (filters.city) {
+        params.city = filters.city;
+      }
 
       const response = await api.get(getUserPublicEndpoint("organizations"), {
         params,

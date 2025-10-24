@@ -69,6 +69,8 @@ export default function UsersScreen() {
             column: 'users.first_name',
             dir: 'asc' as const,
             draw: 1,
+            music_genre: selectedGenres.length > 0 ? selectedGenres.map(g => g.id) : undefined,
+            city: selectedCity || undefined,
           };
           
           await fetchUsers(filters);
@@ -79,7 +81,7 @@ export default function UsersScreen() {
       
       return () => clearTimeout(timeoutId);
     }
-  }, [searchQuery]);
+  }, [searchQuery, selectedGenres, selectedCity]);
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
@@ -97,10 +99,72 @@ export default function UsersScreen() {
     }
   };
 
-  const clearAllFilters = () => {
+  // Handle filter changes and trigger new search
+  const handleGenreSelect = async (genres: { id: number; name: string }[]) => {
+    setSelectedGenres(genres);
+    setGenreModalVisible(false);
+    
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        page: 1,
+        limit: 20,
+        column: 'users.first_name',
+        dir: 'asc' as const,
+        draw: 1,
+        music_genre: genres.length > 0 ? genres.map(g => g.id) : undefined,
+        city: selectedCity || undefined,
+      };
+      
+      await fetchUsers(filters);
+    } catch (error) {
+      console.error('Failed to fetch users with genre filter:', error);
+    }
+  };
+
+  const handleCitySelect = async (city: string | null) => {
+    setSelectedCity(city);
+    setCityModalVisible(false);
+    
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        page: 1,
+        limit: 20,
+        column: 'users.first_name',
+        dir: 'asc' as const,
+        draw: 1,
+        music_genre: selectedGenres.length > 0 ? selectedGenres.map(g => g.id) : undefined,
+        city: city || undefined,
+      };
+      
+      await fetchUsers(filters);
+    } catch (error) {
+      console.error('Failed to fetch users with city filter:', error);
+    }
+  };
+
+  const clearAllFilters = async () => {
     setSearchQuery("");
     setSelectedGenres([]);
     setSelectedCity(null);
+    
+    try {
+      const filters = {
+        search: undefined,
+        page: 1,
+        limit: 20,
+        column: 'users.first_name',
+        dir: 'asc' as const,
+        draw: 1,
+        music_genre: undefined,
+        city: undefined,
+      };
+      
+      await fetchUsers(filters);
+    } catch (error) {
+      console.error('Failed to clear filters:', error);
+    }
   };
 
   // Handle pull to refresh
@@ -113,6 +177,8 @@ export default function UsersScreen() {
         column: 'users.first_name',
         dir: 'asc' as const,
         draw: 1,
+        music_genre: selectedGenres.length > 0 ? selectedGenres.map(g => g.id) : undefined,
+        city: selectedCity || undefined,
       };
       
       await refreshUsers(filters);
@@ -132,6 +198,8 @@ export default function UsersScreen() {
         column: 'users.first_name',
         dir: 'asc' as const,
         draw: 1,
+        music_genre: selectedGenres.length > 0 ? selectedGenres.map(g => g.id) : undefined,
+        city: selectedCity || undefined,
       };
 
       await loadMoreUsers(filters);
@@ -267,20 +335,14 @@ export default function UsersScreen() {
       <GenreFilter
         visible={genreModalVisible}
         onClose={() => setGenreModalVisible(false)}
-        onSelect={(genres) => {
-          setSelectedGenres(genres);
-          setGenreModalVisible(false);
-        }}
+        onSelect={handleGenreSelect}
         selectedGenres={selectedGenres}
       />
       
       <CityFilter
         visible={cityModalVisible}
         onClose={() => setCityModalVisible(false)}
-        onSelect={(city) => {
-          setSelectedCity(city);
-          setCityModalVisible(false);
-        }}
+        onSelect={handleCitySelect}
         selectedCity={selectedCity}
       />
       </SafeAreaView>

@@ -20,10 +20,10 @@ export default function OnboardingScreen() {
       <View className="px-5 pt-9 flex flex-col items-center justify-between h-full">
         <View className="flex flex-col items-center gap-4">
           <Text className="font-poppins-extrabold text-3xl text-[#151B23]">
-            Events, experiences and lifestyle upgrade you need.
+            Events, experiences and lifestyle; the upgrade you need.
           </Text>
           <Text className="font-inter text-base text-[#375476] ">
-            BeAtIt gives you events, experiences, locations and everything you
+            BeAtIt gives you events, experiences, venues and everything you
             need to make the most of your day to day life.
           </Text>
         </View>
