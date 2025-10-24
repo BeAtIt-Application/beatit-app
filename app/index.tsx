@@ -23,7 +23,7 @@ export default function IndexScreen() {
         } else if (!hasSeenOnboardingScreen) {
           router.replace("/onboarding");
         } else {
-          router.replace("/auth/login");
+          router.replace("/onboarding");
         }
       } catch (error) {
         // Fallback to login on error

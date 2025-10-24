@@ -140,7 +140,6 @@ export default function HomeScreen() {
     if (!url || url.trim() === '' || url === 'null' || url === 'undefined') {
       return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
     }
-    console.log('Using image URL:', url);
     return url;
   };
 
