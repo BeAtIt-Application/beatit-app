@@ -333,6 +333,7 @@ export default function EditProfileScreen() {
                 <Text className="text-xs text-gray-500 mt-1">Email cannot be changed</Text>
               </View>
 
+              {profile?.role !== 5 && (
               <View className="mb-4">
                 <Text className="text-sm text-gray-600 mb-2">Username</Text>
                 <TextInput
@@ -343,6 +344,7 @@ export default function EditProfileScreen() {
                   autoCapitalize="none"
                 />
               </View>
+              )}
 
               <View className="mb-4">
                 <Text className="text-sm text-gray-600 mb-2">Phone Number</Text>
@@ -361,7 +363,8 @@ export default function EditProfileScreen() {
               <Text className="text-lg font-bold text-brand-purple mb-3">
                 Professional Info
               </Text>
-
+              
+              {profile?.role !== 5 && (
               <View className="mb-4">
                 <Text className="text-sm text-gray-600 mb-2">Artist Tag</Text>
                 <TextInput
@@ -371,6 +374,7 @@ export default function EditProfileScreen() {
                   placeholder="e.g., DJ & Producer"
                 />
               </View>
+              )}
 
               <View className="mb-4">
                 <Text className="text-sm text-gray-600 mb-2">Bio</Text>
@@ -413,7 +417,9 @@ export default function EditProfileScreen() {
               </View>
             </View>
 
+
             {/* Contact Information */}
+            {profile?.role !== 5 && (
             <View className="mb-6">
               <Text className="text-lg font-bold text-brand-purple mb-3">
                 Contact Information
@@ -442,12 +448,14 @@ export default function EditProfileScreen() {
                 />
               </View>
             </View>
+            )}
 
-            {/* Social Media */}
-            <View className="mb-6">
-              <Text className="text-lg font-bold text-brand-purple mb-3">
-                Social Media
-              </Text>
+            {/* Social Media - Hide for role id 5 */}
+            {profile?.role !== 5 && (
+              <View className="mb-6">
+                <Text className="text-lg font-bold text-brand-purple mb-3">
+                  Social Media
+                </Text>
 
               <View className="mb-4">
                 <Text className="text-sm text-gray-600 mb-2">Instagram</Text>
@@ -504,6 +512,7 @@ export default function EditProfileScreen() {
                 />
               </View>
             </View>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
