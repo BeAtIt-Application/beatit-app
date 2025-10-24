@@ -79,6 +79,10 @@ export function HorizontalSavedSlider({
                 blurRadius={blurRadius}
                 placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
                 transition={200}
+                onError={() => {
+                  console.log('Image failed to load:', card.image);
+                }}
+                cachePolicy="memory-disk"
               />
               
               {/* Gradient Overlay */}

@@ -4,6 +4,7 @@ import { EventsHorizontalList } from "@/components/EventsHorizontalList";
 import { HorizontalSavedSlider, SliderCard } from "@/components/HorizontalSavedSlider";
 import { PageHeader } from "@/components/PageHeader";
 import { VenuesHorizontalList } from "@/components/VenuesHorizontalList";
+import { useFavorites } from "@/src/context/FavoritesContext";
 import { useFYP } from "@/src/hooks/useFYP";
 import { useMusicGenres, useVenueTypes } from "@/src/hooks/useTaxonomies";
 import { router } from "expo-router";
@@ -17,6 +18,7 @@ export default function HomeScreen() {
   
   // FYP (For You Page) data
   const { fypData, loading: fypLoading, error: fypError, refetch: refetchFYP } = useFYP();
+  const { setInitialFavorites } = useFavorites();
 
   // Helper functions to transform API data to component format
   const transformEventForComponent = (apiEvent: any) => ({
@@ -44,15 +46,37 @@ export default function HomeScreen() {
     image: apiVenue.logo || apiVenue.banner?.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
     banner: apiVenue.banner,
     stars: apiVenue.average_rating || 0,
-    venueTypes: apiVenue.type ? [apiVenue.type] : []
+    venueTypes: apiVenue.type ? [apiVenue.type] : [],
+    is_favourite: apiVenue.is_favourite || false
   });
 
-  // Log FYP data when it changes
+  // Log FYP data when it changes and initialize favorites
   useEffect(() => {
     if (fypError) {
       console.error('FYP Error:', fypError);
     }
-  }, [fypData, fypError, fypLoading]);
+    
+    // Initialize favorites from FYP data
+    if (fypData) {
+      const favoriteVenueIds: number[] = [];
+      
+      // Add saved venue if it exists
+      if (fypData.savedVenue) {
+        favoriteVenueIds.push(fypData.savedVenue.id);
+      }
+      
+      // Add preferred venues that are favorited
+      if (fypData.preferredVenues) {
+        fypData.preferredVenues.forEach(venue => {
+          if (venue.is_favourite) {
+            favoriteVenueIds.push(venue.id);
+          }
+        });
+      }
+      
+      setInitialFavorites(favoriteVenueIds);
+    }
+  }, [fypData, fypError, fypLoading, setInitialFavorites]);
 
   const tabs = ["Discover", "Events", "Venues", "Artists"];
 
@@ -83,228 +107,6 @@ export default function HomeScreen() {
     }));
   }, [allVenueTypes]);
 
-  const events = [
-    {
-      id: 1,
-      title: "Neshto interesno ke ima vo Kamarite",
-      date: "Thur 26 May, 09:00 am",
-      location: "Kamarite, Bitola",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      tags: ["Rock", "Metal"],
-    },
-    {
-      id: 2,
-      title: "Neshto interesno ke ima vo Kamarite",
-      date: "Fri 27 May, 08:00 pm",
-      location: "Skopje Center",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      tags: ["Rock", "Metal"],
-
-    },
-  ];
-
-  const venues = [
-    {
-      id: 1,
-      name: "Elegant Garden Venue",
-      date: "Available Now",
-      location: "Adresa, Bitola",
-      city: "Bitola",
-      image:
-      "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      venueTypes: ["Pub", "Klub"],
-      stars: 4.5
-    },
-    {
-      id: 2,
-      name: "Modern Conference Hall",
-      date: "Thu 26 May",
-      location: "Kamarite, Bitola",
-      city: "Bitola",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      venueTypes: ["Pub", "Klub"],
-
-        stars: 4.5
-    },
-    {
-      id: 3,
-      name: "Outdoor Event Space",
-      date: "Fri 27 May",
-      location: "City Center, Skopje",
-      city: "Skopje",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      venueTypes: ["Pub", "Klub"],
-
-      stars: 4.5
-    },
-  ];
-
-  const compactVenues = [
-    {
-      id: 1,
-      name: "Elegant Garden Venue",
-      date: "Available Now",
-      location: "Adresa, Bitola",
-      city: "Bitola",
-      image:
-      "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      venueTypes: ["Pub", "Klub"],
-      stars: 4.5
-    },
-    {
-      id: 2,
-      name: "Modern Conference Hall",
-      date: "Thu 26 May",
-      location: "Kamarite, Bitola",
-      city: "Bitola",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      venueTypes: ["Pub", "Klub"],
-
-        stars: 4.5
-    },
-    {
-      id: 3,
-      name: "Outdoor Event Space",
-      date: "Fri 27 May",
-      location: "City Center, Skopje",
-      city: "Skopje",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      venueTypes: ["Pub", "Klub"],
-
-      stars: 4.5
-    },
-  ];
-
-
-  const compactEvents = [
-    {
-      id: 3,
-      title: "Nekoja zabava ima negde ",
-      date: "Thur 26 May, 10pm",
-      location: "Bitola",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      tag: "Neshto",
-    },
-    {
-      id: 4,
-      title: "Nekoja zabava ima negde ",
-      date: "Sat 28 May, 11pm",
-      location: "Skopje",
-      image:
-        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      tag: "Rock",
-    },
-  ];
-
-  // Mock data for artists (matching API response structure)
-  const compactArtists = [
-    {
-      id: 1,
-      first_name: "Marko",
-      last_name: "Petrovski",
-      username: "marko_petrovski",
-      artist_tag: "DJ & Producer",
-      bio: "Electronic music producer and DJ",
-      city_from: "Skopje",
-      country_from: "Macedonia",
-      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      role: "Artist",
-      email: "marko@example.com",
-      preferred_music_genres: [
-        { id: 1, name: "Electronic" },
-        { id: 2, name: "House" }
-      ],
-    },
-    {
-      id: 2,
-      first_name: "Ana",
-      last_name: "Jovanovska",
-      username: "ana_vocals",
-      artist_tag: "Vocalist & Songwriter",
-      bio: "Jazz and soul vocalist",
-      city_from: "Bitola",
-      country_from: "Macedonia",
-      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      role: "Artist",
-      email: "ana@example.com",
-      preferred_music_genres: [
-        { id: 3, name: "Jazz" },
-        { id: 4, name: "Soul" }
-      ],
-    },
-    {
-      id: 3,
-      first_name: "Stefan",
-      last_name: "Nikolov",
-      username: "stefan_guitar",
-      artist_tag: "Guitarist",
-      bio: "Rock and blues guitarist",
-      city_from: "Ohrid",
-      country_from: "Macedonia",
-      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      role: "Artist",
-      email: "stefan@example.com",
-      preferred_music_genres: [
-        { id: 5, name: "Rock" },
-        { id: 6, name: "Blues" }
-      ],
-    },
-  ];
-
-  // Mock data for organizations (matching API response structure)
-  const compactOrganizations = [
-    {
-      id: 10,
-      first_name: "Beat",
-      last_name: "Events",
-      username: "beat_events",
-      artist_tag: "Event Organizer",
-      bio: "Professional event management and production",
-      city_from: "Skopje",
-      country_from: "Macedonia",
-      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      role: "Organization",
-      email: "info@beatevents.com",
-      contact_phone: "+389 70 123 456",
-      contact_email: "contact@beatevents.com",
-      preferred_venue_types: [
-        { id: 1, name: "Club" },
-        { id: 2, name: "Concert Hall" }
-      ],
-    },
-    {
-      id: 11,
-      first_name: "Music",
-      last_name: "Production MK",
-      username: "music_production_mk",
-      artist_tag: "Music Label",
-      bio: "Independent music label and studio",
-      city_from: "Bitola",
-      country_from: "Macedonia",
-      avatar_url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      avatar_thumbnail: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      role: "Organization",
-      email: "info@musicproduction.mk",
-      contact_phone: "+389 70 987 654",
-      contact_email: "studio@musicproduction.mk",
-      preferred_music_genres: [
-        { id: 1, name: "Electronic" },
-        { id: 5, name: "Rock" }
-      ],
-    },
-  ];
-
 
   const handleCategoryPress = (item: CategoryItem) => {
     
@@ -333,33 +135,76 @@ export default function HomeScreen() {
     }
   };
 
-  // Slider cards data
-  const sliderCards: SliderCard[] = [
-    {
-      id: 1,
-      title: "Venues",
-      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      onPress: () => console.log('Featured Event pressed'),
-    },
-    {
-      id: 2,
-      title: "Events",
-      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      onPress: () => console.log('New Venue pressed'),
-    },
-    {
-      id: 3,
-      title: "Organizations",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
-      onPress: () => console.log('Artist Spotlight pressed'),
-    },
-    {
-      id: 4,
-      title: "Artists",
-      image: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      onPress: () => console.log('Weekend Special pressed'),
-    },
-  ];
+  // Helper function to validate and get image URL
+  const getValidImageUrl = (url: string | null | undefined): string => {
+    if (!url || url.trim() === '' || url === 'null' || url === 'undefined') {
+      return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    }
+    console.log('Using image URL:', url);
+    return url;
+  };
+
+  // Dynamic slider cards based on saved entities from FYP data
+  const sliderCards: SliderCard[] = useMemo(() => {
+    const cards: SliderCard[] = [];
+    
+    // Add Venues card if there is a saved venue
+    if (fypData?.savedVenue) {
+      let venueImage = "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+      
+      if (fypData.savedVenue.banner?.url) {
+        venueImage = getValidImageUrl(fypData.savedVenue.banner.url);
+      } else if (fypData.savedVenue.logo) {
+        // Handle logo which can be string, string[], or object
+        if (typeof fypData.savedVenue.logo === 'string') {
+          venueImage = getValidImageUrl(fypData.savedVenue.logo);
+        } else if (Array.isArray(fypData.savedVenue.logo) && fypData.savedVenue.logo.length > 0) {
+          venueImage = getValidImageUrl(fypData.savedVenue.logo[0]);
+        } else if (typeof fypData.savedVenue.logo === 'object' && 'url' in fypData.savedVenue.logo) {
+          venueImage = getValidImageUrl(fypData.savedVenue.logo.url);
+        }
+      }
+      
+      cards.push({
+        id: 'venues',
+        title: "Venues",
+        image: venueImage,
+        onPress: () => router.push("/venues"),
+      });
+    }
+    
+    // Add Events card if there is a saved event
+    if (fypData?.savedEvent) {
+      cards.push({
+        id: 'events',
+        title: "Events",
+        image: getValidImageUrl(fypData.savedEvent.image),
+        onPress: () => router.push("/events"),
+      });
+    }
+    
+    // Add Organizations card if there is a saved organization
+    if (fypData?.savedOrganization) {
+      cards.push({
+        id: 'organizations',
+        title: "Organizations",
+        image: getValidImageUrl(fypData.savedOrganization.avatar_url),
+        onPress: () => router.push('/users?type=organizations'),
+      });
+    }
+    
+    // Add Artists card if there is a saved artist
+    if (fypData?.savedArtist) {
+      cards.push({
+        id: 'artists',
+        title: "Artists",
+        image: getValidImageUrl(fypData.savedArtist.avatar_url),
+        onPress: () => router.push('/users?type=artists'),
+      });
+    }
+    
+    return cards;
+  }, [fypData]);
 
   return (
     <SafeAreaView className="flex-1 bg-[linear-gradient(180deg,#6932D4_0%,#3F6AE9_100%)]">
@@ -384,13 +229,15 @@ export default function HomeScreen() {
           showNotification={true}
         />
 
-        {/* Horizontal Slider */}
-        <HorizontalSavedSlider
-          cards={sliderCards}
-          cardWidth={220}
-          cardHeight={200}
-          blurRadius={10}
-        />
+        {/* Horizontal Slider - Only show if there are saved entities */}
+        {sliderCards.length > 0 && (
+          <HorizontalSavedSlider
+            cards={sliderCards}
+            cardWidth={220}
+            cardHeight={200}
+            blurRadius={10}
+          />
+        )}
 
         {/* Content */}
           {/* Events near you - Large Cards */}

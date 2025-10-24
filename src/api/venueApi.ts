@@ -207,6 +207,22 @@ export class VenueApi {
     }
   }
 
+  /**
+   * Toggle venue favorite status
+   * @param venueId - The venue ID to toggle favorite
+   */
+  static async toggleVenueFavorite(venueId: number): Promise<{ success: boolean; is_favourite: boolean; message: string }> {
+    try {
+      const endpoint = `/venue/public/${venueId}/toggle-favourite`;
+      
+      const response = await api.post(endpoint);
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
+
 }
 
 // Convenience functions
@@ -215,6 +231,7 @@ export const venueApi = {
   getPublicVenueById: VenueApi.getPublicVenueById,
   getVenuesNearUser: VenueApi.getVenuesNearUser,
   rateVenue: VenueApi.rateVenue,
+  toggleVenueFavorite: VenueApi.toggleVenueFavorite,
 };
 
 

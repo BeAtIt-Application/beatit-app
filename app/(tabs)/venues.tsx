@@ -280,14 +280,13 @@ export default function VenuesScreen() {
                 venue={{
                   id: venue.id,
                   name: venue.name,
-                  venueType: venue.type,
                   city: venue.city,
                   image: venue.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
                   banner: venue.banner,
-                  images: venue.images,
                   venueTypes: [venue.type].filter(Boolean) as string[],
                   average_rating: venue.average_rating,
                   total_ratings: venue.total_ratings,
+                  is_favourite: venue.is_favourite || false,
                 }}
                 onPress={() => router.push(`/venue-detail?id=${venue.id}`)}
               />

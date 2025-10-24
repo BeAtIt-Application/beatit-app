@@ -1,5 +1,6 @@
 import { StarRating } from '@/components/StarRating';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useFavorites } from '@/src/context/FavoritesContext';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -18,8 +19,12 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   const [currentRating, setCurrentRating] = useState(venue.current_user_rating || 0);
   const [averageRating, setAverageRating] = useState(venue.average_rating || 0);
   const [totalRatings, setTotalRatings] = useState(venue.total_ratings || 0);
+  const [isToggling, setIsToggling] = useState(false);
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   const { rateVenue, loading: ratingLoading } = useRateVenue();
+  const { toggleVenueFavorite, isVenueFavorite } = useFavorites();
+  
+  const isFavorite = isVenueFavorite(venue.id);
 
   // Get the banner image from the venue's root banner field
   const getBannerImage = () => {
@@ -163,9 +168,18 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
     Linking.openURL(url);
   };
 
-  const handleHeartPress = () => {
-    // Handle heart press logic here
-    console.log('Heart pressed for venue:', venue.name);
+  const handleHeartPress = async () => {
+    if (isToggling) return; // Prevent multiple rapid clicks
+    
+    try {
+      setIsToggling(true);
+      await toggleVenueFavorite(venue.id);
+    } catch (error) {
+      console.error("Error toggling venue favorite:", error);
+      Alert.alert("Error", "Failed to update favorite status");
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const handleRatingChange = async (rating: number) => {
@@ -213,8 +227,13 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
             onPress={handleHeartPress}
             activeOpacity={0.8}
             className="absolute top-12 right-5 bg-white/90 p-2 rounded-full h-10 w-10 justify-center items-center"
+            disabled={isToggling}
           >
-            <IconSymbol name="heart" size={16} color="#FF6B6B" />
+            <IconSymbol 
+              name="heart" 
+              size={16} 
+              color={isFavorite ? "#FF6B6B" : "#FFFFFF"} 
+            />
           </TouchableOpacity>
           
           {/* Venue Info Card */}

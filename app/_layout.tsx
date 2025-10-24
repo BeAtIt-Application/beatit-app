@@ -1,3 +1,4 @@
+import { FavoritesProvider } from "@/src/context/FavoritesContext";
 import { useUser } from "@/src/hooks/useUser";
 import {
     Inter_400Regular,
@@ -67,22 +68,24 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          <Stack.Screen name="auth" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="venue-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="event-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="user-detail" options={{ headerShown: false }} />
-          <Stack.Screen name="users" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: "modal", title: "Modal" }}
-          />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+      <FavoritesProvider>
+        <ThemeProvider value={DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+            <Stack.Screen name="auth" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="venue-detail" options={{ headerShown: false }} />
+            <Stack.Screen name="event-detail" options={{ headerShown: false }} />
+            <Stack.Screen name="user-detail" options={{ headerShown: false }} />
+            <Stack.Screen name="users" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="modal"
+              options={{ presentation: "modal", title: "Modal" }}
+            />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </FavoritesProvider>
     </GestureHandlerRootView>
   );
 }

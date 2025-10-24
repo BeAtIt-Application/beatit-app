@@ -16,6 +16,7 @@ interface Venue {
   };
   stars?: number;
   venueTypes?: string[];
+  is_favourite?: boolean;
 }
 
 interface VenuesHorizontalListProps {
