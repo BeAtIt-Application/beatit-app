@@ -128,7 +128,7 @@ export default function EventsScreen() {
           } catch (error) {
             console.error('Failed to fetch events:', error);
           }
-        }, 300); // 300ms debounce
+        }, 500); // 500ms debounce
       };
     })(),
     [searchQuery, fetchEvents]

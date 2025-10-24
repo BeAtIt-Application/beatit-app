@@ -77,7 +77,7 @@ export default function UsersScreen() {
         } catch (error) {
           console.error('Failed to fetch users:', error);
         }
-      }, 300); // 300ms debounce
+      }, 500); // 500ms debounce
       
       return () => clearTimeout(timeoutId);
     }

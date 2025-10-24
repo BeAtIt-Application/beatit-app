@@ -75,7 +75,7 @@ export default function VenuesScreen() {
           } catch (error) {
             console.error('Failed to fetch venues:', error);
           }
-        }, 300); // 300ms debounce
+        }, 500); // 500ms debounce
       };
     })(),
     [searchQuery, fetchVenues]
