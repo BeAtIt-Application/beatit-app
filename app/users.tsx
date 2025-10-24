@@ -8,11 +8,11 @@ import { useMusicGenres } from "@/src/hooks/useTaxonomies";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -239,7 +239,7 @@ export default function UsersScreen() {
         <PageHeader
           title={pageTitle}
           colors={['#5271FF', '#5C1593'] as const}
-          filters={filters}
+          filters={userType === 'artists' ? filters : []}
           showSearch={true}
           showLogo={true}
           showNotification={false}
@@ -253,7 +253,7 @@ export default function UsersScreen() {
         <TouchableOpacity 
           onPress={() => router.back()}
           activeOpacity={0.8}
-          className="absolute top-12 left-5 w-10 h-10 bg-white/90 rounded-full justify-center items-center shadow-lg z-[9999]"
+          className="absolute top-8 left-5 w-10 h-10 bg-white/90 rounded-full justify-center items-center shadow-lg z-[10]"
           style={{ elevation: 9999 }}
         >
           <IconSymbol name="chevron.left" size={20} color="#000" />

@@ -59,12 +59,12 @@ export function PageHeader({
       start={{x: 1, y: 0}}
       end={{x: 0, y: 1}}
     >
-      {/* Back Button - positioned outside the padded container */}
-      {showBackButton && (
-        <TouchableOpacity 
+       {/* Back Button - positioned outside the padded container */}
+       {showBackButton && (
+         <TouchableOpacity 
           className="absolute top-0 left-5 w-10 h-10 z-[9999]"
-          style={{ elevation: 9999 }}
-            activeOpacity={0.8}
+           style={{ elevation: 9999 }}
+           activeOpacity={0.8}
           onPress={() => router.back()}
 
         >
@@ -72,11 +72,11 @@ export function PageHeader({
             className="w-full h-full bg-white/90 rounded-full justify-center items-center shadow-lg"
           pointerEvents="box-none"
           style={{ elevation: 9999 }}
-          >
-            <IconSymbol name="chevron.left" size={20} color="#000" />
+         >
+           <IconSymbol name="chevron.left" size={20} color="#000" />
           </View>
-        </TouchableOpacity>
-      )}
+         </TouchableOpacity>
+       )}
       <View className="px-5 pt-4 pb-6">
         {/* Logo Section */}
         {showLogo && (
@@ -97,7 +97,7 @@ export function PageHeader({
         )}
 
         {/* Title Section */}
-        <View className="mb-2">
+        <View className="mb-4">
           <Text className="text-3xl font-bold text-white">{title}</Text>
         </View>
 

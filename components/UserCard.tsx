@@ -73,15 +73,6 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onPress, fromHorizonta
           <IconSymbol name="heart" size={16} color="white" />
         </TouchableOpacity>
 
-        {/* User Type Badge */}
-        <View className="absolute top-3 left-3">
-          <View className="bg-[#2FCC67] px-2 py-1 rounded-full">
-            <Text className="text-white text-xs font-semibold">
-              {getUserType()}
-            </Text>
-          </View>
-        </View>
-
         {/* Circular Avatar */}
         <View className="absolute -bottom-8">
           <View className="bg-white rounded-full p-1 shadow-lg">
@@ -123,20 +114,22 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onPress, fromHorizonta
 
       
         {/* Music Genres */}
-        <View className="mb-3">
-          <Text className="text-gray-500 text-xs mb-2">Music Genres</Text>
-          <View className="flex-row flex-wrap gap-1">
-            {user.preferred_music_genres && user.preferred_music_genres.length > 0 ? (
-              user.preferred_music_genres.map((genre, index) => (
-                <View key={index} className="bg-[#761CBC] px-2 py-1 rounded-2xl">
-                  <Text className="text-xs text-white font-medium">{genre.name}</Text>
-                </View>
-              ))
-            ) : (
-              <Text className="text-gray-400 text-sm">No genres specified</Text>
-            )}
+        {getUserType() === 'Artist' && (
+          <View className="mb-3">
+            <Text className="text-gray-500 text-xs mb-2">Music Genres</Text>
+            <View className="flex-row flex-wrap gap-1">
+              {user.preferred_music_genres && user.preferred_music_genres.length > 0 ? (
+                user.preferred_music_genres.map((genre, index) => (
+                  <View key={index} className="bg-[#761CBC] px-2 py-1 rounded-2xl">
+                    <Text className="text-xs text-white font-medium">{genre.name}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text className="text-gray-400 text-sm">No genres specified</Text>
+              )}
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Social Links */}
         <View className="flex-row items-center justify-between">
