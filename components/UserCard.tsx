@@ -11,7 +11,7 @@ interface UserCardProps {
   fromHorizontalList?: boolean;
 }
 
-export const UserCard: React.FC<UserCardProps> = ({ user, onPress, fromHorizontalList }) => {
+const UserCardComponent: React.FC<UserCardProps> = ({ user, onPress, fromHorizontalList }) => {
   const handleHeartPress = (e: any) => {
     e.stopPropagation();
     // Handle heart press logic here
@@ -168,3 +168,6 @@ export const UserCard: React.FC<UserCardProps> = ({ user, onPress, fromHorizonta
     </TouchableOpacity>
   );
 };
+
+export const UserCard = React.memo(UserCardComponent);
+UserCard.displayName = 'UserCard';

@@ -24,7 +24,7 @@ interface VenueCardProps {
   fromHorizontalList?: boolean;
 }
 
-export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizontalList }) => {
+const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizontalList }) => {
   const handleHeartPress = (e: any) => {
     e.stopPropagation();
     // Handle heart press logic here
@@ -129,3 +129,6 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
     </TouchableOpacity>
   );
 };
+
+export const VenueCard = React.memo(VenueCardComponent);
+VenueCard.displayName = 'VenueCard';

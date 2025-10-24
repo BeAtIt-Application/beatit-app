@@ -19,7 +19,7 @@ interface EventCardProps {
   fromHorizontalList?: boolean;
 }
 
-export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizontalList }) => {
+const EventCardComponent: React.FC<EventCardProps> = ({ event, onPress, fromHorizontalList }) => {
   const handleHeartPress = (e: any) => {
     e.stopPropagation();
     // Handle heart press logic here
@@ -95,3 +95,6 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onPress, fromHorizo
     </TouchableOpacity>
   );
 };
+
+export const EventCard = React.memo(EventCardComponent);
+EventCard.displayName = 'EventCard';
