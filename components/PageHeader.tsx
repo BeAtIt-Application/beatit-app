@@ -46,6 +46,13 @@ export function PageHeader({
     }
   };
 
+  const clearSearch = () => {
+    setSearchQuery("");
+    if (onSearchChange) {
+      onSearchChange("");
+    }
+  };
+
   const handleFilterPress = (filter: string) => {
     setSelectedFilter(filter);
     if (onFilterChange) {
@@ -113,6 +120,15 @@ export function PageHeader({
                 value={searchQuery}
                 onChangeText={handleSearchChange}
               />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity
+                  onPress={clearSearch}
+                  className="ml-2 p-1"
+                  activeOpacity={0.7}
+                >
+                  <IconSymbol name="xmark.circle.fill" size={20} color="#5271FF" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}

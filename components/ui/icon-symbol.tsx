@@ -34,6 +34,7 @@ const MAPPING = {
   'phone': 'phone',
   'envelope': 'email',
   'xmark': 'close',
+  'xmark.circle.fill': 'cancel',
   'photo': 'photo-camera',
   'person.2': 'people',
   'play.rectangle.fill': 'play-arrow',
