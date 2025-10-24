@@ -127,9 +127,10 @@ export default function MapScreen() {
     longitudeDelta: 0.1,
   });
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [loadingLocation, setLoadingLocation] = useState(true);
-  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [loadingLocation, setLoadingLocation] = useState(false); // Start as false to prevent automatic loading
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(true); // Start as true since we don't have location
   const [showLocationPrompt, setShowLocationPrompt] = useState(true);
+  const [userLocationDecisionMade, setUserLocationDecisionMade] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<{ type: "event" | "venue"; data: Event[] | Venue } | null>(null);
   const [searchRadius, setSearchRadius] = useState(10000); // Default 10km in meters
   const [showRadiusControl, setShowRadiusControl] = useState(false);
@@ -157,46 +158,11 @@ export default function MapScreen() {
   const events = (userLocation && useProximitySearch) ? nearbyEvents : genericEvents;
   const venues = (userLocation && useProximitySearch) ? nearbyVenues : genericVenues;
 
-  // Get user location on mount
-  useEffect(() => {
-    const getUserLocation = async () => {
-      try {
-        const permissionStatus = await requestLocationPermission();
-        if (!permissionStatus.granted) {
-          setLocationPermissionDenied(true);
-          setLoadingLocation(false);
-          return;
-        }
-
-        const location = await getCurrentLocation();
-        if (location) {
-          setUserLocation({
-            latitude: location.latitude,
-            longitude: location.longitude,
-          });
-          setRegion({
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          });
-          setLocationPermissionDenied(false);
-        } else {
-          setLocationPermissionDenied(true);
-        }
-      } catch (error) {
-        setLocationPermissionDenied(true);
-      } finally {
-        setLoadingLocation(false);
-      }
-    };
-
-    getUserLocation();
-  }, []);
 
   // Function to retry location permission or open settings
   const handleEnableLocation = useCallback(async () => {
     setLoadingLocation(true);
+    setUserLocationDecisionMade(false); // Reset decision flag when user explicitly enables location
     try {
       const permissionStatus = await requestLocationPermission();
       
@@ -258,11 +224,32 @@ export default function MapScreen() {
       } else {
         setLocationPermissionDenied(true);
       }
-    } catch (error) {
-      setLocationPermissionDenied(true);
-    } finally {
-      setLoadingLocation(false);
-    }
+      } catch (error) {
+        setLocationPermissionDenied(true);
+        // Show user-friendly message for device settings issues
+        Alert.alert(
+          "Location Services Disabled",
+          "Please enable location services in your device settings to use the 'Near Me' feature.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel"
+            },
+            {
+              text: "Open Settings",
+              onPress: () => {
+                if (Platform.OS === 'ios') {
+                  Linking.openURL('app-settings:');
+                } else {
+                  Linking.openSettings();
+                }
+              }
+            }
+          ]
+        );
+      } finally {
+        setLoadingLocation(false);
+      }
   }, []);
 
   // Check location permission when app comes to foreground (user returns from settings)
@@ -298,6 +285,8 @@ export default function MapScreen() {
           }
         } catch (error) {
           console.log("Could not get location on app resume:", error);
+          // Keep location permission denied state when device settings are unsatisfied
+          // The app will continue to work with the default location
         }
       }
     });
@@ -545,8 +534,8 @@ export default function MapScreen() {
         </ScrollView>
       </View>
 
-      {/* Location Prompt - Show when location is not available */}
-      {!userLocation && !loadingLocation && showLocationPrompt && locationPermissionDenied && (
+      {/* Location Prompt - Show when location is not available and user hasn't made a decision */}
+      {!userLocation && !loadingLocation && !userLocationDecisionMade && (
         <View style={styles.locationPromptContainer}>
           <View style={styles.locationPromptContent}>
             <IconSymbol name="location.slash.fill" size={20} color="#FF9800" />
@@ -560,9 +549,12 @@ export default function MapScreen() {
           <View style={styles.locationPromptActions}>
             <TouchableOpacity
               style={styles.locationPromptDismiss}
-              onPress={() => setShowLocationPrompt(false)}
+              onPress={() => {
+                setShowLocationPrompt(false);
+                setUserLocationDecisionMade(true);
+              }}
             >
-              <Text style={styles.locationPromptDismissText}>Dismiss</Text>
+              <Text style={styles.locationPromptDismissText}>No Thanks</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.locationPromptButton}
@@ -575,7 +567,7 @@ export default function MapScreen() {
         </View>
       )}
 
-      {/* Radius Control - Only show when user location is available */}
+      {/* Radius Control - Show when user location is available OR when proximity search is not enabled */}
       {userLocation && (
         <View style={styles.radiusControlContainer}>
           {useProximitySearch ? (
@@ -670,7 +662,7 @@ export default function MapScreen() {
             initialRegion={region}
             onRegionChangeComplete={setRegion}
             onPress={() => setSelectedMarker(null)}
-            showsUserLocation={true}
+            showsUserLocation={userLocation !== null}
             showsMyLocationButton={false}
             showsCompass={true}
             showsScale={true}
