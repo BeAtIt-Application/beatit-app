@@ -198,19 +198,18 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
           <View className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
           
           {/* Back Button */}
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-            className="absolute top-12 left-3 bg-white/90 p-2 rounded-full"
-          >
-            <IconSymbol name="chevron.left" size={16} color="#000" />
-          </TouchableOpacity>
+          <TouchableOpacity
+          onPress={() => router.back()}
+          className="absolute top-12 left-5 w-10 h-10 bg-white rounded-full justify-center items-center shadow-lg"
+        >
+          <IconSymbol name="chevron.left" size={20} color="black" />
+        </TouchableOpacity>
           
           {/* Heart Favorite Button */}
           <TouchableOpacity 
             onPress={handleHeartPress}
             activeOpacity={0.8}
-            className="absolute top-12 right-3 bg-white/90 p-2 rounded-full"
+            className="absolute top-12 right-5 bg-white/90 p-2 rounded-full h-10 w-10 justify-center items-center"
           >
             <IconSymbol name="heart" size={16} color="#FF6B6B" />
           </TouchableOpacity>

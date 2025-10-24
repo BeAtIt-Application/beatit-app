@@ -248,7 +248,7 @@ export default function EditInterestsScreen() {
         </ScrollView>
 
         {/* Requirements Footer */}
-        <View className="bg-gray-50 px-5 py-4 border-t border-gray-200">
+        <View className="bg-gray-50 px-5 py-4 border-t border-gray-200 mb-12">
           <Text className="text-sm font-semibold text-gray-700 mb-2">
             Requirements:
           </Text>

@@ -83,10 +83,11 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
             style={{ width: "100%", height: 200, borderTopRightRadius: 16, borderTopLeftRadius: 16 }}
             contentFit="cover"
           />
+
           <TouchableOpacity 
             onPress={handleHeartPress}
             activeOpacity={0.8}
-            className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full"
+            className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full h-10 w-10 justify-center items-center"
           >
             <IconSymbol name="heart" size={16} color="#FF6B6B" />
           </TouchableOpacity>
