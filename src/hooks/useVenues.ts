@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Venue, venueApi, VenueFilterParams } from "../api/venueApi";
+import { RateVenueResponse, Venue, venueApi, VenueFilterParams } from "../api/venueApi";
 
 // Hook for fetching venues with filters
 export const useVenues = () => {
@@ -154,5 +154,33 @@ export const useVenuesNearUser = () => {
     loading,
     error,
     fetchVenuesNearUser,
+  };
+};
+
+// Hook for rating a venue
+export const useRateVenue = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const rateVenue = useCallback(async (venueId: number, rating: number): Promise<RateVenueResponse> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await venueApi.rateVenue(venueId, rating);
+      return response;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to rate venue";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    rateVenue,
+    loading,
+    error,
   };
 };

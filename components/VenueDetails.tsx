@@ -1,9 +1,11 @@
+import { StarRating } from '@/components/StarRating';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Dimensions, Image, Linking, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, Linking, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { Venue } from '@/src/api/venueApi';
+import { useRateVenue } from '@/src/hooks/useVenues';
 
 interface VenueDetailsProps {
   venue: Venue;
@@ -12,7 +14,11 @@ interface VenueDetailsProps {
 export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [currentRating, setCurrentRating] = useState(venue.current_user_rating || 0);
+  const [averageRating, setAverageRating] = useState(venue.average_rating || 0);
+  const [totalRatings, setTotalRatings] = useState(venue.total_ratings || 0);
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+  const { rateVenue, loading: ratingLoading } = useRateVenue();
 
   // Get the banner image from the venue's root banner field
   const getBannerImage = () => {
@@ -159,6 +165,22 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   const handleHeartPress = () => {
     // Handle heart press logic here
     console.log('Heart pressed for venue:', venue.name);
+  };
+
+  const handleRatingChange = async (rating: number) => {
+    try {
+      console.log('Rating venue:', venue.id, 'with rating:', rating);
+      const response = await rateVenue(venue.id, rating);
+      console.log('Rating response:', response);
+      setCurrentRating(rating);
+      setAverageRating(response.average_rating);
+      setTotalRatings(response.total_ratings);
+      Alert.alert('Success', `You rated this venue ${rating} star${rating > 1 ? 's' : ''}!`);
+    } catch (error) {
+      console.error('Rating error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit rating. Please try again.';
+      Alert.alert('Error', errorMessage);
+    }
   };
 
   return (
@@ -321,6 +343,48 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
             ))}
           </View>
         </View>
+         
+        {/* Rating Section */}
+        <View className="mb-4">
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-lg font-semibold text-gray-800">Rating</Text>
+            {totalRatings > 0 && (
+              <Text className="text-sm text-gray-500">
+                {totalRatings} rating{totalRatings > 1 ? 's' : ''}
+              </Text>
+            )}
+          </View>
+          
+          {/* Average Rating Display */}
+          {averageRating > 0 && (
+            <View className="mb-3">
+              <StarRating 
+                rating={averageRating} 
+                size={18} 
+                showText={true}
+                interactive={false}
+              />
+            </View>
+          )}
+          
+          {/* User Rating Section */}
+          <View className="bg-gray-50 rounded-xl p-4">
+            <Text className="text-sm font-medium text-gray-700 mb-2">
+              {currentRating > 0 ? 'Your Rating:' : 'Rate this venue:'}
+            </Text>
+            <StarRating 
+              rating={currentRating} 
+              onRatingChange={handleRatingChange}
+              interactive={true}
+              size={24}
+              disabled={ratingLoading}
+            />
+            {ratingLoading && (
+              <Text className="text-sm text-gray-500 mt-2">Submitting rating...</Text>
+            )}
+          </View>
+        </View>
+        
       </View>
 
       {/* Image Modal */}

@@ -101,6 +101,24 @@ export interface VenueResponse {
   status?: string;
 }
 
+// Rating types
+export interface RateVenueRequest {
+  rating: number; // 1-5
+}
+
+export interface RateVenueResponse {
+  success: boolean;
+  rating: number;
+  total_ratings: number;
+  average_rating: number;
+}
+
+export interface VenueRatingInfo {
+  average_rating: number;
+  total_ratings: number;
+  current_user_rating: number | null;
+}
+
 // Venue API service
 export class VenueApi {
   /**
@@ -126,11 +144,34 @@ export class VenueApi {
 
   /**
    * Get single public venue by ID
+   * Returns venue details including rating information (average_rating, total_ratings, current_user_rating)
    */
   static async getPublicVenueById(id: number): Promise<Venue> {
     try {
-      
       const response = await api.get(`${getVenueEndpoint("publicGet")}/${id}`);
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
+
+  /**
+   * Rate a venue
+   * @param venueId - The venue ID to rate
+   * @param rating - Rating value (1-5)
+   */
+  static async rateVenue(venueId: number, rating: number): Promise<RateVenueResponse> {
+    try {
+      // Validate rating
+      if (rating < 1 || rating > 5 || !Number.isInteger(rating)) {
+        throw new Error("Rating must be an integer between 1 and 5");
+      }
+
+      const endpoint = `/venue/public/${venueId}/rate-venue`;
+      const requestBody: RateVenueRequest = { rating };
+      
+      const response = await api.post(endpoint, requestBody);
       return response.data;
     } catch (error) {
       const apiError = handleApiError(error as any);
@@ -173,6 +214,7 @@ export const venueApi = {
   getPublicVenuesFiltered: VenueApi.getPublicVenuesFiltered,
   getPublicVenueById: VenueApi.getPublicVenueById,
   getVenuesNearUser: VenueApi.getVenuesNearUser,
+  rateVenue: VenueApi.rateVenue,
 };
 
 

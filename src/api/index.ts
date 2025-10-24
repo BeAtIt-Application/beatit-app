@@ -32,6 +32,6 @@ export type {
 export type { ApiError, RefreshTokenResponse } from "./client";
 export type { Event, EventFilterParams, EventResponse, EventToggleStatusResponse } from "./eventApi";
 export type { Taxonomy } from "./taxonomyApi";
-export type { UpdateUserData, UserProfile } from "./userApi";
-export type { Venue, VenueFilterParams, VenueResponse } from "./venueApi";
+export type { Artist, MusicGenre, Organization, PublicUser, UserFilterParams, UserListResponse, UserPagination, VenueType } from "./userApi";
+export type { RateVenueRequest, RateVenueResponse, Venue, VenueFilterParams, VenueRatingInfo, VenueResponse } from "./venueApi";
 

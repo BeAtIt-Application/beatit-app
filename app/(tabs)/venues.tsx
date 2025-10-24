@@ -8,11 +8,11 @@ import { getCurrentLocation, requestLocationPermission } from "@/src/services/lo
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
+    RefreshControl,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -275,7 +275,8 @@ export default function VenuesScreen() {
                   banner: venue.banner,
                   images: venue.images,
                   venueTypes: [venue.type].filter(Boolean) as string[],
-                  stars: 0, // No rating field in API response
+                  average_rating: venue.average_rating,
+                  total_ratings: venue.total_ratings,
                 }}
                 onPress={() => router.push(`/venue-detail?id=${venue.id}`)}
               />

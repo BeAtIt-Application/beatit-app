@@ -17,6 +17,8 @@ interface VenueCardProps {
     };
     stars?: number;
     venueTypes?: string[];
+    average_rating?: number;
+    total_ratings?: number;
   };
   onPress?: () => void;
   fromHorizontalList?: boolean;
@@ -95,14 +97,17 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizo
           <Text className="text-base font-bold text-[#1A1A2E] mb-2 leading-5 text-lg">
             {venue.name}
           </Text>
-          {venue.stars !== undefined && (
+          {(venue.average_rating !== undefined && venue.average_rating > 0) && (
             <View className="flex-row items-center gap-1 mb-1">
-              {/* {renderStars(venue.stars)} */}
-              {renderStars(5)}
+              {renderStars(venue.average_rating)}
               <Text className="text-sm font-semibold text-gray-700 ml-1">
-                {/* {venue.stars.toFixed(1)} */}
-                5.0
+                {venue.average_rating.toFixed(1)}
               </Text>
+              {venue.total_ratings && venue.total_ratings > 0 && (
+                <Text className="text-xs text-gray-500 ml-1">
+                  ({venue.total_ratings})
+                </Text>
+              )}
             </View>
           )}
           <View className="flex-row items-center mb-3">
