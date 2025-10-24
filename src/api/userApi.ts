@@ -1,5 +1,7 @@
 import { api, handleApiError } from "./client";
 import { getUserPublicEndpoint } from "./config";
+import { Event } from "./eventApi";
+import { Venue } from "./venueApi";
 
 // Types
 export interface MusicGenre {
@@ -76,6 +78,18 @@ export interface UserFilterParams {
   limit?: number;
   music_genre?: number[]; // Array of genre IDs for filtering
   city?: string; // City name for filtering
+}
+
+// FYP (For You Page) Types
+export interface FYPResponse {
+  savedEvent: Event | null;
+  savedVenue: Venue | null;
+  savedArtist: PublicUser | null;
+  savedOrganization: PublicUser | null;
+  preferredEvents: Event[];
+  preferredVenues: Venue[];
+  preferredArtists: PublicUser[];
+  preferredOrganizations: PublicUser[];
 }
 
 // User API service
@@ -162,6 +176,20 @@ export class UserApi {
       throw new Error(apiError.message);
     }
   }
+
+  /**
+   * Get For You Page (FYP) data
+   * Returns personalized recommendations based on user's preferences
+   */
+  static async getFYPData(): Promise<FYPResponse> {
+    try {
+      const response = await api.get(getUserPublicEndpoint("fyp"));
+      return response.data;
+    } catch (error) {
+      const apiError = handleApiError(error as any);
+      throw new Error(apiError.message);
+    }
+  }
 }
 
 // Convenience wrapper with default error handling
@@ -169,4 +197,5 @@ export const userApi = {
   getPublicArtists: UserApi.getPublicArtists,
   getPublicOrganizations: UserApi.getPublicOrganizations,
   getPublicUserById: UserApi.getPublicUserById,
+  getFYPData: UserApi.getFYPData,
 };

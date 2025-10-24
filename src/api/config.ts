@@ -27,6 +27,7 @@ export const API_CONFIG = {
       artists: "/user/public/artists",
       organizations: "/user/public/organizations",
       detail: "/user/public",
+      fyp: "/user/public/fyp",
     },
     event: {
       publicFilter: "/event/public/filter",

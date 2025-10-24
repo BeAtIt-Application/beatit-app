@@ -42,7 +42,7 @@ export function HorizontalSavedSlider({
   const snapInterval = snapToInterval ? defaultCardWidth + spacing : undefined;
 
   return (
-    <View className="mb-4 pt-8">
+    <View className="mb-8 pt-8">
       <Text className="pl-5 text-xl font-bold text-[#1A1A2E]">
         Saved
       </Text>      

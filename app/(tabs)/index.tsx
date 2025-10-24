@@ -1,21 +1,57 @@
 import { CategoryGrid, CategoryItem } from "@/components/CategoryGrid";
-import { CompactEventsHorizontalList } from "@/components/CompactEventsHorizontalList";
 import { CompactUsersHorizontalList } from "@/components/CompactUsersHorizontalList";
-import { CompactVenuesHorizontalList } from "@/components/CompactVenuesHorizontalList";
 import { EventsHorizontalList } from "@/components/EventsHorizontalList";
-import { HorizontalArtistSlider } from "@/components/HorizontalArtistSlider";
 import { HorizontalSavedSlider, SliderCard } from "@/components/HorizontalSavedSlider";
 import { PageHeader } from "@/components/PageHeader";
 import { VenuesHorizontalList } from "@/components/VenuesHorizontalList";
+import { useFYP } from "@/src/hooks/useFYP";
 import { useMusicGenres, useVenueTypes } from "@/src/hooks/useTaxonomies";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Discover");
   const { genres: allGenres } = useMusicGenres();
   const { venueTypes: allVenueTypes } = useVenueTypes();
+  
+  // FYP (For You Page) data
+  const { fypData, loading: fypLoading, error: fypError, refetch: refetchFYP } = useFYP();
+
+  // Helper functions to transform API data to component format
+  const transformEventForComponent = (apiEvent: any) => ({
+    id: apiEvent.id,
+    title: apiEvent.name,
+    date: new Date(apiEvent.event_start).toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    }),
+    location: `${apiEvent.venue_name}, ${apiEvent.city}`,
+    venueName: apiEvent.venue_name,
+    city: apiEvent.city,
+    image: apiEvent.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+    tags: apiEvent.music_genres || []
+  });
+
+  const transformVenueForComponent = (apiVenue: any) => ({
+    id: apiVenue.id,
+    name: apiVenue.name,
+    city: apiVenue.city,
+    image: apiVenue.logo || apiVenue.banner?.url || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+    banner: apiVenue.banner,
+    stars: apiVenue.average_rating || 0,
+    venueTypes: apiVenue.type ? [apiVenue.type] : []
+  });
+
+  // Log FYP data when it changes
+  useEffect(() => {
+    if (fypError) {
+      console.error('FYP Error:', fypError);
+    }
+  }, [fypData, fypError, fypLoading]);
 
   const tabs = ["Discover", "Events", "Venues", "Artists"];
 
@@ -74,6 +110,7 @@ export default function HomeScreen() {
       name: "Elegant Garden Venue",
       date: "Available Now",
       location: "Adresa, Bitola",
+      city: "Bitola",
       image:
       "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
@@ -84,6 +121,7 @@ export default function HomeScreen() {
       name: "Modern Conference Hall",
       date: "Thu 26 May",
       location: "Kamarite, Bitola",
+      city: "Bitola",
       image:
         "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
@@ -95,6 +133,7 @@ export default function HomeScreen() {
       name: "Outdoor Event Space",
       date: "Fri 27 May",
       location: "City Center, Skopje",
+      city: "Skopje",
       image:
         "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
@@ -109,6 +148,7 @@ export default function HomeScreen() {
       name: "Elegant Garden Venue",
       date: "Available Now",
       location: "Adresa, Bitola",
+      city: "Bitola",
       image:
       "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
@@ -119,6 +159,7 @@ export default function HomeScreen() {
       name: "Modern Conference Hall",
       date: "Thu 26 May",
       location: "Kamarite, Bitola",
+      city: "Bitola",
       image:
         "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
@@ -130,6 +171,7 @@ export default function HomeScreen() {
       name: "Outdoor Event Space",
       date: "Fri 27 May",
       location: "City Center, Skopje",
+      city: "Skopje",
       image:
         "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
       venueTypes: ["Pub", "Klub"],
@@ -333,76 +375,119 @@ export default function HomeScreen() {
         />
 
         {/* Content */}
-        <View className="bg-gray-100 mt-4">
           {/* Events near you - Large Cards */}
+          {/* <View className="bg-gray-100 mt-4">
           <EventsHorizontalList
             title="Events near you"
             events={events}
             onSeeAll={() => router.push("/events")}
           />
-        </View>
+        </View> */}
 
-        <View className="bg-gray-100 mt-4">
-          {/* Events near you - Large Cards */}
+        {/* Events near you - Large Cards */}
+          {/* <View className="bg-gray-100 mt-4">
           <VenuesHorizontalList
             title="Venues near you"
             venues={venues}
             onSeeAll={() => router.push("/venues")}
           />
-        </View>
+        </View> */}
 
         {/* Events near you - Compact Cards */}
-        <CompactEventsHorizontalList
+        {/* <CompactEventsHorizontalList
           title="Compact Events"
           events={compactEvents}
           onSeeAll={() => router.push("/events")}
-        />
+        /> */}
 
         {/* Venues near you - Compact Cards */}
-        <CompactVenuesHorizontalList
+        {/* <CompactVenuesHorizontalList
           title="Compact Venues"
           venues={compactVenues}
           onSeeAll={() => router.push("/venues")}
-        />
+        /> */}
         
         {/* Saved Artists Slider */}
-        <HorizontalArtistSlider
+        {/* <HorizontalArtistSlider
           title="Featured Artists"
           artists={compactArtists}
           cardWidth={220}
           cardHeight={200}
           blurRadius={10}
-        />
+        /> */}
 
         {/* Artists - Compact Cards */}
-        <CompactUsersHorizontalList
+        {/* <CompactUsersHorizontalList
           title="Featured Artists"
           users={compactArtists}
           onSeeAll={() => router.push('/users?type=artists')}
-        />
+        /> */}
 
         {/* Organizations - Compact Cards */}
-        <CompactUsersHorizontalList
+        {/* <CompactUsersHorizontalList
           title="Organizations"
           users={compactOrganizations}
           onSeeAll={() => router.push('/users?type=organizations')}
-        />
+        /> */}
 
-        {/* Genres */}
-        <CategoryGrid
-          title="Genres"
-          items={randomGenres}
-          onItemPress={handleCategoryPress}
-          columns={2}
-        />
+        {/* FYP (For You Page) Sections */}
+        {fypData && (
+          <>
+            {/* FYP Preferred Events */}
+            {fypData.preferredEvents && fypData.preferredEvents.length > 0 && (
+              <EventsHorizontalList
+                title="For You - Events"
+                events={fypData.preferredEvents.map(transformEventForComponent)}
+                onSeeAll={() => router.push("/events")}
+              />
+            )}
 
-        {/* Venue Types */}
-        <CategoryGrid
-          title="Venue Types"
-          items={randomVenueTypes}
-          onItemPress={handleCategoryPress}
-          columns={2}
-        />
+            {/* Genres */}
+            <CategoryGrid
+              title="View Events by Genre"
+              items={randomGenres}
+              onItemPress={handleCategoryPress}
+              columns={2}
+            />
+
+
+            {/* FYP Preferred Venues */}
+            {fypData.preferredVenues && fypData.preferredVenues.length > 0 && (
+              <VenuesHorizontalList
+                title="For You - Venues"
+                venues={fypData.preferredVenues.map(transformVenueForComponent)}
+                onSeeAll={() => router.push("/venues")}
+              />
+            )}
+            
+            
+            {/* FYP Preferred Artists */}
+            {fypData.preferredArtists && fypData.preferredArtists.length > 0 && (
+              <CompactUsersHorizontalList
+                title="For You - Artists"
+                users={fypData.preferredArtists}
+                onSeeAll={() => router.push('/users?type=artists')}
+              />
+            )}
+
+            {/* Venue Types */}
+              <CategoryGrid
+                title="View Venues by Type"
+                items={randomVenueTypes}
+                onItemPress={handleCategoryPress}
+                columns={2}
+              />
+
+            {/* FYP Preferred Organizations */}
+            {fypData.preferredOrganizations && fypData.preferredOrganizations.length > 0 && (
+              <CompactUsersHorizontalList
+                title="Organizations"
+                users={fypData.preferredOrganizations}
+                onSeeAll={() => router.push('/users?type=organizations')}
+              />
+            )}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
