@@ -1,8 +1,9 @@
 import { StarRating } from '@/components/StarRating';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Dimensions, Image, Linking, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Linking, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { Venue } from '@/src/api/venueApi';
 import { useRateVenue } from '@/src/hooks/useVenues';
@@ -190,8 +191,10 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
           {/* Banner Image Background */}
           <Image
             source={{ uri: bannerImageUrl }}
-            className="w-full h-64"
-            resizeMode="cover"
+            style={{ width: '100%', height: 256 }}
+            contentFit="cover"
+            placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+            transition={200}
           />
           
           {/* Gradient Overlay */}
@@ -225,8 +228,10 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
                         ? venue.logo 
                         : (venue.logo as any)?.url || (venue.logo as any)?.[0]
                     }}
+                    placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                    transition={200}
                     style={{ width: 120, height: 120, borderRadius: 60 }}
-                    resizeMode="cover"
+                    contentFit="cover"
                   />
                 </View>
               )}
@@ -275,8 +280,10 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
                   >
                     <Image
                       source={{ uri: imageUrl }}
-                      className="w-48 h-32 rounded-xl"
-                      resizeMode="cover"
+                      style={{ width: 192, height: 128, borderRadius: 12 }}
+                      contentFit="cover"
+                      placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                      transition={200}
                     />
                   </TouchableOpacity>
                 );
@@ -415,7 +422,9 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
                 width: screenWidth * 0.9,
                 height: screenHeight * 0.8,
               }}
-              resizeMode="contain"
+              placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+              transition={200}
+              contentFit="contain"
             />
           )}
 

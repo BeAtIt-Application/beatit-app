@@ -740,6 +740,8 @@ export default function MapScreen() {
                       source={{ uri: event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" }}
                       style={styles.cardImage}
                       contentFit="cover"
+                      placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                      transition={200}
                     />
                     <View style={styles.cardContent}>
                       <Text style={styles.cardTitle} numberOfLines={2}>
@@ -795,6 +797,8 @@ export default function MapScreen() {
                         source={{ uri: event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" }}
                         style={styles.cardImage}
                         contentFit="cover"
+                        placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                        transition={200}
                       />
                       <View style={styles.cardContent}>
                         <Text style={styles.cardTitle} numberOfLines={2}>
@@ -844,6 +848,8 @@ export default function MapScreen() {
                          (selectedMarker.data as Venue).image || 
                          "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" 
                   }}
+                  placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                  transition={200}
                   style={styles.cardImage}
                   contentFit="cover"
                 />

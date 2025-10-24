@@ -216,6 +216,8 @@ export default function EventDetailScreen() {
           }}
           style={{ width: "100%", height: 300 }}
           contentFit="cover"
+          placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+          transition={200}
         />
 
         {/* Back Button Overlay */}

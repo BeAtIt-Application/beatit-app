@@ -111,6 +111,8 @@ export default function ProfileScreen() {
               source={{ uri: avatarUrl }}
               style={{ width: 120, height: 120, borderRadius: 60 }}
               contentFit="cover"
+              placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+              transition={200}
             />
           </View>
         </View>

@@ -51,6 +51,8 @@ export const CompactVenueCard: React.FC<CompactVenueCardProps> = ({
             marginRight: 15,
           }}
           contentFit="cover"
+          placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+          transition={200}
         />
         <View className="flex-1 justify-center">
           <Text className="text-base font-semibold text-[#1A1A2E] mb-1">

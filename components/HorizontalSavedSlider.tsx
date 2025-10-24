@@ -77,6 +77,8 @@ export function HorizontalSavedSlider({
                 style={{ width: '100%', height: '100%' }}
                 contentFit="cover"
                 blurRadius={blurRadius}
+                placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                transition={200}
               />
               
               {/* Gradient Overlay */}

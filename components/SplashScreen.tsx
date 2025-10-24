@@ -47,8 +47,6 @@ export default function Splash() {
           source={require("@/assets/images/splash.png")}
           style={styles.logo}
           resizeMode="contain"
-          onLoad={() => console.log("✅ Image loaded successfully")}
-          onError={(error) => console.log("❌ Image failed to load:", error)}
         />
       </Animated.View>
 

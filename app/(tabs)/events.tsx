@@ -134,26 +134,27 @@ export default function EventsScreen() {
     [searchQuery, fetchEvents]
   );
 
+  // Helper function to build base filters
+  const buildBaseFilters = (search?: string) => ({
+    search: search || undefined,
+    musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined,
+    dateFilter: selectedDateRange ? (selectedDateRange.label === "Custom Range" ? "custom" : getDateFilterType(selectedDateRange.label)) : undefined,
+    startDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.from || '') : undefined,
+    endDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.to || '') : undefined,
+    date_from: convertFormattedDateToISO(selectedDateRange?.from || ''),
+    date_to: convertFormattedDateToISO(selectedDateRange?.to || ''),
+    city: useLocationFilter ? undefined : selectedCity || undefined,
+    lat: useLocationFilter ? userLocation?.lat : undefined,
+    lng: useLocationFilter ? userLocation?.lng : undefined,
+    radius: useLocationFilter ? locationRadius : undefined,
+    page: 1,
+    limit: 20,
+  });
+
   // Fetch events with filters (immediate for non-search filters)
   const loadEvents = async () => {
     try {
-      const filters = {
-        search: searchQuery || undefined,
-        musicGenre: selectedGenres.length > 0 ? selectedGenres[0].id : undefined, // Use first selected genre ID
-        dateFilter: selectedDateRange ? (selectedDateRange.label === "Custom Range" ? "custom" : getDateFilterType(selectedDateRange.label)) : undefined,
-        startDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.from || '') : undefined,
-        endDate: selectedDateRange?.label === "Custom Range" ? convertFormattedDateToISO(selectedDateRange?.to || '') : undefined,
-        // Also send the old parameters in case API expects them
-        date_from: convertFormattedDateToISO(selectedDateRange?.from || ''),
-        date_to: convertFormattedDateToISO(selectedDateRange?.to || ''),
-        city: useLocationFilter ? undefined : selectedCity || undefined, // Don't use city when location filter is active
-        lat: useLocationFilter ? userLocation?.lat : undefined,
-        lng: useLocationFilter ? userLocation?.lng : undefined,
-        radius: useLocationFilter ? locationRadius : undefined, // Add radius for location-based filtering
-        page: 1,
-        limit: 20,
-      };
-
+      const filters = buildBaseFilters(searchQuery);
       await fetchEvents(filters);
     } catch (error) {
       console.error('Failed to fetch events:', error);
@@ -175,6 +176,15 @@ export default function EventsScreen() {
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
+    
+    // If search is cleared, immediately trigger search to clear filter
+    if (text === "") {
+      const filters = {
+        ...buildBaseFilters(),
+        search: undefined
+      };
+      fetchEvents(filters);
+    }
   };
 
   const handleFilterChange = (filter: string) => {

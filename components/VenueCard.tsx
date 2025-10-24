@@ -82,6 +82,8 @@ const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHori
             source={{ uri: cardImageUrl }}
             style={{ width: "100%", height: 200, borderTopRightRadius: 16, borderTopLeftRadius: 16 }}
             contentFit="cover"
+            placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+            transition={200}
           />
 
           <TouchableOpacity 

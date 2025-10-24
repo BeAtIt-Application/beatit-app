@@ -57,6 +57,8 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, onPress, fromHori
             source={{ uri: event.image }}
             style={{ width: "100%", height: 200, borderTopRightRadius: 16, borderTopLeftRadius: 16 }}
             contentFit="cover"
+            placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+            transition={200}
           />
           <View className="absolute top-3 left-3 bg-black/70 px-3 py-2 rounded-md">
             <Text className="text-white text-sm font-semibold text-center">{day}</Text>

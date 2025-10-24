@@ -6,15 +6,15 @@ import * as ImagePicker from 'expo-image-picker';
 import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 export default function EditProfileScreen() {
@@ -271,6 +271,8 @@ export default function EditProfileScreen() {
                   source={{ uri: avatarUrl }}
                   style={{ width: 120, height: 120, borderRadius: 60 }}
                   contentFit="cover"
+                  placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                  transition={200}
                 />
                 {uploadingAvatar && (
                   <View className="absolute inset-0 bg-black/50 rounded-full justify-center items-center">

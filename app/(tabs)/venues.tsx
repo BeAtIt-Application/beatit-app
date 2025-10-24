@@ -8,11 +8,11 @@ import { getCurrentLocation, requestLocationPermission } from "@/src/services/lo
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -81,20 +81,22 @@ export default function VenuesScreen() {
     [searchQuery, fetchVenues]
   );
 
+  // Helper function to build base filters
+  const buildBaseFilters = (search?: string) => ({
+    search: search || undefined,
+    venueType: selectedVenueType?.id || undefined,
+    city: useLocationFilter ? undefined : selectedCity || undefined,
+    lat: useLocationFilter ? userLocation?.lat : undefined,
+    lng: useLocationFilter ? userLocation?.lng : undefined,
+    radius: useLocationFilter ? locationRadius : undefined,
+    page: 1,
+    limit: 20,
+  });
+
   // Fetch venues with filters (immediate for non-search filters)
   const loadVenues = async () => {
     try {
-      const filters = {
-        search: searchQuery || undefined,
-        venueType: selectedVenueType?.id || undefined, // Use venue type ID for API
-        city: useLocationFilter ? undefined : selectedCity || undefined, // Don't use city when location filter is active
-        lat: useLocationFilter ? userLocation?.lat : undefined,
-        lng: useLocationFilter ? userLocation?.lng : undefined,
-        radius: useLocationFilter ? locationRadius : undefined, // Add radius for location-based filtering
-        page: 1,
-        limit: 20,
-      };
-      
+      const filters = buildBaseFilters(searchQuery);
       await fetchVenues(filters);
     } catch (error) {
       console.error('Failed to fetch venues:', error);
@@ -116,6 +118,15 @@ export default function VenuesScreen() {
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
+    
+    // If search is cleared, immediately trigger search to clear filter
+    if (text === "") {
+      const filters = {
+        ...buildBaseFilters(),
+        search: undefined
+      };
+      fetchVenues(filters);
+    }
   };
 
   const handleFilterChange = (filter: string) => {

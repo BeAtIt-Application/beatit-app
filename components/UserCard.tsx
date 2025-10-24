@@ -80,6 +80,8 @@ const UserCardComponent: React.FC<UserCardProps> = ({ user, onPress, fromHorizon
               source={{ uri: cardImageUrl }}
               style={{ width: 60, height: 60, borderRadius: 30 }}
               contentFit="cover"
+              placeholder="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+              transition={200}
             />
           </View>
         </View>
