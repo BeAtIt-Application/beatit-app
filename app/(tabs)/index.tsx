@@ -110,10 +110,9 @@ export default function HomeScreen() {
 
   const handleCategoryPress = (item: CategoryItem) => {
     
-    // Determine if this is a genre or venue type based on the item's ID
-    // Genres will have IDs from the music genres API, venue types from venue types API
-    const isGenre = randomGenres.some(genre => genre.id === item.id);
-    const isVenueType = randomVenueTypes.some(venueType => venueType.id === item.id);
+    // Determine if this is a genre or venue type by checking which array contains this exact item
+    const isGenre = randomGenres.some(genre => genre.id === item.id && genre.label === item.label);
+    const isVenueType = randomVenueTypes.some(venueType => venueType.id === item.id && venueType.label === item.label);
     
     if (isGenre) {
       // Navigate to events page with genre filter
