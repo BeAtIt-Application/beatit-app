@@ -49,12 +49,16 @@ export type Artist = PublicUser;
 export type Organization = PublicUser;
 
 export interface UserPagination {
-  current_page: number;
-  per_page: number;
   total: number;
-  last_page: number;
-  from: number;
-  to: number;
+  count: number;
+  currentPage: number;
+  lastPage: number;
+  limit: number;
+  options: {
+    path: string;
+    pageName: string;
+  };
+  dataLength: number;
 }
 
 export interface UserListResponse {
@@ -68,6 +72,8 @@ export interface UserFilterParams {
   dir?: 'asc' | 'desc';
   search?: string;
   draw?: number;
+  page?: number;
+  limit?: number;
 }
 
 // User API service
@@ -78,11 +84,12 @@ export class UserApi {
   static async getPublicArtists(filters: UserFilterParams = {}): Promise<UserListResponse> {
     try {
       const params = {
-        length: filters.length || 10,
+        length: filters.limit || filters.length || 20,
         column: filters.column || 'users.first_name',
         dir: filters.dir || 'asc',
         search: filters.search || '',
         draw: filters.draw || 1,
+        page: filters.page || 1,
       };
 
       const response = await api.get(getUserPublicEndpoint("artists"), {
@@ -102,11 +109,12 @@ export class UserApi {
   static async getPublicOrganizations(filters: UserFilterParams = {}): Promise<UserListResponse> {
     try {
       const params = {
-        length: filters.length || 10,
+        length: filters.limit || filters.length || 20,
         column: filters.column || 'users.first_name',
         dir: filters.dir || 'asc',
         search: filters.search || '',
         draw: filters.draw || 1,
+        page: filters.page || 1,
       };
 
       const response = await api.get(getUserPublicEndpoint("organizations"), {

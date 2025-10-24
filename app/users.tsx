@@ -8,11 +8,11 @@ import { useMusicGenres } from "@/src/hooks/useTaxonomies";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
+    RefreshControl,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -39,9 +39,13 @@ export default function UsersScreen() {
     users,
     loading,
     error,
-    pagination,
+    total,
+    page,
+    lastPage,
+    hasMoreData,
     fetchUsers,
-    refetch
+    loadMoreUsers,
+    refreshUsers
   } = useUsers(userType as 'artists' | 'organizations');
 
   const { genres: allGenres } = useMusicGenres();
@@ -60,7 +64,8 @@ export default function UsersScreen() {
         try {
           const filters = {
             search: searchQuery || undefined,
-            length: 20,
+            page: 1,
+            limit: 20,
             column: 'users.first_name',
             dir: 'asc' as const,
             draw: 1,
@@ -100,7 +105,39 @@ export default function UsersScreen() {
 
   // Handle pull to refresh
   const handleRefresh = async () => {
-    await refetch();
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        page: 1,
+        limit: 20,
+        column: 'users.first_name',
+        dir: 'asc' as const,
+        draw: 1,
+      };
+      
+      await refreshUsers(filters);
+    } catch (error) {
+      console.error('Failed to refresh users:', error);
+    }
+  };
+
+  // Load more users function
+  const handleLoadMore = async () => {
+    if (loading || !hasMoreData) return;
+    
+    try {
+      const filters = {
+        search: searchQuery || undefined,
+        limit: 20,
+        column: 'users.first_name',
+        dir: 'asc' as const,
+        draw: 1,
+      };
+
+      await loadMoreUsers(filters);
+    } catch (error) {
+      console.error('Failed to load more users:', error);
+    }
   };
 
   const selectedFilters = {
@@ -158,7 +195,7 @@ export default function UsersScreen() {
         <View className="mb-8 mt-4 px-5">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-black">
-              {loading ? "Loading..." : `Total ${pagination?.total || users?.length || 0}`}
+              {loading ? "Loading..." : `Total ${total || users?.length || 0}`}
             </Text>
             <View className="flex-row gap-2">
               {(selectedGenres.length > 0 || selectedCity || searchQuery) && (
@@ -192,11 +229,34 @@ export default function UsersScreen() {
             </View>
           )}
           
-          {/* Pagination Info */}
-          {users && users.length > 0 && pagination && (
+          {/* Load More Button */}
+          {users && users.length > 0 && hasMoreData && (
             <View className="py-4 items-center">
-              <Text className="text-gray-500 text-xs">
-                Showing {pagination.from}-{pagination.to} of {pagination.total} {userType}
+              <TouchableOpacity
+                onPress={handleLoadMore}
+                disabled={loading}
+                className={`px-6 py-3 rounded-full ${
+                  loading ? 'bg-gray-300' : 'bg-[#5271FF]'
+                }`}
+              >
+                <Text className={`text-sm font-semibold ${
+                  loading ? 'text-gray-500' : 'text-white'
+                }`}>
+                  {loading ? 'Loading...' : `Load More ${userType}`}
+                </Text>
+              </TouchableOpacity>
+              <Text className="text-gray-500 text-xs mt-2">
+                Page {page} of {lastPage} • {total} total {userType}
+              </Text>
+            </View>
+          )}
+          
+          {/* No More Results */}
+          {users && users.length > 0 && !hasMoreData && (
+            <View className="py-4 items-center">
+              <Text className="text-gray-400 text-sm">No more results</Text>
+              <Text className="text-gray-500 text-xs mt-1">
+                Showing all {total} {userType}
               </Text>
             </View>
           )}
