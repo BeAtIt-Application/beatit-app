@@ -8,7 +8,7 @@ import { useFYP } from "@/src/hooks/useFYP";
 import { useMusicGenres, useVenueTypes } from "@/src/hooks/useTaxonomies";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView } from "react-native";
+import { RefreshControl, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Discover");
@@ -29,6 +29,7 @@ export default function HomeScreen() {
       hour: '2-digit',
       minute: '2-digit'
     }),
+    event_start: apiEvent.event_start,
     location: `${apiEvent.venue_name}, ${apiEvent.city}`,
     venueName: apiEvent.venue_name,
     city: apiEvent.city,
@@ -323,6 +324,15 @@ export default function HomeScreen() {
     }
   };
 
+  // Handle pull to refresh
+  const handleRefresh = async () => {
+    try {
+      await refetchFYP();
+    } catch (error) {
+      console.error('Failed to refresh FYP data:', error);
+    }
+  };
+
   // Slider cards data
   const sliderCards: SliderCard[] = [
     {
@@ -357,6 +367,14 @@ export default function HomeScreen() {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 90 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={fypLoading}
+            onRefresh={handleRefresh}
+            tintColor="#5271FF"
+            colors={["#5271FF"]}
+          />
+        }
       >
         <PageHeader
           title="Home Feed"
