@@ -162,7 +162,7 @@ export default function EventsScreen() {
 
   // Handle search query changes with debounce
   useEffect(() => {
-    if (searchQuery !== undefined) {
+    if (searchQuery !== undefined && searchQuery !== "") {
       debouncedLoadEvents();
     }
   }, [searchQuery, debouncedLoadEvents]);

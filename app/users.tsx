@@ -59,7 +59,7 @@ export default function UsersScreen() {
 
   // Handle search query changes with debounce
   useEffect(() => {
-    if (searchQuery !== undefined) {
+    if (searchQuery !== undefined && searchQuery !== "") {
       const timeoutId = setTimeout(async () => {
         try {
           const filters = {

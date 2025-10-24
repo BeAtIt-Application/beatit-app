@@ -103,7 +103,7 @@ export default function VenuesScreen() {
 
   // Handle search query changes with debounce
   useEffect(() => {
-    if (searchQuery !== undefined) {
+    if (searchQuery !== undefined && searchQuery !== "") {
       debouncedLoadVenues();
     }
   }, [searchQuery, debouncedLoadVenues]);
