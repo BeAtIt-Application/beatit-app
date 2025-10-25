@@ -1,7 +1,7 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useFavorites } from "@/src/context/FavoritesContext";
 import { Image } from "expo-image";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 interface VenueCardProps {
@@ -28,9 +28,11 @@ interface VenueCardProps {
 
 const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizontalList }) => {
   const [isToggling, setIsToggling] = useState(false);
-  const { toggleVenueFavorite, isVenueFavorite } = useFavorites();
+  const { toggleVenueFavorite, isVenueFavorite, favoriteVenues } = useFavorites();
   
-  const isFavorite = isVenueFavorite(venue.id);
+  // Use context first, fallback to venue prop for initial state
+  // Accessing favoriteVenues directly forces re-render when Context updates
+  const isFavorite = favoriteVenues.has(venue.id) || venue.is_favourite || false;
 
   const handleHeartPress = async (e: any) => {
     e.stopPropagation();
@@ -106,14 +108,14 @@ const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHori
 
           <TouchableOpacity 
             onPress={handleHeartPress}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
             className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full h-10 w-10 justify-center items-center"
             disabled={isToggling}
           >
             <IconSymbol 
-              name="heart" 
-              size={16} 
-              color={isFavorite ? "#FF6B6B" : "#FFFFFF"} 
+              name={"heart"} 
+              size={18} 
+              color={isFavorite ? "#FF6B6B" : "#9CA3AF"} 
             />
           </TouchableOpacity>
         </View>
@@ -155,5 +157,6 @@ const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHori
   );
 };
 
-export const VenueCard = React.memo(VenueCardComponent);
+// Removed React.memo to allow re-renders when Context state changes
+export const VenueCard = VenueCardComponent;
 VenueCard.displayName = 'VenueCard';

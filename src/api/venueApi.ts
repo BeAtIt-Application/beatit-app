@@ -210,8 +210,9 @@ export class VenueApi {
   /**
    * Toggle venue favorite status
    * @param venueId - The venue ID to toggle favorite
+   * @returns { is_favourite: boolean, message: string }
    */
-  static async toggleVenueFavorite(venueId: number): Promise<{ success: boolean; is_favourite: boolean; message: string }> {
+  static async toggleVenueFavorite(venueId: number): Promise<{ is_favourite: boolean; message: string }> {
     try {
       const endpoint = `/venue/public/${venueId}/toggle-favourite`;
       

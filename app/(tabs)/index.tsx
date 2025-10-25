@@ -76,7 +76,8 @@ export default function HomeScreen() {
       
       setInitialFavorites(favoriteVenueIds);
     }
-  }, [fypData, fypError, fypLoading, setInitialFavorites]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fypData, fypError, fypLoading]);
 
   const tabs = ["Discover", "Events", "Venues", "Artists"];
 

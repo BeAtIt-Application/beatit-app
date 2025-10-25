@@ -225,14 +225,14 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
           {/* Heart Favorite Button */}
           <TouchableOpacity 
             onPress={handleHeartPress}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
             className="absolute top-12 right-5 bg-white/90 p-2 rounded-full h-10 w-10 justify-center items-center"
             disabled={isToggling}
           >
             <IconSymbol 
               name="heart" 
-              size={16} 
-              color={isFavorite ? "#FF6B6B" : "#FFFFFF"} 
+              size={18} 
+              color={isFavorite ? "#FF6B6B" : "#9CA3AF"} 
             />
           </TouchableOpacity>
           

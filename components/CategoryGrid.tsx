@@ -31,6 +31,7 @@ export function CategoryGrid({
         <View key={i} className="flex-row gap-3 mb-3">
           {rowItems.map((item) => (
             <TouchableOpacity
+              activeOpacity={1}
               key={item.id}
               className="flex-1 bg-gray-100 px-5 py-3 rounded-full justify-center items-center bg-white"
               onPress={() => onItemPress?.(item)}
