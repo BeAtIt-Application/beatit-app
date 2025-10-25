@@ -24,9 +24,10 @@ interface VenueCardProps {
   };
   onPress?: () => void;
   fromHorizontalList?: boolean;
+  hideLikeButton?: boolean;
 }
 
-const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizontalList }) => {
+const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHorizontalList, hideLikeButton }) => {
   const [isToggling, setIsToggling] = useState(false);
   const { toggleVenueFavorite, isVenueFavorite, favoriteVenues } = useFavorites();
   
@@ -106,18 +107,20 @@ const VenueCardComponent: React.FC<VenueCardProps> = ({ venue, onPress, fromHori
             transition={200}
           />
 
-          <TouchableOpacity 
-            onPress={handleHeartPress}
-            activeOpacity={0.7}
-            className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full h-10 w-10 justify-center items-center"
-            disabled={isToggling}
-          >
-            <IconSymbol 
-              name={"heart"} 
-              size={18} 
-              color={isFavorite ? "#FF6B6B" : "#9CA3AF"} 
-            />
-          </TouchableOpacity>
+          {!hideLikeButton && (
+            <TouchableOpacity 
+              onPress={handleHeartPress}
+              activeOpacity={0.7}
+              className="absolute top-3 right-2.5 bg-white/90 p-2 rounded-full h-10 w-10 justify-center items-center"
+              disabled={isToggling}
+            >
+              <IconSymbol 
+                name={"heart"} 
+                size={18} 
+                color={isFavorite ? "#FF6B6B" : "#9CA3AF"} 
+              />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Venue Details */}

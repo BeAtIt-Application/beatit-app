@@ -22,9 +22,10 @@ export const VenueDetails: React.FC<VenueDetailsProps> = ({ venue }) => {
   const [isToggling, setIsToggling] = useState(false);
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   const { rateVenue, loading: ratingLoading } = useRateVenue();
-  const { toggleVenueFavorite, isVenueFavorite } = useFavorites();
+  const { toggleVenueFavorite, isVenueFavorite, favoriteVenues } = useFavorites();
   
-  const isFavorite = isVenueFavorite(venue.id);
+  // Use favoriteVenues directly to subscribe to Context changes
+  const isFavorite = favoriteVenues.has(venue.id) || venue.is_favourite || false;
 
   // Get the banner image from the venue's root banner field
   const getBannerImage = () => {

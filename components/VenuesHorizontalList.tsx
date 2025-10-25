@@ -58,6 +58,7 @@ export function VenuesHorizontalList({
               venue={venue}
               onPress={() => router.push(`/venue-detail?id=${venue.id}`)}
               fromHorizontalList={true}
+              hideLikeButton={true}
             />
           ))}
         </View>
