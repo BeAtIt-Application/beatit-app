@@ -14,6 +14,7 @@ interface EventCardProps {
     city?: string;
     image: string;
     tags: string[];
+    ticket_price?: number;
   };
   onPress?: () => void;
   fromHorizontalList?: boolean;
@@ -72,7 +73,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, onPress, fromHori
             {event.title}
           </Text>
           <Text className="text-md text-gray-600 mb-1">{event.date}</Text>
-          <View className="flex-row items-center mb-3">
+          <View className="flex-row items-center mb-1">
             <IconSymbol name="location" size={14} color="#666" />
             <View className="flex-row items-center ml-1">
               {event.venueName ? (
@@ -85,6 +86,14 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, onPress, fromHori
               )}
             </View>
           </View>
+          {event.ticket_price !== undefined && event.ticket_price !== null && (
+            <View className="mb-2 flex-row items-center">
+              <IconSymbol name="ticket" size={16} color="#666" />
+              <Text className="text-md font-semibold text-gray-600 ml-1">
+                {event.ticket_price === 0 ? 'Free' : `$${event.ticket_price.toFixed(2)}MKD`}
+              </Text>
+            </View>
+          )}
           <View className="flex-row gap-2">
             {event.tags.map((tag, index) => (
               <View key={index} className="bg-[#761CBC] px-2 py-1 rounded-2xl">

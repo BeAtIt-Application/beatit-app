@@ -47,6 +47,7 @@ const MAPPING = {
   'globe': 'language',
   'eye': 'visibility',
   'eye.slash': 'visibility-off',
+  'ticket': 'confirmation-number',
 } as IconMapping;
 
 /**

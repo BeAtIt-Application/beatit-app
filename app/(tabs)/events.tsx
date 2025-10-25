@@ -364,8 +364,9 @@ export default function EventsScreen() {
                   location: event.venue_name ? `${event.venue_name}, ${event.city}` : event.city,
                   venueName: event.venue_name,
                   city: event.city,
-                  image: event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+                  image: event.event_image || event.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
                   tags: event.music_genres || [event.city],
+                  ticket_price: event.ticket_price,
                 }}
                 onPress={() => router.push(`/event-detail?id=${event.id}`)}
               />

@@ -35,8 +35,9 @@ export default function HomeScreen() {
     location: `${apiEvent.venue_name}, ${apiEvent.city}`,
     venueName: apiEvent.venue_name,
     city: apiEvent.city,
-    image: apiEvent.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-    tags: apiEvent.music_genres || []
+    image: apiEvent.event_image || apiEvent.image || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+    tags: apiEvent.music_genres || [],
+    ticket_price: apiEvent.ticket_price
   });
 
   const transformVenueForComponent = (apiVenue: any) => ({
